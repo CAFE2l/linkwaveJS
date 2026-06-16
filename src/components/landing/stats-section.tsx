@@ -18,8 +18,8 @@ export function StatsSection({ stats }: { stats: LandingStats }) {
           const Icon = item.icon;
           return (
             <MotionReveal key={item.key} delay={index * 0.08}>
-              <Card className="group p-6 transition hover:-translate-y-1 hover:shadow-2xl">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm transition group-hover:bg-brand/15">
+              <Card className="group p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand/10">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm backdrop-blur-sm transition duration-300 group-hover:bg-brand/15 group-hover:shadow-md group-hover:shadow-brand/10">
                   <Icon size={23} />
                 </div>
                 <div className="font-mono text-4xl font-black tracking-tight md:text-5xl">

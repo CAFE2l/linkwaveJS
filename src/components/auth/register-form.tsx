@@ -285,7 +285,7 @@ export function RegisterForm() {
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.2 }}>
-        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-white/35 p-3 text-sm text-card-foreground backdrop-blur transition hover:bg-white/50 dark:bg-white/5 dark:hover:bg-white/8">
+        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/20 bg-white/30 p-3 text-sm text-card-foreground backdrop-blur-md transition hover:bg-white/50 dark:bg-white/5 dark:hover:bg-white/8">
           <input
             type="checkbox"
             className={cn(
@@ -380,7 +380,7 @@ function Field({
       <div className="relative">
         <span
           className={cn(
-            "pointer-events-none absolute left-4 top-4 z-10 text-brand",
+            "pointer-events-none absolute left-4 top-4 z-10 text-brand/70",
             error && "text-destructive",
           )}
         >

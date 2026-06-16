@@ -46,7 +46,7 @@ export function FeaturesSection() {
   return (
     <section id="recursos" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
       <MotionReveal className="max-w-2xl">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/8 px-4 py-1.5 text-sm font-semibold text-brand">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/35 px-4 py-1.5 text-sm font-semibold text-brand shadow-sm shadow-brand/10 backdrop-blur-xl">
           Recursos
         </div>
         <h2 className="text-4xl font-black tracking-tight md:text-5xl">
@@ -58,8 +58,8 @@ export function FeaturesSection() {
           const Icon = feature.icon;
           return (
             <MotionReveal key={feature.title} delay={index * 0.04} variant="up">
-              <Card className="group h-full p-6 transition hover:-translate-y-1 hover:shadow-2xl">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm transition group-hover:bg-brand/15">
+              <Card className="group h-full p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand/10">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm backdrop-blur-sm transition duration-300 group-hover:bg-brand/15 group-hover:shadow-md group-hover:shadow-brand/10">
                   <Icon size={21} />
                 </div>
                 <h3 className="text-lg font-black">{feature.title}</h3>

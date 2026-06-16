@@ -20,7 +20,6 @@ export default async function Home() {
   return (
     <ThemeProvider>
       <main className="aurora-shell relative min-h-screen overflow-hidden">
-        <div className="mesh-grid pointer-events-none fixed inset-0" />
         <Navbar isLoggedIn={Boolean(user)} />
         <HeroSection isLoggedIn={Boolean(user)} stats={stats} />
         <StatsSection stats={stats} />

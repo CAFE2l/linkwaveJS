@@ -27,7 +27,7 @@ export function HowItWorksSection() {
   return (
     <section id="como-funciona" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
       <MotionReveal className="mx-auto max-w-2xl text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/8 px-4 py-1.5 text-sm font-semibold text-brand">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/35 px-4 py-1.5 text-sm font-semibold text-brand shadow-sm shadow-brand/10 backdrop-blur-xl">
           Como funciona
         </div>
         <h2 className="text-4xl font-black tracking-tight md:text-5xl">
@@ -35,15 +35,16 @@ export function HowItWorksSection() {
         </h2>
       </MotionReveal>
       <div className="relative mt-14 grid gap-6 md:grid-cols-3">
-        <div className="pointer-events-none absolute left-0 right-0 top-1/2 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block" />
+        <div className="pointer-events-none absolute left-0 right-0 top-1/2 hidden h-px bg-gradient-to-r from-transparent via-brand/20 to-transparent md:block" />
         {steps.map((step, index) => {
           const Icon = step.icon;
           return (
             <MotionReveal key={step.title} delay={index * 0.1}>
-              <Card className="group relative h-full p-7 transition hover:-translate-y-1 hover:shadow-2xl">
+              <Card className="group relative h-full p-7 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand/10">
                 <div className="mb-5 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-strong text-white shadow-lg shadow-brand/25">
-                    <Icon size={22} />
+                  <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-brand to-brand-strong text-white shadow-lg shadow-brand/25">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/40 to-transparent" />
+                    <Icon size={22} className="relative" />
                   </div>
                   <span className="font-mono text-sm font-black tracking-wider text-muted">
                     {step.number}

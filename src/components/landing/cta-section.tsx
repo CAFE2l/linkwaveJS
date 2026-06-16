@@ -15,16 +15,19 @@ export function CTASection({
     <section className="mx-auto max-w-5xl px-4 py-20 md:py-28">
       <MotionReveal variant="scale">
         <Card className="glass-strong relative overflow-hidden p-8 text-center shadow-2xl md:p-14">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-full bg-accent/15 blur-3xl" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 rounded-full bg-brand/10 blur-3xl" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 rounded-full bg-gradient-to-r from-accent/15 via-brand/10 to-cyan/15 blur-[100px] animate-aurora" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 rounded-full bg-gradient-to-r from-cyan/10 via-accent/10 to-brand/10 blur-[100px] animate-aurora" style={{ animationDelay: "-10s" }} />
           <div className="relative">
-            <Image
-              src="/brand/icon.png"
-              alt="LinkWave"
-              width={80}
-              height={80}
-              className="mx-auto rounded-3xl shadow-xl"
-            />
+            <div className="relative mx-auto inline-block">
+              <Image
+                src="/brand/icon.png"
+                alt="LinkWave"
+                width={80}
+                height={80}
+                className="rounded-3xl shadow-xl ring-2 ring-white/30"
+              />
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/40 to-transparent opacity-60" />
+            </div>
             <h2 className="mt-7 text-4xl font-black tracking-tight md:text-5xl">
               Vamos surfar juntos?
             </h2>

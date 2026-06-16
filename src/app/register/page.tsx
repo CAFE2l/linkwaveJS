@@ -39,31 +39,33 @@ export default async function RegisterPage() {
 
   return (
     <main className="aurora-shell relative min-h-screen overflow-hidden px-4 py-6">
-      <div className="mesh-grid pointer-events-none absolute inset-0" />
-
-      <div className="pointer-events-none absolute left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/30 blur-[100px] dark:bg-emerald-500/12 animate-blob" />
-      <div className="pointer-events-none absolute right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/35 blur-[100px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
-      <div className="pointer-events-none absolute left-[40%] top-[10%] h-[25rem] w-[25rem] rounded-full bg-indigo-300/20 blur-[100px] dark:bg-indigo-500/10 animate-blob-3" style={{ animationDelay: "-8s" }} />
+      <div className="pointer-events-none absolute left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/25 blur-[120px] dark:bg-emerald-500/12 animate-blob" />
+      <div className="pointer-events-none absolute right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/30 blur-[120px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
+      <div className="pointer-events-none absolute left-[40%] top-[10%] h-[25rem] w-[25rem] rounded-full bg-indigo-300/15 blur-[100px] dark:bg-indigo-500/10 animate-blob-3" style={{ animationDelay: "-8s" }} />
 
       <div className="relative mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl flex-col">
         <header className="glass-nav mb-8 flex items-center justify-between rounded-full px-4 py-3 shadow-lg shadow-sky-950/5">
           <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/brand/icon.png"
-              alt="LinkWave"
-              width={44}
-              height={44}
-              className="rounded-2xl"
-              priority
-            />
+            <div className="relative">
+              <Image
+                src="/brand/icon.png"
+                alt="LinkWave"
+                width={44}
+                height={44}
+                className="rounded-2xl"
+                priority
+              />
+              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/30 to-transparent opacity-50" />
+            </div>
             <span className="text-lg font-black text-foreground">
               LinkWave
             </span>
           </Link>
           <Link
             href="/login"
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-bold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:bg-white/80 dark:hover:bg-white/10"
+            className="relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-white/20 to-white/5 px-4 text-sm font-bold text-foreground shadow-lg shadow-black/5 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-white/8 dark:from-white/8 dark:to-white/3"
           >
+            <div className="pointer-events-none absolute inset-x-[15%] top-0 h-[1px] rounded-full bg-gradient-to-r from-transparent via-white/60 to-transparent" />
             Login
             <ArrowRight className="size-4" />
           </Link>
@@ -71,7 +73,7 @@ export default async function RegisterPage() {
 
         <section className="grid flex-1 items-center gap-10 pb-8 lg:grid-cols-[1fr_30rem]">
           <div className="hidden lg:block">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-bold text-brand shadow-sm">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-white/40 px-4 py-2 text-sm font-bold text-brand shadow-sm backdrop-blur-md">
               <Sparkles className="size-4" />
               Cadastro seguro com Supabase
             </div>
@@ -87,9 +89,9 @@ export default async function RegisterPage() {
               {benefits.map((item) => (
                 <div
                   key={item.text}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-card/70 px-5 py-3.5 text-sm font-semibold text-card-foreground shadow-sm backdrop-blur transition hover:bg-card"
+                  className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/40 px-5 py-3.5 text-sm font-semibold text-card-foreground shadow-sm backdrop-blur-md transition hover:bg-white/60 dark:bg-white/5 dark:hover:bg-white/8"
                 >
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand shadow-sm backdrop-blur-sm">
                     <item.icon className="size-4" />
                   </div>
                   {item.text}
@@ -101,13 +103,14 @@ export default async function RegisterPage() {
           <div className="mx-auto w-full max-w-md">
             <div className="glass-panel rounded-[2rem] p-6 sm:p-8">
               <div className="mb-8 text-center">
-                <div className="mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-brand/20 to-accent/10 p-0 shadow-inner">
+                <div className="relative mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-brand/20 to-accent/10 p-0 shadow-inner">
+                  <div className="absolute inset-0 rounded-[1.25rem] bg-gradient-to-b from-white/30 to-transparent opacity-50" />
                   <Image
                     src="/brand/icon.png"
                     alt="LinkWave"
                     width={56}
                     height={56}
-                    className="drop-shadow-xl"
+                    className="relative drop-shadow-xl"
                     priority
                   />
                 </div>
@@ -122,7 +125,7 @@ export default async function RegisterPage() {
               <RegisterForm />
             </div>
 
-            <footer className="mt-5 rounded-2xl border border-border bg-card/60 p-4 text-center text-xs text-muted backdrop-blur">
+            <footer className="mt-5 rounded-2xl border border-white/20 bg-white/30 p-4 text-center text-xs text-muted shadow-sm backdrop-blur-md dark:bg-white/5">
               © 2026 LinkWave. Todos os direitos reservados.
             </footer>
           </div>

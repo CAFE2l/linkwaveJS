@@ -73,7 +73,6 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <main className="aurora-shell relative min-h-screen overflow-hidden px-4 py-10">
-      <div className="mesh-grid pointer-events-none absolute inset-0" />
       <section className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-xl flex-col justify-center">
         <div className="glass-panel rounded-[2rem] p-6 text-center">
           <div className="mx-auto flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] border border-border bg-white/80 shadow-xl dark:bg-white/10">

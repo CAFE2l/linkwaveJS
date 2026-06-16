@@ -23,9 +23,10 @@ import { Card } from "@/components/ui/card";
 import { LinkForm } from "@/components/dashboard/link-form";
 import { EditLinkModal, DeleteLinkModal } from "@/components/dashboard/edit-modal";
 import { useToast } from "@/components/dashboard/toast";
+import { IconImage } from "@/components/dashboard/icon-image";
 import type { Link } from "@/types/database";
 
-const ICON_STYLES: Record<string, string> = {
+const FALLBACK_STYLES: Record<string, string> = {
   instagram: "linear-gradient(135deg, #f58529, #dd2a7b, #8134af)",
   youtube: "linear-gradient(135deg, #ff0000, #cc0000)",
   github: "linear-gradient(135deg, #6b7280, #1f2937)",
@@ -42,30 +43,41 @@ const ICON_STYLES: Record<string, string> = {
   link: "linear-gradient(135deg, #818cf8, #4f46e5)",
 };
 
-function getIconStyle(icon: string | null): string {
+function getFallbackStyle(icon: string | null): string {
   const key = icon?.toLowerCase() ?? "link";
-  return ICON_STYLES[key] ?? "linear-gradient(135deg, #38bdf8, #0284c7)";
+  return FALLBACK_STYLES[key] ?? "linear-gradient(135deg, #38bdf8, #0284c7)";
 }
 
 function getIconLabel(icon: string | null): string {
-  const map: Record<string, string> = {
-    instagram: "IG",
-    youtube: "YT",
-    github: "GH",
-    twitter: "X",
-    linkedin: "in",
-    tiktok: "TT",
-    twitch: "TW",
-    discord: "DC",
-    telegram: "TG",
-    whatsapp: "WA",
-    spotify: "SP",
-    email: "@",
-    website: "WWW",
-    link: "🔗",
-  };
-  const key = icon?.toLowerCase() ?? "link";
-  return map[key] ?? icon?.slice(0, 2).toUpperCase() ?? "🔗";
+  if (!icon) return "🔗";
+  return icon.slice(0, 2).toUpperCase();
+}
+
+function IconDisplay({ icon }: { icon: string | null }) {
+  if (!icon || icon === "link") {
+    return (
+      <div
+        className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
+        style={{ background: getFallbackStyle(icon) }}
+      >
+        🔗
+      </div>
+    );
+  }
+  return (
+    <IconImage
+      name={icon}
+      className="size-10 shrink-0 rounded-xl object-contain"
+      fallback={
+        <div
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
+          style={{ background: getFallbackStyle(icon) }}
+        >
+          {getIconLabel(icon)}
+        </div>
+      }
+    />
+  );
 }
 
 export function LinksManager({ links }: { links: Link[] }) {
@@ -211,12 +223,7 @@ function SortableLink({
           <GripVertical size={18} />
         </button>
 
-        <div
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
-          style={{ background: getIconStyle(link.icon) }}
-        >
-          {getIconLabel(link.icon)}
-        </div>
+        <IconDisplay icon={link.icon} />
 
         <div className="min-w-0 flex-1">
           <div className="truncate font-black">{link.title}</div>

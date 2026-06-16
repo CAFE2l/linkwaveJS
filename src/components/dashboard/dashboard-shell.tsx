@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, LogOut, Sparkles } from "lucide-react";
+import { ExternalLink, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
@@ -49,12 +49,6 @@ export function DashboardShell({
                   height={44}
                   className="rounded-xl"
                 />
-                <div className="absolute -right-1 -top-1">
-                  <Sparkles
-                    size={12}
-                    className="text-brand drop-shadow-[0_0_6px_rgba(14,165,233,0.5)]"
-                  />
-                </div>
               </div>
               <div>
                 <div className="flex items-center gap-2 text-lg font-black">

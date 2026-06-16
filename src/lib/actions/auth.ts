@@ -191,7 +191,7 @@ export async function registerUserAction(
   return {
     ok: true,
     message: "Conta criada com sucesso.",
-    redirectTo: "/onboarding",
+    redirectTo: "/dashboard",
   };
 }
 

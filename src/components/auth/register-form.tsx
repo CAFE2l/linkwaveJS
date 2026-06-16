@@ -144,10 +144,7 @@ export function RegisterForm() {
           return;
         }
 
-        setSuccessMessage(result.message);
-        setTimeout(() => {
-          router.push(result.redirectTo ?? "/onboarding");
-        }, 600);
+        router.push(result.redirectTo ?? "/dashboard");
       });
     },
     [router, setError],

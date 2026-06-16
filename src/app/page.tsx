@@ -19,7 +19,7 @@ export default async function Home() {
 
   return (
     <ThemeProvider>
-      <main className="aurora-shell relative min-h-screen overflow-hidden">
+      <main className="aero-shell relative min-h-screen overflow-hidden">
         <Navbar isLoggedIn={Boolean(user)} />
         <HeroSection isLoggedIn={Boolean(user)} stats={stats} />
         <StatsSection stats={stats} />

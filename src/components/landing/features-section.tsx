@@ -45,7 +45,7 @@ export function FeaturesSection() {
   return (
     <section id="recursos" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
       <MotionReveal className="max-w-2xl">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold text-brand backdrop-blur-xl dark:bg-[rgba(0,180,255,0.08)] dark:border-[rgba(0,180,255,0.2)]" style={{ background: "rgba(255,255,255,0.35)", border: "1.5px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 14px rgba(42,168,224,0.15), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/30 px-4 py-1.5 text-sm font-semibold text-brand shadow-sm backdrop-blur-xl dark:border-[rgba(0,180,255,0.1)] dark:bg-[rgba(0,180,255,0.06)]">
           Recursos
         </div>
         <h2 className="text-4xl font-black tracking-tight md:text-5xl dark:text-[#d6eaff]">
@@ -58,11 +58,11 @@ export function FeaturesSection() {
           return (
             <MotionReveal key={feature.title} delay={index * 0.04} variant="up">
               <div className="aero-card group h-full p-6 cursor-default">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl backdrop-blur-sm transition duration-300 dark:bg-[rgba(0,200,255,0.08)] dark:text-[#00c8ff]" style={{ background: "rgba(42,168,224,0.1)", color: "#2aa8e0" }}>
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl text-brand backdrop-blur-sm transition duration-300 dark:bg-[rgba(0,200,255,0.06)] dark:text-[#00c8ff]" style={{ background: "rgba(42,168,224,0.1)" }}>
                   <Icon size={21} />
                 </div>
                 <h3 className="text-lg font-black dark:text-[#d6eaff]">{feature.title}</h3>
-                <p className="mt-2 leading-7 dark:text-[#6090b0]" style={{ color: "#4f6d8a" }}>{feature.description}</p>
+                <p className="mt-2 leading-7 text-muted">{feature.description}</p>
               </div>
             </MotionReveal>
           );

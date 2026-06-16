@@ -9,7 +9,7 @@ export type IconInfo = {
 };
 
 export async function listIconsAction(): Promise<IconInfo[]> {
-  const iconsDir = join(process.cwd(), "imgs", "icons", "links");
+  const iconsDir = join(process.cwd(), "public", "imgs", "icons", "links");
   const files = readdirSync(iconsDir);
   return files
     .filter((f) => f.endsWith(".png"))

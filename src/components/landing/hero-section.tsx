@@ -24,14 +24,14 @@ export function HeroSection({
 }) {
   return (
     <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-28 md:grid-cols-[1.05fr_0.95fr] md:pb-32 md:pt-36">
-      <div className="aero-blob aero-blob-1 left-[3%] top-[10%]" />
-      <div className="aero-blob aero-blob-2 right-[5%] top-[25%]" />
-      <div className="aero-blob aero-blob-3 left-[35%] top-[50%]" />
+      <div className="hero-deco aero-blob aero-blob-1 left-[3%] top-[10%]" />
+      <div className="hero-deco aero-blob aero-blob-2 right-[5%] top-[25%]" />
+      <div className="hero-deco aero-blob aero-blob-3 left-[35%] top-[50%]" />
 
       <MotionReveal>
-        <div className="relative">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/35 px-4 py-1.5 text-sm font-semibold text-brand backdrop-blur-xl dark:bg-[rgba(0,180,255,0.08)] dark:border-[rgba(0,180,255,0.2)]" style={{ border: "1.5px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 14px rgba(42,168,224,0.15), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-            <span className="h-2 w-2 rounded-full bg-accent shadow-sm animate-glow-pulse dark:bg-[#00ff88]" style={{ boxShadow: "0 0 8px rgba(40,176,96,0.5)" }} />
+        <div className="relative z-10">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/30 px-4 py-1.5 text-sm font-semibold text-brand shadow-sm backdrop-blur-xl dark:border-[rgba(0,180,255,0.1)] dark:bg-[rgba(0,180,255,0.06)]">
+            <span className="h-2 w-2 rounded-full bg-accent shadow-sm animate-glow-pulse dark:bg-[#00ff88]" />
             LinkWave v1.0 &mdash; Crie sua onda
           </div>
 

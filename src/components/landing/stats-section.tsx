@@ -18,13 +18,13 @@ export function StatsSection({ stats }: { stats: LandingStats }) {
           return (
             <MotionReveal key={item.key} delay={index * 0.08}>
               <div className="aero-card group p-6 cursor-default">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl backdrop-blur-sm transition duration-300 dark:bg-[rgba(0,200,255,0.08)] dark:text-[#00c8ff]" style={{ background: "rgba(42,168,224,0.1)", color: "#2aa8e0" }}>
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl text-brand backdrop-blur-sm transition duration-300 dark:text-[#00c8ff]" style={{ background: "rgba(42,168,224,0.1)" }}>
                   <Icon size={23} />
                 </div>
                 <div className="font-mono text-4xl font-black tracking-tight md:text-5xl dark:text-[#d6eaff]">
                   <CountUp end={stats[item.key]} suffix={item.suffix} delay={index * 0.1} />
                 </div>
-                <p className="mt-2 font-semibold dark:text-[#6090b0]" style={{ color: "#4f6d8a" }}>{item.label}</p>
+                <p className="mt-2 font-semibold text-muted">{item.label}</p>
               </div>
             </MotionReveal>
           );

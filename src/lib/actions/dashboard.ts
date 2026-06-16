@@ -47,7 +47,17 @@ export async function updateProfileAction(input: unknown): Promise<ActionState> 
 
   const { error: profileError } = await supabase
     .from("profiles")
-    .upsert({ user_id: userId, bio: bio || null, theme, custom_colors: {} });
+    .upsert({
+      user_id: userId,
+      name: username,
+      username,
+      email,
+      avatar_url: avatarUrl || null,
+      active: true,
+      bio: bio || null,
+      theme,
+      custom_colors: {},
+    });
 
   if (userError || profileError) {
     return { ok: false, message: "Não foi possível atualizar o perfil." };

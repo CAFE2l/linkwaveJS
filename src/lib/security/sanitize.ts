@@ -10,5 +10,5 @@ export function normalizeEmail(value: string) {
 }
 
 export function normalizeUsername(value: string) {
-  return sanitizeText(value).toLowerCase();
+  return sanitizeText(value).toLowerCase().replace(/[^a-z0-9_]/g, "");
 }

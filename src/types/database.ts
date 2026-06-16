@@ -16,6 +16,7 @@ export type Database = {
           id: string;
           email: string;
           username: string;
+          name: string;
           avatar_url: string | null;
           active: boolean;
           created_at: string;
@@ -24,6 +25,7 @@ export type Database = {
           id: string;
           email: string;
           username: string;
+          name?: string;
           avatar_url?: string | null;
           active?: boolean;
           created_at?: string;
@@ -31,6 +33,7 @@ export type Database = {
         Update: {
           email?: string;
           username?: string;
+          name?: string;
           avatar_url?: string | null;
           active?: boolean;
         };

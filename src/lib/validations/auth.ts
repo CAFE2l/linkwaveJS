@@ -18,6 +18,15 @@ export const reservedUsernames = new Set([
   "account",
   "terms",
   "privacy",
+  "admin",
+  "administrator",
+  "moderator",
+  "staff",
+  "system",
+  "null",
+  "undefined",
+  "_",
+  "__",
 ]);
 
 export const usernameSchema = z
@@ -26,8 +35,14 @@ export const usernameSchema = z
   .toLowerCase()
   .min(3, "Use pelo menos 3 caracteres.")
   .max(30, "Use no máximo 30 caracteres.")
-  .regex(/^[a-z0-9_]{3,30}$/, "Use apenas letras minúsculas, números e underscore.")
-  .refine((value) => !reservedUsernames.has(value), "Este username é reservado.");
+  .regex(
+    /^[a-z0-9_]{3,30}$/,
+    "Use apenas letras minúsculas, números e underscore.",
+  )
+  .refine(
+    (value) => !reservedUsernames.has(value),
+    "Este username é reservado.",
+  );
 
 export const passwordSchema = z
   .string()
@@ -38,7 +53,11 @@ export const passwordSchema = z
   .regex(/[0-9]/, "Inclua pelo menos um número.");
 
 export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Informe um email válido."),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Informe um email válido."),
   password: z.string().min(6, "A senha precisa ter pelo menos 6 caracteres."),
 });
 
@@ -49,8 +68,15 @@ export const registerSchema = z
       .trim()
       .min(2, "Informe seu nome completo.")
       .max(80, "O nome pode ter no máximo 80 caracteres.")
-      .regex(/^[\p{L}\p{M}' -]+$/u, "Use apenas letras, espaços, hífen e apóstrofo."),
-    email: z.string().trim().toLowerCase().email("Informe um email válido."),
+      .regex(
+        /^[\p{L}\p{M}' -]+$/u,
+        "Use apenas letras, espaços, hífen e apóstrofo.",
+      ),
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .email("Informe um email válido."),
     username: usernameSchema,
     password: passwordSchema,
     confirmPassword: z.string(),
@@ -63,12 +89,12 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export const legacyRegisterSchema = loginSchema.extend({
-  username: usernameSchema,
-});
-
 export const resetPasswordSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Informe um email válido."),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Informe um email válido."),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

@@ -2,7 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 
-const protectedRoutes = ["/dashboard", "/profile"];
+const protectedRoutes = ["/dashboard", "/profile", "/onboarding", "/settings"];
+const authRoutes = ["/login", "/register"];
+
+function withSecurityHeaders(response: NextResponse) {
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  return response;
+}
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -11,7 +20,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
+    return withSecurityHeaders(response);
   }
 
   const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -36,13 +45,20 @@ export async function updateSession(request: NextRequest) {
   const isProtected = protectedRoutes.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   );
+  const isAuthRoute = authRoutes.some((path) => request.nextUrl.pathname.startsWith(path));
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+    return withSecurityHeaders(NextResponse.redirect(url));
   }
 
-  return response;
+  if (isAuthRoute && user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return withSecurityHeaders(NextResponse.redirect(url));
+  }
+
+  return withSecurityHeaders(response);
 }

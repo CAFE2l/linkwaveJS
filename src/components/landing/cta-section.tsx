@@ -12,23 +12,41 @@ export function CTASection({
   totalUsers: number;
 }) {
   return (
-    <section className="mx-auto max-w-5xl px-4 py-24">
-      <MotionReveal>
-        <Card className="relative overflow-hidden p-8 text-center md:p-14">
-          <div className="absolute inset-x-20 top-0 h-32 rounded-full bg-accent/20 blur-3xl" />
-          <Image src="/brand/icon.png" alt="" width={76} height={76} className="relative mx-auto rounded-3xl" />
-          <h2 className="relative mt-7 text-4xl font-black tracking-tight md:text-5xl">
-            Vamos surfar juntos?
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted">
-            {totalUsers.toLocaleString("pt-BR")} pessoas já estão na onda. Publique sua
-            página em menos de dois minutos.
-          </p>
-          <div className="relative mt-8">
-            <ButtonLink href={isLoggedIn ? "/dashboard" : "/register"} size="lg" variant="accent">
-              {isLoggedIn ? <ArrowRight size={19} /> : <UserPlus size={19} />}
-              {isLoggedIn ? "Acessar dashboard" : "Começar agora - grátis"}
-            </ButtonLink>
+    <section className="mx-auto max-w-5xl px-4 py-20 md:py-28">
+      <MotionReveal variant="scale">
+        <Card className="glass-strong relative overflow-hidden p-8 text-center shadow-2xl md:p-14">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-full bg-accent/15 blur-3xl" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 rounded-full bg-brand/10 blur-3xl" />
+          <div className="relative">
+            <Image
+              src="/brand/icon.png"
+              alt="LinkWave"
+              width={80}
+              height={80}
+              className="mx-auto rounded-3xl shadow-xl"
+            />
+            <h2 className="mt-7 text-4xl font-black tracking-tight md:text-5xl">
+              Vamos surfar juntos?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg leading-8 text-muted">
+              Mais de{" "}
+              <span className="font-black text-foreground">
+                {totalUsers.toLocaleString("pt-BR")}
+              </span>{" "}
+              pessoas já estão na onda. Crie sua página em menos de 2 minutos.
+            </p>
+            <div className="mt-8">
+              <ButtonLink
+                href={isLoggedIn ? "/dashboard" : "/register"}
+                size="lg"
+                variant="accent"
+              >
+                {isLoggedIn ? <ArrowRight size={19} /> : <UserPlus size={19} />}
+                {isLoggedIn
+                  ? "Acessar Dashboard"
+                  : "Começar agora — grátis"}
+              </ButtonLink>
+            </div>
           </div>
         </Card>
       </MotionReveal>

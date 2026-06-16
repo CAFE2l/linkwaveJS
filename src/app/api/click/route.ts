@@ -16,15 +16,17 @@ export async function POST(request: Request) {
 
   const headerStore = await headers();
   const supabase = await createClient();
-  const { error } = await supabase.from("clicks").insert({
-    link_id: parsed.data.linkId,
-    user_id: parsed.data.userId,
-    ip_address:
-      headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      headerStore.get("x-real-ip"),
-    country: headerStore.get("x-vercel-ip-country"),
-    city: headerStore.get("x-vercel-ip-city"),
-  });
+  const { error } = await supabase
+    .from("clicks")
+    .insert({
+      link_id: parsed.data.linkId,
+      user_id: parsed.data.userId,
+      ip_address:
+        headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        headerStore.get("x-real-ip"),
+      country: headerStore.get("x-vercel-ip-country"),
+      city: headerStore.get("x-vercel-ip-city"),
+    } as never);
 
   if (error) {
     return NextResponse.json({ error: "Click not recorded" }, { status: 500 });

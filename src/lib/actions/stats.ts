@@ -15,7 +15,7 @@ export async function getLandingStats(): Promise<LandingStats> {
         supabase.from("users").select("id").eq("active", true),
       ]);
 
-    const activeIds = activeUsers?.map((user) => user.id) ?? [];
+    const activeIds = activeUsers?.map((u) => u.id) ?? [];
     let usersWithClicks = 0;
 
     if (activeIds.length > 0) {

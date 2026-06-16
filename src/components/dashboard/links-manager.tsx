@@ -38,7 +38,7 @@ export function LinksManager({ links }: { links: Link[] }) {
     const newIndex = items.findIndex((item) => item.id === over.id);
     const ordered = arrayMove(items, oldIndex, newIndex);
     setItems(ordered);
-    startTransition(() => reorderLinksAction({ ids: ordered.map((item) => item.id) }));
+    startTransition(() => { void reorderLinksAction({ ids: ordered.map((item) => item.id) }); });
   }
 
   function remove(id: string) {

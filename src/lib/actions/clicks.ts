@@ -17,5 +17,5 @@ export async function recordClickAction(linkId: string, userId: string) {
     ip_address: ip,
     country: headerStore.get("x-vercel-ip-country"),
     city: headerStore.get("x-vercel-ip-city"),
-  });
+  } as never);
 }

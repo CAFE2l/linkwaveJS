@@ -35,7 +35,7 @@ import { UsernameAvailability } from "./username-availability";
 const formAnimation = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
 };
 
 const fieldAnimation = {
@@ -62,7 +62,7 @@ export function RegisterForm() {
     watch,
     setError,
     clearErrors,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -71,7 +71,7 @@ export function RegisterForm() {
       username: "",
       password: "",
       confirmPassword: "",
-      terms: false,
+      terms: true,
     },
     mode: "onBlur",
   });
@@ -84,7 +84,7 @@ export function RegisterForm() {
     [username],
   );
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (normalizedUsername.length < 3) {

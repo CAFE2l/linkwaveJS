@@ -55,7 +55,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground">{children}</body>
+      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

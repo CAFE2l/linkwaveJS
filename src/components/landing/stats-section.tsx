@@ -1,28 +1,29 @@
 import { Activity, MousePointerClick, SmilePlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { MotionReveal } from "@/components/shared/motion-reveal";
+import { CountUp } from "./count-up";
 import type { LandingStats } from "@/types/database";
 
 const labels = [
-  { key: "totalUsers", label: "Usuários ativos", icon: Activity },
-  { key: "totalClicks", label: "Cliques registrados", icon: MousePointerClick },
-  { key: "satisfaction", label: "Satisfação", icon: SmilePlus, suffix: "%" },
+  { key: "totalUsers" as const, label: "Usuários ativos", icon: Activity, suffix: "+" },
+  { key: "totalClicks" as const, label: "Cliques registrados", icon: MousePointerClick, suffix: "+" },
+  { key: "satisfaction" as const, label: "Satisfação", icon: SmilePlus, suffix: "%" },
 ] as const;
 
 export function StatsSection({ stats }: { stats: LandingStats }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10">
-      <div className="grid gap-4 md:grid-cols-3">
+    <section className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <div className="grid gap-5 md:grid-cols-3">
         {labels.map((item, index) => {
           const Icon = item.icon;
-          const value = stats[item.key].toLocaleString("pt-BR");
           return (
-            <MotionReveal key={item.key} delay={index * 0.06}>
-              <Card className="p-6">
-                <Icon className="mb-6 text-brand" size={24} />
-                <div className="font-mono text-4xl font-black">
-                  {value}
-                  {"suffix" in item ? item.suffix : "+"}
+            <MotionReveal key={item.key} delay={index * 0.08}>
+              <Card className="group p-6 transition hover:-translate-y-1 hover:shadow-2xl">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm transition group-hover:bg-brand/15">
+                  <Icon size={23} />
+                </div>
+                <div className="font-mono text-4xl font-black tracking-tight md:text-5xl">
+                  <CountUp end={stats[item.key]} suffix={item.suffix} delay={index * 0.1} />
                 </div>
                 <p className="mt-2 font-semibold text-muted">{item.label}</p>
               </Card>

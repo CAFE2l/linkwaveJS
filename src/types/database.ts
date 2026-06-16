@@ -37,6 +37,7 @@ export type Database = {
           avatar_url?: string | null;
           active?: boolean;
         };
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -78,6 +79,7 @@ export type Database = {
           custom_colors?: Json;
           updated_at?: string;
         };
+        Relationships: [];
       };
       links: {
         Row: {
@@ -104,6 +106,7 @@ export type Database = {
           icon?: string | null;
           order_position?: number;
         };
+        Relationships: [];
       };
       clicks: {
         Row: {
@@ -124,7 +127,12 @@ export type Database = {
           city?: string | null;
           created_at?: string;
         };
-        Update: never;
+        Update: {
+          ip_address?: string | null;
+          country?: string | null;
+          city?: string | null;
+        };
+        Relationships: [];
       };
       registration_rate_limits: {
         Row: {
@@ -137,7 +145,10 @@ export type Database = {
           ip_key: string;
           created_at?: string;
         };
-        Update: never;
+        Update: {
+          ip_key?: string;
+        };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicLinkButton } from "@/components/shared/public-link-button";
 import { createClient } from "@/lib/supabase/server";
@@ -22,7 +23,11 @@ async function getPublicProfile(username: string) {
 
   const [{ data: profile }, { data: links }] = await Promise.all([
     supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
-    supabase.from("links").select("*").eq("user_id", user.id).order("order_position"),
+    supabase
+      .from("links")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("order_position"),
   ]);
 
   return { user, profile, links: links ?? [] };
@@ -95,9 +100,12 @@ export default async function PublicProfilePage({ params }: Props) {
             ) : null}
           </div>
         </div>
-        <a href="/" className="mt-6 text-center text-sm font-bold text-muted hover:text-foreground">
+        <Link
+          href="/"
+          className="mt-6 text-center text-sm font-bold text-muted hover:text-foreground"
+        >
           Criado com LinkWave
-        </a>
+        </Link>
       </section>
     </main>
   );

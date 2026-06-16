@@ -166,6 +166,12 @@ button, a, input, textarea {
 .animate-blob-3 { animation: blob-float 18s ease-in-out infinite reverse; }
 .animate-pulse-subtle { animation: pulse-subtle 4s ease-in-out infinite; }
 
+.glass-nav {
+  border: 1px solid var(--border);
+  background: var(--card);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
 .scroll-shimmer {
   mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);

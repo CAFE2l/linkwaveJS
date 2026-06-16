@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import type { AppUser, Profile } from "@/types/database";
 
-export function ProfileForm({ user, profile }: { user: AppUser; profile: Profile | null }) {
+export function ProfileForm({
+  user,
+  profile,
+}: {
+  user: AppUser;
+  profile: Profile | null;
+}) {
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const form = useForm<ProfileInput>({
@@ -53,9 +59,15 @@ export function ProfileForm({ user, profile }: { user: AppUser; profile: Profile
           <option value="aurora">Aurora</option>
         </select>
       </label>
-      {message ? <p className="text-sm font-semibold text-muted">{message}</p> : null}
+      {message ? (
+        <p className="text-sm font-semibold text-muted">{message}</p>
+      ) : null}
       <Button type="submit" variant="accent" disabled={pending}>
-        {pending ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+        {pending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Save className="size-4" />
+        )}
         Salvar perfil
       </Button>
     </form>
@@ -75,7 +87,9 @@ function Field({
     <label className="block space-y-2">
       <span className="text-sm font-bold">{label}</span>
       {children}
-      {error ? <span className="text-xs font-semibold text-red-500">{error}</span> : null}
+      {error ? (
+        <span className="text-xs font-semibold text-red-500">{error}</span>
+      ) : null}
     </label>
   );
 }

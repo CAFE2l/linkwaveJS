@@ -18,19 +18,22 @@ export default async function DashboardPage() {
 
   if (!authUser) redirect("/login");
 
-  const [{ data: user }, { data: profile }, { data: links }, { data: clicks }] = await Promise.all([
-    supabase.from("users").select("*").eq("id", authUser.id).single(),
-    supabase.from("profiles").select("*").eq("user_id", authUser.id).maybeSingle(),
-    supabase.from("links").select("*").eq("user_id", authUser.id).order("order_position"),
-    supabase.from("clicks").select("link_id, links(title)").eq("user_id", authUser.id),
-  ]);
+  const userResult = await supabase.from("users").select("*").eq("id", authUser.id).single();
+  const profileResult = await supabase.from("profiles").select("*").eq("user_id", authUser.id).maybeSingle();
+  const linksResult = await supabase.from("links").select("*").eq("user_id", authUser.id).order("order_position") as unknown as { data: { id: string; user_id: string; title: string; url: string; icon: string | null; order_position: number; created_at: string }[] | null };
+  const clickResult = await supabase.from("clicks").select("link_id").eq("user_id", authUser.id) as unknown as { data: { link_id: string }[] | null };
+
+  const user = userResult.data;
+  const profile = profileResult.data ?? null;
+  const links = linksResult.data;
+  const clickRows = clickResult.data;
 
   if (!user) redirect("/register");
 
+  const linkMap = new Map(links?.map((l) => [l.id, l.title]) ?? []);
   const clickCounts = new Map<string, { title: string; count: number }>();
-  clicks?.forEach((click) => {
-    const link = Array.isArray(click.links) ? click.links[0] : click.links;
-    const title = link?.title ?? "Link";
+  clickRows?.forEach((click) => {
+    const title = linkMap.get(click.link_id) ?? "Link";
     const current = clickCounts.get(click.link_id) ?? { title, count: 0 };
     clickCounts.set(click.link_id, { title, count: current.count + 1 });
   });
@@ -40,7 +43,11 @@ export default async function DashboardPage() {
     <DashboardShell user={user}>
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
         <section className="space-y-6">
-          <StatsCards totalLinks={links?.length ?? 0} totalClicks={clicks?.length ?? 0} topLink={topLink} />
+          <StatsCards
+            totalLinks={links?.length ?? 0}
+            totalClicks={clickRows?.length ?? 0}
+            topLink={topLink}
+          />
           <Card className="p-6">
             <h1 className="text-2xl font-black">Perfil</h1>
             <p className="mt-2 text-sm font-medium text-muted">

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { AuthCard } from "@/components/shared/auth-card";
 import { LoginForm } from "@/components/shared/login-form";
@@ -20,7 +21,9 @@ export default function LoginPage() {
         </>
       }
     >
-      <LoginForm />
+      <Suspense fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />}>
+        <LoginForm />
+      </Suspense>
     </AuthCard>
   );
 }

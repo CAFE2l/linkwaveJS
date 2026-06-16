@@ -8,6 +8,7 @@ import {
   linkSchema,
   profileSchema,
   reorderLinksSchema,
+  userThemeSchema,
 } from "@/lib/validations/profile";
 
 type ActionState = {
@@ -163,4 +164,31 @@ export async function reorderLinksAction(
 
   revalidatePath("/dashboard");
   return { ok: true, message: "Ordem atualizada." };
+}
+
+export async function updateUserThemeAction(
+  input: unknown,
+): Promise<ActionState> {
+  const parsed = userThemeSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: parsed.error.issues[0]?.message ?? "Tema inválido.",
+    };
+  }
+
+  const { supabase, userId } = await getCurrentUserId();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ custom_colors: parsed.data as never })
+    .eq("user_id", userId);
+
+  if (error) {
+    return { ok: false, message: "Não foi possível salvar o tema." };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/u/*");
+  return { ok: true, message: "Tema salvo." };
 }

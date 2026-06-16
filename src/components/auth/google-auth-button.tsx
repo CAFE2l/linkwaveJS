@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import googleIcon from "/imgs/icons/links/Google.png";
+import googleIcon from "/public/imgs/icons/links/Google.png";
 
 export function GoogleAuthButton() {
   const [loading, setLoading] = useState(false);

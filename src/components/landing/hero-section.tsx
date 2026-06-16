@@ -4,16 +4,16 @@ import { ArrowRight, CheckCircle2, LogIn, UserPlus } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { MotionReveal } from "@/components/shared/motion-reveal";
 import type { LandingStats } from "@/types/database";
-import instagramIcon from "/imgs/icons/links/Instagram.png";
-import youtubeIcon from "/imgs/icons/links/Youtube.png";
-import tiktokIcon from "/imgs/icons/links/TikTok.png";
-import facebookIcon from "/imgs/icons/links/Facebook.png";
+import instagramIcon from "/public/imgs/icons/links/Instagram.png";
+import youtubeIcon from "/public/imgs/icons/links/Youtube.png";
+import tiktokIcon from "/public/imgs/icons/links/TikTok.png";
+import facebookIcon from "/public/imgs/icons/links/Facebook.png";
 
 const socialLinks = [
-  { name: "Instagram", icon: instagramIcon, handle: "@linkwave", url: "instagram.com/linkwave" },
-  { name: "YouTube", icon: youtubeIcon, handle: "@linkwave", url: "youtube.com/@linkwave" },
-  { name: "TikTok", icon: tiktokIcon, handle: "@linkwave", url: "tiktok.com/@linkwave" },
-  { name: "Facebook", icon: facebookIcon, handle: "/linkwave", url: "facebook.com/linkwave" },
+  { name: "Instagram", icon: instagramIcon, handle: "@usuario", url: "instagram.com", href: "https://instagram.com" },
+  { name: "YouTube", icon: youtubeIcon, handle: "@usuario", url: "youtube.com", href: "https://youtube.com" },
+  { name: "TikTok", icon: tiktokIcon, handle: "@usuario", url: "tiktok.com", href: "https://tiktok.com" },
+  { name: "Facebook", icon: facebookIcon, handle: "/usuario", url: "facebook.com", href: "https://facebook.com" },
 ] as const;
 
 export function HeroSection({
@@ -96,7 +96,7 @@ export function HeroSection({
                   <div className="mx-auto mb-2 h-14 w-14 overflow-hidden rounded-full" style={{ border: "3px solid rgba(255,255,255,0.85)", boxShadow: "0 4px 16px rgba(80,180,220,0.3)" }}>
                     <Image src="/brand/icon.png" alt="" width={56} height={56} className="h-full w-full object-cover" />
                   </div>
-                  <p className="phone-text-primary text-xs font-bold">@linkwave</p>
+                  <p className="phone-text-primary text-xs font-bold">@usuario</p>
                   <p className="phone-text-strong text-sm font-black">Minha onda</p>
                   <p className="phone-text-muted text-xs">Compartilhe seus links 🌊</p>
 
@@ -107,8 +107,8 @@ export function HeroSection({
 
                 <div className="relative mt-3 space-y-2 px-3 pb-4">
                   {socialLinks.map((item, i) => (
-                    <div key={item.name}
-                      className="phone-link-item group relative flex items-center gap-3 rounded-2xl p-3 transition-all duration-300"
+                    <a key={item.name} href={item.href} target="_blank" rel="noopener noreferrer"
+                      className="phone-link-item group relative flex items-center gap-3 rounded-2xl p-3 transition-all duration-300 no-underline"
                       style={{ animation: `fade-in-up 0.5s ease-out ${i * 0.1}s both` }}
                     >
                       <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/40 to-transparent dark:from-[rgba(0,200,255,0.05)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -118,7 +118,7 @@ export function HeroSection({
                         <p className="phone-text-muted truncate text-xs">{item.url}</p>
                       </div>
                       <ArrowRight size={14} className="phone-arrow relative z-10 shrink-0 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>

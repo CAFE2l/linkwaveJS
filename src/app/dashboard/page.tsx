@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ProfileCard } from "@/components/dashboard/profile-card";
 import { LinksManager } from "@/components/dashboard/links-manager";
+import { ThemeCustomizer } from "@/components/dashboard/theme-customizer";
 import { createClient } from "@/lib/supabase/server";
-import type { Link } from "@/types/database";
+import type { Link, UserThemeConfig } from "@/types/database";
 
 export const metadata = {
   title: "Dashboard",
@@ -51,6 +52,8 @@ export default async function DashboardPage() {
   const totalClicks = clickRows.length;
   const totalLinks = links.length;
 
+  const userTheme = (profile?.custom_colors ?? null) as UserThemeConfig | null;
+
   return (
     <DashboardShell user={user}>
       <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
@@ -63,6 +66,10 @@ export default async function DashboardPage() {
           />
         </div>
         <LinksManager links={links} />
+      </div>
+
+      <div className="mt-10">
+        <ThemeCustomizer initial={userTheme} />
       </div>
     </DashboardShell>
   );

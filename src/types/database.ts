@@ -88,6 +88,9 @@ export type Database = {
           title: string;
           url: string;
           icon: string | null;
+          icone: string | null;
+          icon_blob: string | null;
+          is_custom_icon: boolean;
           order_position: number;
           created_at: string;
         };
@@ -97,6 +100,9 @@ export type Database = {
           title: string;
           url: string;
           icon?: string | null;
+          icone?: string | null;
+          icon_blob?: string | null;
+          is_custom_icon?: boolean;
           order_position?: number;
           created_at?: string;
         };
@@ -104,6 +110,9 @@ export type Database = {
           title?: string;
           url?: string;
           icon?: string | null;
+          icone?: string | null;
+          icon_blob?: string | null;
+          is_custom_icon?: boolean;
           order_position?: number;
         };
         Relationships: [];
@@ -167,4 +176,38 @@ export type LandingStats = {
   totalUsers: number;
   totalClicks: number;
   satisfaction: number;
+};
+
+export type UserThemeConfig = {
+  background_type: "solid" | "gradient";
+  background_color: string;
+  background_gradient_start: string;
+  background_gradient_end: string;
+  card_color: string;
+  card_opacity: number;
+  card_blur: number;
+  card_border_radius: number;
+  card_shadow: boolean;
+  text_color_primary: string;
+  text_color_secondary: string;
+  button_color: string;
+  button_glow: boolean;
+  border_color: string;
+};
+
+export const DEFAULT_USER_THEME: UserThemeConfig = {
+  background_type: "gradient",
+  background_color: "#dceef9",
+  background_gradient_start: "#a8edcf",
+  background_gradient_end: "#4ab8f5",
+  card_color: "#ffffff",
+  card_opacity: 30,
+  card_blur: 14,
+  card_border_radius: 24,
+  card_shadow: true,
+  text_color_primary: "#0b1829",
+  text_color_secondary: "#4f6d8a",
+  button_color: "#0ea5e9",
+  button_glow: true,
+  border_color: "#ffffff",
 };

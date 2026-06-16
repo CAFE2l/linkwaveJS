@@ -35,10 +35,7 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
               <a
                 key={l.href}
                 href={l.href}
-                className="rounded-full px-4 py-2 text-sm font-semibold transition dark:text-[#6090b0] dark:hover:text-[#80d0ff] dark:hover:bg-[rgba(0,180,255,0.08)]"
-                style={{ color: "#4f6d8a" }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.4)"; e.currentTarget.style.color = "#1a6a9a"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#4f6d8a"; }}
+                className="rounded-full px-4 py-2 text-sm font-semibold text-[#4f6d8a] transition hover:bg-white/40 hover:text-[#1a6a9a] dark:text-[#6090b0] dark:hover:bg-[rgba(0,180,255,0.08)] dark:hover:text-[#80d0ff]"
               >
                 {l.label}
               </a>
@@ -70,22 +67,19 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {open && (
-        <div className="mx-4 mt-2 overflow-hidden rounded-2xl p-4 shadow-xl dark:bg-[rgba(8,18,38,0.8)] dark:border-[rgba(0,180,255,0.15)]" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(20px)", border: "1.5px solid rgba(255,255,255,0.75)" }}>
+        <div className="mx-4 mt-2 overflow-hidden rounded-2xl border border-white/20 bg-white/50 p-4 shadow-xl backdrop-blur-xl dark:border-[rgba(0,180,255,0.1)] dark:bg-[rgba(5,12,28,0.75)]">
           <div className="flex flex-col gap-1">
             {links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm font-semibold transition dark:text-[#6090b0] dark:hover:text-[#80d0ff] dark:hover:bg-[rgba(0,180,255,0.08)]"
-                style={{ color: "#4f6d8a" }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.4)"; e.currentTarget.style.color = "#1a6a9a"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#4f6d8a"; }}
+                className="rounded-xl px-4 py-3 text-sm font-semibold text-[#4f6d8a] transition hover:bg-white/40 hover:text-[#1a6a9a] dark:text-[#6090b0] dark:hover:bg-[rgba(0,180,255,0.08)] dark:hover:text-[#80d0ff]"
               >
                 {l.label}
               </a>
             ))}
-            <hr className="dark:border-[rgba(0,180,255,0.15)]" style={{ borderColor: "rgba(255,255,255,0.5)", margin: "0.5rem 0" }} />
+            <hr className="my-2 border-white/50 dark:border-[rgba(0,180,255,0.08)]" />
             <Link
               href={isLoggedIn ? "/dashboard" : "/register"}
               onClick={() => setOpen(false)}

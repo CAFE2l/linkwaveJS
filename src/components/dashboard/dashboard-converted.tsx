@@ -14,6 +14,36 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   const [links, setLinks] = useState<DbLink[]>(initialLinks ?? []);
   const [totalClicks, setTotalClicks] = useState<number>(initialClicks ?? 0);
 
+  // Full icon list (ported from PHP page)
+  const iconesDisponiveis: Record<string, string> = {
+    airbnb: 'Airbnb',
+    discord: 'Discord',
+    duolingo: 'Duolingo',
+    'facebook-messenger': 'Messenger',
+    facebook: 'Facebook',
+    github: 'GitHub',
+    gmail: 'Gmail',
+    instagram: 'Instagram',
+    linkedin: 'LinkedIn',
+    netflix: 'Netflix',
+    notion: 'Notion',
+    paypal: 'PayPal',
+    pinterest: 'Pinterest',
+    reddit: 'Reddit',
+    skype: 'Skype',
+    snapchat: 'Snapchat',
+    soundcloud: 'SoundCloud',
+    spotify: 'Spotify',
+    steam: 'Steam',
+    telegram: 'Telegram',
+    tiktok: 'TikTok',
+    tinder: 'Tinder',
+    twitch: 'Twitch',
+    twitter: 'Twitter',
+    whatsapp: 'WhatsApp',
+    youtube: 'YouTube'
+  };
+
   const [iconMode, setIconMode] = useState<'predefined' | 'custom'>('predefined');
   const [customIconDataUrl, setCustomIconDataUrl] = useState<string | null>(null);
   const [createTitle, setCreateTitle] = useState('');
@@ -23,6 +53,52 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   const [isEditing, setIsEditing] = useState(false);
   const [editingLink, setEditingLink] = useState<DbLink | null>(null);
   const [editCustomIconDataUrl, setEditCustomIconDataUrl] = useState<string | null>(null);
+
+  // Toast system
+  const [toasts, setToasts] = useState<Array<{ id: string; msg: string; type?: 'success'|'error' }>>([]);
+  function showToast(msg: string, type: 'success' | 'error' = 'success') {
+    const id = String(Date.now()) + Math.random().toString(36).slice(2,6);
+    setToasts((t) => [...t, { id, msg, type }]);
+    setTimeout(() => setToasts((t) => t.filter(x => x.id !== id)), 3000);
+  }
+
+  // Name / Bio modals
+  const [nameModalOpen, setNameModalOpen] = useState(false);
+  const [bioModalOpen, setBioModalOpen] = useState(false);
+  const [nameInput, setNameInput] = useState<string>(user?.name ?? '');
+  const [bioInput, setBioInput] = useState<string>(user?.bio ?? '');
+
+  async function saveName() {
+    if (!nameInput || nameInput.trim().length === 0) { showToast('❌ O nome não pode estar vazio', 'error'); return; }
+    if (nameInput.length > 60) { showToast('❌ Nome muito longo (máx 60)', 'error'); return; }
+    try {
+      const { error, data } = await supabase.from('users').update({ name: nameInput }).eq('id', user.id).select().single();
+      if (error) throw error;
+      showToast('✅ Nome atualizado!', 'success');
+      setNameModalOpen(false);
+      // update local user object (best-effort)
+      (user as any).name = nameInput;
+    } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
+  }
+
+  async function saveBio() {
+    if (bioInput.length > 160) { showToast('❌ Bio muito longa (máx 160)', 'error'); return; }
+    try {
+      const { error, data } = await supabase.from('users').update({ bio: bioInput }).eq('id', user.id).select().single();
+      if (error) throw error;
+      showToast('✅ Bio atualizada!', 'success');
+      setBioModalOpen(false);
+      (user as any).bio = bioInput;
+    } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
+  }
+
+  async function copyToClipboard(text: string) {
+    if (!text) { showToast('❌ Sem texto para copiar', 'error'); return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('✅ Link copiado!', 'success');
+    } catch (e) { console.error(e); showToast('❌ Erro ao copiar', 'error'); }
+  }
 
   const linksRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -182,7 +258,17 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
               </div>
 
               <h2 className="mt-4 text-2xl font-black">@{user?.username}</h2>
-              <p className="text-sm mb-3 font-semibold">{user?.name ?? 'Seu nome'}</p>
+
+              <div className="mt-2 mb-3 text-center md:text-left">
+                <p className="text-sm mb-2 text-ocean font-semibold inline-flex items-center gap-2">
+                  <span id="nomeText">{user?.name ?? 'Seu nome'}</span>
+                  <button onClick={() => setNameModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar nome">✎</button>
+                </p>
+                <p className="text-muted text-sm mb-1 inline-flex items-center gap-2">
+                  <span id="bioText">{(user as any)?.bio ?? 'Sem bio ainda'}</span>
+                  <button onClick={() => setBioModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar bio">✎</button>
+                </p>
+              </div>
 
               <div className="mt-5 w-full flex flex-col gap-2">
                 <button onClick={() => window.open(`/u/${user?.username}`, '_blank')} className="btn-blue">Ver perfil público</button>
@@ -318,6 +404,47 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
 
           </div>
         </main>
+
+        {/* Name & Bio modals and toasts */}
+        {nameModalOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="modal-dialog glass p-6 rounded-3xl w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-ocean">Editar Nome</h3>
+                <button onClick={() => setNameModalOpen(false)} className="text-muted">✕</button>
+              </div>
+              <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} type="text" maxLength={60} className="aero-input w-full mb-3" />
+              <div className="flex gap-3">
+                <button onClick={() => setNameModalOpen(false)} className="btn-ghost flex-1">Cancelar</button>
+                <button onClick={() => saveName()} className="btn-green flex-1">Salvar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {bioModalOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="modal-dialog glass p-6 rounded-3xl w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-ocean">Editar Bio</h3>
+                <button onClick={() => setBioModalOpen(false)} className="text-muted">✕</button>
+              </div>
+              <textarea value={bioInput} onChange={(e) => setBioInput(e.target.value)} maxLength={160} rows={3} className="aero-input w-full mb-3 resize-none" />
+              <div className="flex gap-3">
+                <button onClick={() => setBioModalOpen(false)} className="btn-ghost flex-1">Cancelar</button>
+                <button onClick={() => saveBio()} className="btn-green flex-1">Salvar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div aria-live="polite" className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+          {toasts.map(t => (
+            <div key={t.id} className={`toast ${t.type === 'success' ? 'success' : 'error'}`}>
+              {t.msg}
+            </div>
+          ))}
+        </div>
 
         <footer className="container mt-8">
           <div className="glass-sm p-4 flex items-center justify-between text-muted text-sm">

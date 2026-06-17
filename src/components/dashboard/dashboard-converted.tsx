@@ -53,6 +53,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   const [isEditing, setIsEditing] = useState(false);
   const [editingLink, setEditingLink] = useState<DbLink | null>(null);
   const [editCustomIconDataUrl, setEditCustomIconDataUrl] = useState<string | null>(null);
+  const [editSelectedIcon, setEditSelectedIcon] = useState<string>('');
 
   // Toast system
   const [toasts, setToasts] = useState<Array<{ id: string; msg: string; type?: 'success'|'error' }>>([]);
@@ -176,7 +177,8 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
     setIsEditing(true);
     setEditingLink(link);
     setEditCustomIconDataUrl(link.icon_blob ?? null);
-    // prefill select value by manipulating DOM after render is acceptable in small scope
+    setEditSelectedIcon(String(link.icone || ''));
+    // prefill select value after render
     setTimeout(() => {
       const sel = document.getElementById('edit_icon') as HTMLSelectElement | null;
       if (sel) sel.value = String(link.icone || '');
@@ -328,13 +330,27 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                 {iconMode === 'predefined' ? (
                   <div>
                     <label className="block text-xs mb-1.5">Selecione um ícone</label>
-                    <select value={createIcon} onChange={(e) => setCreateIcon(e.target.value)} className="aero-select w-full">
+                    <select value={createIcon} onChange={(e) => setCreateIcon(e.target.value)} className="aero-select w-full" aria-label="Selecionar ícone">
                       <option value="">-- Escolha um --</option>
-                      {/* minimal list - reuse some public icons */}
-                      <option value="instagram">Instagram</option>
-                      <option value="github">GitHub</option>
-                      <option value="linkedin">LinkedIn</option>
+                    {Object.entries(iconesDisponiveis).map(([key, name]) => (
+                      <option key={key} value={key}>{name}</option>
+                    ))}
                     </select>
+
+                    {/* Preview grid with clickable icons */}
+                    <div className="mt-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
+                    {Object.entries(iconesDisponiveis).map(([key, name]) => {
+                      const filename = key.split(/[^a-zA-Z0-9]+/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('_') + '.png';
+                      const src = `/imgs/icons/links/${filename}`;
+                      const isSelected = createIcon === key;
+                      return (
+                        <button type="button" key={key} onClick={() => setCreateIcon(key)} className={`flex flex-col items-center p-2 rounded ${isSelected ? 'ring-2 ring-blue-300' : 'bg-white/10'} hover:ring-2 hover:ring-blue-200`} title={name}>
+                          <img src={src} alt={name} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-8 h-8 object-contain mb-1" />
+                          <span className="text-xs text-muted truncate" style={{maxWidth: '4rem'}}>{name}</span>
+                        </button>
+                      );
+                    })}
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -476,12 +492,24 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                 </div>
                 <div>
                   <label className="block text-xs mb-2">Ícone Padrão</label>
-                  <select id="edit_icon" className="aero-select w-full default">
+                  <select id="edit_icon" className="aero-select w-full default" value={editSelectedIcon} onChange={(e)=>{ setEditSelectedIcon(e.target.value); }}>
                     <option value="">-- Sem ícone padrão --</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="github">GitHub</option>
-                    <option value="linkedin">LinkedIn</option>
+                    {Object.entries(iconesDisponiveis).map(([k,n]) => <option key={k} value={k}>{n}</option>)}
                   </select>
+
+                  {/* Preview grid for edit modal */}
+                  <div className="mt-3 grid grid-cols-6 gap-2">
+                    {Object.entries(iconesDisponiveis).map(([key, name]) => {
+                      const filename = key.split(/[^a-zA-Z0-9]+/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('_') + '.png';
+                      const src = `/imgs/icons/links/${filename}`;
+                      const isSelected = editSelectedIcon === key;
+                      return (
+                        <button key={key} type="button" onClick={() => { setEditSelectedIcon(key); setEditCustomIconDataUrl(null); const sel = document.getElementById('edit_icon') as HTMLSelectElement | null; if (sel) sel.value = key; }} className={`flex flex-col items-center p-1 rounded ${isSelected ? 'ring-2 ring-blue-300' : 'bg-white/5'}`} title={name}>
+                          <img src={src} alt={name} onError={(e)=>{ (e.target as HTMLImageElement).style.display = 'none'; }} className="w-8 h-8 object-contain mb-1" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs mb-2">Ou imagem customizada</label>

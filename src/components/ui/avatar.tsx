@@ -9,11 +9,11 @@ export function Avatar({
 }: {
   src?: string | null;
   alt: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
-  const dims = { sm: 32, md: 40, lg: 56 };
-  const px = dims[size];
+  const dims: Record<string, number> = { sm: 32, md: 40, lg: 56, xl: 96 };
+  const px = dims[size] ?? dims.md;
 
   return (
     <div

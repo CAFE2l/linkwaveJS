@@ -74,7 +74,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
       <div className="container">
         <nav className="nav-inner glass-sm p-3 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/assets/icons/icon.png" alt="LinkWave" className="w-9 h-9" />
+            <img src="/brand/icon.png" alt="LinkWave" className="w-9 h-9" />
             <span className="font-black text-xl text-ocean">LinkWave</span>
           </div>
           <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
         <footer className="container mt-8">
           <div className="glass-sm p-4 flex items-center justify-between text-muted text-sm">
             <div className="flex items-center gap-2">
-              <img src="/assets/icons/icon.png" alt="LinkWave" className="w-5 h-5 opacity-60" />
+              <img src="/brand/icon.png" alt="LinkWave" className="w-5 h-5 opacity-60" />
               <span className="font-bold text-ocean-light">LinkWave</span>
             </div>
             <div className="text-xs">Dashboard v1.0</div>

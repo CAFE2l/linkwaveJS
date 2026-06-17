@@ -11,11 +11,13 @@ export function EditLinkModal({
   link,
   open,
   onClose,
+  onSaved,
   onToast,
 }: {
   link: Link | null;
   open: boolean;
   onClose: () => void;
+  onSaved?: (link?: Link) => void;
   onToast?: (message: string, type?: "success" | "error") => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -55,19 +57,19 @@ export function EditLinkModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="glass-strong w-full max-w-md rounded-[1.75rem] p-6 shadow-2xl"
+            className="card w-full max-w-md rounded-xl p-6 shadow-2xl"
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-black">Editar link</h3>
               <button
                 onClick={onClose}
-                className="flex size-9 items-center justify-center rounded-xl text-muted transition hover:bg-white/30 hover:text-foreground dark:hover:bg-white/10"
+                className="flex size-9 items-center justify-center rounded-xl text-fg-secondary transition hover:bg-surface-hover hover:text-foreground dark:hover:bg-surface"
               >
                 <X size={18} />
               </button>
             </div>
             <div className="mt-5">
-              <LinkForm link={link} onSaved={onClose} onToast={onToast} />
+              <LinkForm link={link} onSaved={(updated) => { onSaved?.(updated); onClose(); }} onToast={onToast} />
             </div>
           </motion.div>
         </motion.div>
@@ -124,10 +126,10 @@ export function DeleteLinkModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="glass-strong w-full max-w-sm rounded-[1.75rem] p-6 shadow-2xl"
+            className="card w-full max-w-sm rounded-xl p-6 shadow-2xl"
           >
             <h3 className="text-lg font-black">Excluir link</h3>
-            <p className="mt-2 text-sm font-medium text-muted">
+            <p className="mt-2 text-sm font-medium text-fg-secondary">
               Tem certeza que deseja excluir &ldquo;{link?.title}&rdquo;? Esta
               ação não pode ser desfeita.
             </p>

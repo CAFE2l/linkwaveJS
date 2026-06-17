@@ -1,68 +1,42 @@
-import {
-  BarChart3,
-  Infinity,
-  Palette,
-  Smartphone,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import { BarChart3, Infinity, Palette, Smartphone } from "lucide-react";
 import { MotionReveal } from "@/components/shared/motion-reveal";
 
 const features = [
-  {
-    title: "Personalização total",
-    description: "Cores, temas e estilos. Sua página com sua cara, fluindo do seu jeito.",
-    icon: Palette,
-  },
-  {
-    title: "Links ilimitados",
-    description: "Adicione quantos links quiser e organize com ordenação drag-and-drop.",
-    icon: Infinity,
-  },
-  {
-    title: "Estatísticas em tempo real",
-    description: "Veja quantas pessoas estão surfando na sua onda com analytics real.",
-    icon: BarChart3,
-  },
-  {
-    title: "100% responsivo",
-    description: "Perfeito em qualquer dispositivo, do celular ao PC.",
-    icon: Smartphone,
-  },
-  {
-    title: "Segurança de verdade",
-    description: "RLS, validação Zod, rate limiting e proteção contra spam.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Performance nativa",
-    description: "Server Components, cache e carregamento instantâneo.",
-    icon: Zap,
-  },
+  { title: "Personalização total", description: "Cores, temas e estilos. Sua página com sua cara, fluindo do seu jeito.", icon: Palette },
+  { title: "Links ilimitados", description: "Adicione quantos links quiser e organize com ícones.", icon: Infinity },
+  { title: "Estatísticas em tempo real", description: "Veja quantas pessoas estão surfando na sua onda.", icon: BarChart3 },
+  { title: "100% responsivo", description: "Perfeito em qualquer dispositivo, do celular ao PC.", icon: Smartphone },
 ];
 
 export function FeaturesSection() {
   return (
-    <section id="recursos" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
-      <MotionReveal className="max-w-2xl">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/30 px-4 py-1.5 text-sm font-semibold text-brand shadow-sm backdrop-blur-xl dark:border-[rgba(0,180,255,0.1)] dark:bg-[rgba(0,180,255,0.06)]">
-          Recursos
-        </div>
-        <h2 className="text-4xl font-black tracking-tight md:text-5xl dark:text-[#d6eaff]">
+    <section className="mx-auto max-w-3xl px-5 py-20 md:py-28">
+      <MotionReveal className="text-center">
+        <span className="glass-tag">Recursos</span>
+        <h2 className="mt-4 text-3xl font-black tracking-tight md:text-4xl text-ocean" style={{ textShadow: "0 2px 0 rgba(255,255,255,0.5)" }}>
           Tudo que você precisa
         </h2>
       </MotionReveal>
-      <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto mt-12 grid gap-5 md:grid-cols-2">
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (
-            <MotionReveal key={feature.title} delay={index * 0.04} variant="up">
-              <div className="aero-card group h-full p-6 cursor-default">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl text-brand backdrop-blur-sm transition duration-300 dark:bg-[rgba(0,200,255,0.06)] dark:text-[#00c8ff]" style={{ background: "rgba(42,168,224,0.1)" }}>
-                  <Icon size={21} />
+            <MotionReveal key={feature.title} delay={index * 0.06}>
+              <div className="glass-card flex items-start gap-5 p-6">
+                <div
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px]"
+                  style={{
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(210,240,255,0.7))",
+                    border: "1.5px solid rgba(255,255,255,0.9)",
+                    boxShadow: "0 4px 12px rgba(80,180,220,0.2), inset 0 1px 0 rgba(255,255,255,1)",
+                  }}
+                >
+                  <Icon size={22} style={{ color: "#2a8abf" }} />
                 </div>
-                <h3 className="text-lg font-black dark:text-[#d6eaff]">{feature.title}</h3>
-                <p className="mt-2 leading-7 text-muted">{feature.description}</p>
+                <div>
+                  <h3 className="font-bold text-ocean">{feature.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{feature.description}</p>
+                </div>
               </div>
             </MotionReveal>
           );

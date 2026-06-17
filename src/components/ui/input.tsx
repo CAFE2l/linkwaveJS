@@ -1,32 +1,33 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils/cn";
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(
-        "h-12 w-full rounded-full border border-white/30 bg-white/30 px-4 text-sm text-foreground shadow-sm transition-all duration-300 placeholder:text-muted/60",
-        "backdrop-blur-lg",
-        "focus:border-brand/40 focus:bg-white/50 focus:shadow-lg focus:shadow-brand/10 focus:ring-2 focus:ring-brand/20",
-        "dark:border-white/8 dark:bg-white/5 dark:focus:bg-white/8",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...props }, ref) => (
+    <input
+      ref={ref}
       className={cn(
-        "min-h-28 w-full rounded-2xl border border-white/30 bg-white/30 px-4 py-3 text-sm text-foreground shadow-sm transition-all duration-300 placeholder:text-muted/60",
-        "backdrop-blur-lg",
-        "focus:border-brand/40 focus:bg-white/50 focus:shadow-lg focus:shadow-brand/10 focus:ring-2 focus:ring-brand/20",
-        "dark:border-white/8 dark:bg-white/5 dark:focus:bg-white/8",
+        "h-11 w-full rounded-xl border border-border bg-surface px-4 text-sm text-foreground placeholder:text-fg-secondary/60 transition-colors focus:border-brand focus:ring-2 focus:ring-brand-ring focus:outline-none",
         className,
       )}
       {...props}
     />
-  );
-}
+  ),
+);
+Input.displayName = "Input";
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => (
+    <textarea
+      ref={ref}
+      className={cn(
+        "w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground placeholder:text-fg-secondary/60 transition-colors focus:border-brand focus:ring-2 focus:ring-brand-ring focus:outline-none resize-y min-h-[100px]",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+Textarea.displayName = "Textarea";

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Card } from "@/components/ui/card";
 
 export function AuthCard({
   title,
@@ -15,17 +14,17 @@ export function AuthCard({
   footer: ReactNode;
 }) {
   return (
-    <main className="aurora-shell flex min-h-screen items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md p-7">
-        <Link href="/" className="mb-8 flex items-center gap-3">
-          <Image src="/brand/icon.png" alt="LinkWave" width={44} height={44} className="rounded-xl" />
-          <span className="text-xl font-black">LinkWave</span>
+    <main className="flex min-h-screen items-center justify-center bg-bg px-4 py-12">
+      <div className="card w-full max-w-md p-7">
+        <Link href="/" className="mb-6 flex items-center gap-3">
+          <Image src="/brand/icon.png" alt="LinkWave" width={40} height={40} className="rounded-xl" />
+          <span className="text-lg font-bold text-foreground">LinkWave</span>
         </Link>
-        <h1 className="text-3xl font-black tracking-tight">{title}</h1>
-        <p className="mt-2 leading-7 text-muted">{description}</p>
-        <div className="mt-7">{children}</div>
-        <div className="mt-7 text-center text-sm text-muted">{footer}</div>
-      </Card>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+        <p className="mt-2 text-sm leading-relaxed text-fg-secondary">{description}</p>
+        <div className="mt-6">{children}</div>
+        <div className="mt-6 text-center text-sm text-fg-secondary">{footer}</div>
+      </div>
     </main>
   );
 }

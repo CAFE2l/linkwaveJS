@@ -1,11 +1,11 @@
-import { ThemeProvider } from "@/components/landing/theme-provider";
 import { CTASection } from "@/components/landing/cta-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { Footer } from "@/components/landing/footer";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { Navbar } from "@/components/landing/navbar";
-import { StatsSection } from "@/components/landing/stats-section";
+import { BlobBackground } from "@/components/landing/blob-background";
+import { ThemeProvider } from "@/components/landing/theme-provider";
 import { getLandingStats } from "@/lib/actions/stats";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,15 +19,26 @@ export default async function Home() {
 
   return (
     <ThemeProvider>
-      <main className="aero-shell relative min-h-screen overflow-hidden">
-        <Navbar isLoggedIn={Boolean(user)} />
-        <HeroSection isLoggedIn={Boolean(user)} stats={stats} />
-        <StatsSection stats={stats} />
-        <HowItWorksSection />
-        <FeaturesSection />
-        <CTASection isLoggedIn={Boolean(user)} totalUsers={stats.totalUsers} />
-        <Footer />
-      </main>
+      <div className="min-h-screen landing-bg">
+        <BlobBackground />
+        <div className="relative z-10">
+          <Navbar isLoggedIn={Boolean(user)} />
+          <HeroSection isLoggedIn={Boolean(user)} stats={stats} />
+          <div className="mx-auto max-w-5xl px-5">
+            <div className="glass-divider" />
+          </div>
+          <HowItWorksSection />
+          <div className="mx-auto max-w-5xl px-5">
+            <div className="glass-divider" />
+          </div>
+          <FeaturesSection />
+          <div className="mx-auto max-w-5xl px-5">
+            <div className="glass-divider" />
+          </div>
+          <CTASection isLoggedIn={Boolean(user)} />
+          <Footer />
+        </div>
+      </div>
     </ThemeProvider>
   );
 }

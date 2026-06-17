@@ -1,7 +1,8 @@
-import type React from "react";
-import { CheckCircle2, UserPlus, ArrowRight } from "lucide-react";
-import type { LandingStats } from "@/types/database";
+"use client";
+
 import { MotionReveal } from "@/components/shared/motion-reveal";
+import { ArrowRight, CheckCircle2, UserPlus } from "lucide-react";
+import type { LandingStats } from "@/types/database";
 import Image from "next/image";
 
 function formatNumber(n: number): string {
@@ -17,72 +18,81 @@ export function HeroSection({
   stats: LandingStats;
 }) {
   return (
-    <section className="relative px-4 pb-20 pt-24 md:pb-28 md:pt-32">
-      <div className="hero-deco aero-blob aero-blob-1 left-[-150px] top-[-100px]" />
-      <div className="hero-deco aero-blob aero-blob-2 bottom-[-100px] right-[-100px]" />
-      <div className="hero-deco aero-blob aero-blob-3 left-1/2 top-2/4 -translate-x-1/2 -translate-y-1/2" />
-
+    <section className="relative px-5 pb-24 pt-32 md:pb-32 md:pt-40">
       <MotionReveal>
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <div className="mb-5">
-            <span className="aero-tag">✦ LinkWave v1.0 &mdash; Crie sua onda</span>
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-6">
+            <span className="glass-tag">✦ LinkWave v1.0 — Crie sua onda</span>
           </div>
 
           <div className="mb-8 flex justify-center">
-            <Image
-              src="/brand/icon.png"
-              alt="LinkWave"
-              width={112}
-              height={112}
-              className="logo-hero h-28 w-28 md:h-36 md:w-36"
-            />
+            <div className="animate-logo-float">
+              <Image
+                src="/brand/icon.png"
+                alt="LinkWave"
+                width={112}
+                height={112}
+                className="h-28 w-28 md:h-36 md:w-36"
+                style={{ filter: "drop-shadow(0 8px 24px rgba(80,200,240,0.5)) drop-shadow(0 2px 8px rgba(255,255,255,0.6))" }}
+              />
+            </div>
           </div>
 
-          <h1 className="text-balance text-5xl font-black leading-tight tracking-tight md:text-7xl hero-title-shadow">
+          <h1
+            className="text-balance text-5xl font-black leading-tight md:text-7xl text-ocean"
+            style={{ textShadow: "0 2px 0 rgba(255,255,255,0.88)" }}
+          >
             Sua onda de<br />
-            <span className="text-gradient-glow">links pessoais</span>
+            <span
+              style={{
+                background: "linear-gradient(135deg, #2aa8e0, #28b060)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              links pessoais
+            </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed md:text-xl" style={{ color: "rgba(30,80,120,0.55)" }}>
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed md:text-xl text-muted">
             Uma página única e compartilhável com todos os seus links. Simples de
             criar, impossível de ignorar.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             {isLoggedIn ? (
-              <a href="/dashboard" className="btn-cta">
+              <a href="/dashboard" className="glass-button-green px-8 py-3">
                 <ArrowRight size={19} /> Acessar dashboard
               </a>
             ) : (
               <>
-                <a href="/register" className="btn-cta">
+                <a href="/register" className="glass-button-green px-8 py-3">
                   <UserPlus size={19} /> Pegar minha onda
                 </a>
-                <a href="/login" className="btn-outline">
+                <a href="/login" className="glass-button-outline px-7 py-3">
                   Já tenho conta <ArrowRight size={17} />
                 </a>
               </>
             )}
           </div>
 
-          <p className="mt-6 text-sm" style={{ color: "rgba(30,80,120,0.55)" }}>
+          <p className="mt-6 text-sm text-muted">
             <CheckCircle2 size={15} className="mr-1 inline" style={{ color: "#28b060" }} />
-            Gratuito &middot; Sem cartão de crédito
+            Gratuito · Sem cartão de crédito
           </p>
 
-          <div className="mt-16 flex flex-wrap justify-center gap-5">
-            <div className="stat-card">
-              <p className="text-2xl font-black" style={{ color: "#2a8abf" }}>{formatNumber(stats.totalUsers)}</p>
-              <p className="mt-1 text-sm" style={{ color: "rgba(30,80,120,0.55)" }}>Usuários</p>
-            </div>
-            <div className="stat-card">
-              <p className="text-2xl font-black" style={{ color: "#2a8abf" }}>{formatNumber(stats.totalClicks)}</p>
-              <p className="mt-1 text-sm" style={{ color: "rgba(30,80,120,0.55)" }}>Cliques</p>
-            </div>
-            <div className="stat-card">
-              <p className="text-2xl font-black" style={{ color: "#2a8abf" }}>{stats.satisfaction}%</p>
-              <p className="mt-1 text-sm" style={{ color: "rgba(30,80,120,0.55)" }}>Satisfação</p>
-            </div>
+          <div className="mt-16 flex flex-wrap justify-center gap-4">
+            {[
+              { label: "Usuários", value: formatNumber(stats.totalUsers) },
+              { label: "Cliques", value: formatNumber(stats.totalClicks) },
+              { label: "Satisfação", value: `${stats.satisfaction}%` },
+            ].map((s) => (
+              <div key={s.label} className="glass-stat">
+                <p className="text-2xl font-black text-ocean-light">{s.value}</p>
+                <p className="mt-1 text-xs font-bold text-muted uppercase tracking-wider">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </MotionReveal>

@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ProfileCard } from "@/components/dashboard/profile-card";
+import DashboardConverted from "@/components/dashboard/dashboard-converted";
 import { LinksManager } from "@/components/dashboard/links-manager";
-import { ThemeCustomizer } from "@/components/dashboard/theme-customizer";
+import { StatsCards } from "@/components/dashboard/stats-cards";
 import { createClient } from "@/lib/supabase/server";
-import type { Link, UserThemeConfig } from "@/types/database";
+import type { Link } from "@/types/database";
 
 export const metadata = {
   title: "Dashboard",
@@ -23,11 +23,6 @@ export default async function DashboardPage() {
     .select("*")
     .eq("id", authUser.id)
     .single();
-  const profileResult = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .maybeSingle();
   const linksResult = (await supabase
     .from("links")
     .select("*")
@@ -43,7 +38,6 @@ export default async function DashboardPage() {
   };
 
   const user = userResult.data;
-  const profile = profileResult.data ?? null;
   const links = linksResult.data ?? [];
   const clickRows = clickResult.data ?? [];
 
@@ -51,26 +45,13 @@ export default async function DashboardPage() {
 
   const totalClicks = clickRows.length;
   const totalLinks = links.length;
-
-  const userTheme = (profile?.custom_colors ?? null) as UserThemeConfig | null;
+  const topLink = links.length > 0
+    ? links.reduce((a, b) => a.title.length > b.title.length ? a : b).title
+    : undefined;
 
   return (
     <DashboardShell user={user}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
-        <div className="space-y-6">
-          <ProfileCard
-            user={user}
-            profile={profile}
-            totalLinks={totalLinks}
-            totalClicks={totalClicks}
-          />
-        </div>
-        <LinksManager links={links} />
-      </div>
-
-      <div className="mt-10">
-        <ThemeCustomizer initial={userTheme} />
-      </div>
+      <DashboardConverted user={user} links={links} totalClicks={totalClicks} />
     </DashboardShell>
   );
 }

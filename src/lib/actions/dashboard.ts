@@ -1,20 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeUrl } from "@/lib/utils/url";
-import {
-  linkSchema,
-  profileSchema,
-  reorderLinksSchema,
-  userThemeSchema,
-} from "@/lib/validations/profile";
+import { linkSchema, reorderLinksSchema } from "@/lib/validations/profile";
 
 type ActionState = {
   ok: boolean;
   message: string;
 };
+
+export type UploadState = ActionState & { url?: string };
 
 async function getCurrentUserId() {
   const supabase = await createClient();
@@ -26,64 +22,12 @@ async function getCurrentUserId() {
   return { supabase, userId: user.id, email: user.email ?? "" };
 }
 
-export async function updateProfileAction(
-  input: unknown,
-): Promise<ActionState> {
-  const parsed = profileSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      ok: false,
-      message: parsed.error.issues[0]?.message ?? "Dados inválidos.",
-    };
-  }
-
-  const { supabase, userId, email } = await getCurrentUserId();
-  const { username, bio, avatarUrl, theme } = parsed.data;
-
-  const { data: existing } = await supabase
-    .from("users")
-    .select("id")
-    .eq("username", username)
-    .neq("id", userId)
-    .maybeSingle();
-
-  if (existing) {
-    return { ok: false, message: "Este username já está em uso." };
-  }
-
-  const { error: userError } = await supabase.from("users").upsert({
-    id: userId,
-    email,
-    username,
-    name: username,
-    avatar_url: avatarUrl || null,
-    active: true,
-  });
-
-  const { error: profileError } = await supabase.from("profiles").upsert({
-    user_id: userId,
-    name: username,
-    username,
-    email,
-    avatar_url: avatarUrl || null,
-    active: true,
-    bio: bio || null,
-    theme,
-    custom_colors: {},
-  });
-
-  if (userError || profileError) {
-    return { ok: false, message: "Não foi possível atualizar o perfil." };
-  }
-
-  revalidatePath("/dashboard");
-  revalidatePath(`/u/${username}`);
-  return { ok: true, message: "Perfil atualizado." };
-}
+import { redirect } from "next/navigation";
+import type { Link } from "@/types/database";
 
 export async function upsertLinkAction(
   input: unknown,
-): Promise<ActionState> {
+): Promise<ActionState & { link?: Link }> {
   const parsed = linkSchema.safeParse(input);
   if (!parsed.success) {
     return {
@@ -104,23 +48,36 @@ export async function upsertLinkAction(
     orderPosition = count ?? 0;
   }
 
-  const payload = {
-    user_id: userId,
-    title,
-    url: normalizeUrl(url),
-    icon: icon || "link",
-    ...(id ? { id } : { order_position: orderPosition }),
-  } as const;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await supabase.from("links").upsert(payload as any);
+  const { data, error } = id
+    ? await supabase.from("links").update({
+        title,
+        url: normalizeUrl(url),
+        icon: icon || "link",
+      } satisfies Partial<{
+        title: string;
+        url: string;
+        icon: string;
+      }>).eq("id", id).eq("user_id", userId).select().single()
+    : await supabase.from("links").insert({
+        user_id: userId,
+        title,
+        url: normalizeUrl(url),
+        icon: icon || "link",
+        order_position: orderPosition,
+      } satisfies {
+        user_id: string;
+        title: string;
+        url: string;
+        icon: string;
+        order_position: number;
+      }).select().single();
 
   if (error) {
     return { ok: false, message: "Não foi possível salvar o link." };
   }
 
   revalidatePath("/dashboard");
-  return { ok: true, message: id ? "Link atualizado." : "Link criado." };
+  return { ok: true, message: id ? "Link atualizado." : "Link criado.", link: data ?? undefined };
 }
 
 export async function deleteLinkAction(id: string): Promise<ActionState> {
@@ -166,29 +123,78 @@ export async function reorderLinksAction(
   return { ok: true, message: "Ordem atualizada." };
 }
 
-export async function updateUserThemeAction(
-  input: unknown,
-): Promise<ActionState> {
-  const parsed = userThemeSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      ok: false,
-      message: parsed.error.issues[0]?.message ?? "Tema inválido.",
-    };
-  }
-
+export async function uploadAvatarAction(
+  formData: FormData,
+): Promise<UploadState> {
   const { supabase, userId } = await getCurrentUserId();
+  const file = formData.get("file") as File;
+  if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({ custom_colors: parsed.data as never })
-    .eq("user_id", userId);
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
+  const fileName = `avatars/${userId}.${ext}`;
 
-  if (error) {
-    return { ok: false, message: "Não foi possível salvar o tema." };
+  const { error: uploadError } = await supabase.storage
+    .from("user-content")
+    .upload(fileName, file, { upsert: true });
+
+  if (uploadError) {
+    return { ok: false, message: "Erro ao fazer upload." };
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/u/*");
-  return { ok: true, message: "Tema salvo." };
+  const { data: urlData } = supabase.storage
+    .from("user-content")
+    .getPublicUrl(fileName);
+
+  const avatarUrl = urlData?.publicUrl ?? null;
+
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ avatar_url: avatarUrl })
+    .eq("id", userId);
+
+  if (updateError) {
+    return { ok: false, message: "Erro ao salvar avatar." };
+  }
+
+  revalidatePath("/profile");
+  revalidatePath("/dashboard/customize");
+  return { ok: true, message: "Avatar atualizado.", url: avatarUrl ?? undefined };
+}
+
+export async function uploadBannerAction(
+  formData: FormData,
+): Promise<UploadState> {
+  const { supabase, userId } = await getCurrentUserId();
+  const file = formData.get("file") as File;
+  if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
+  const fileName = `banners/${userId}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("user-content")
+    .upload(fileName, file, { upsert: true });
+
+  if (uploadError) {
+    return { ok: false, message: "Erro ao fazer upload." };
+  }
+
+  const { data: urlData } = supabase.storage
+    .from("user-content")
+    .getPublicUrl(fileName);
+
+  const bannerUrl = urlData?.publicUrl ?? null;
+
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ banner_url: bannerUrl })
+    .eq("id", userId);
+
+  if (updateError) {
+    return { ok: false, message: "Erro ao salvar banner." };
+  }
+
+  revalidatePath("/profile");
+  revalidatePath("/dashboard/customize");
+  return { ok: true, message: "Banner atualizado.", url: bannerUrl ?? undefined };
 }

@@ -17,7 +17,7 @@ export function LinkForm({
   onToast,
 }: {
   link?: Link;
-  onSaved?: () => void;
+  onSaved?: (link?: Link) => void;
   onToast?: (message: string, type?: "success" | "error") => void;
 }) {
   const [pending, startTransition] = useTransition();
@@ -36,7 +36,12 @@ export function LinkForm({
       const result = await upsertLinkAction(values);
       if (result.ok) {
         if (!link) form.reset({ title: "", url: "", icon: "link" });
-        onSaved?.();
+        // prefer returning the created/updated record when available
+        if (result.link) {
+          onSaved?.(result.link);
+        } else {
+          onSaved?.();
+        }
         onToast?.(result.message, "success");
       } else {
         onToast?.(result.message, "error");

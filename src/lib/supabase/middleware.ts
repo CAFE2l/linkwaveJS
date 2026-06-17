@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 
-const protectedRoutes = ["/dashboard", "/profile", "/onboarding", "/settings"];
+const protectedRoutes = ["/dashboard", "/profile", "/theme", "/admin", "/onboarding", "/settings"];
 const authRoutes = ["/login", "/register"];
 
 function withSecurityHeaders(response: NextResponse) {

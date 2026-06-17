@@ -54,7 +54,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className={`glass-strong flex items-center gap-3 rounded-2xl px-5 py-3 pr-4 shadow-xl ${
+              className={`card flex items-center gap-3 rounded-2xl px-5 py-3 pr-4 shadow-xl ${
                 toast.type === "success"
                   ? "border-accent/30 shadow-accent/10"
                   : "border-red-400/30 shadow-red-400/10"
@@ -68,7 +68,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <span className="text-sm font-semibold">{toast.message}</span>
               <button
                 onClick={() => removeToast(toast.id)}
-                className="ml-2 rounded-lg p-1 text-muted transition hover:bg-white/20 hover:text-foreground"
+                className="ml-2 rounded-lg p-1 text-fg-secondary transition hover:bg-surface-hover hover:text-foreground"
               >
                 <X size={14} />
               </button>

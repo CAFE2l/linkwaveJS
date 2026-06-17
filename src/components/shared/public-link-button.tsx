@@ -2,9 +2,20 @@
 
 import { ArrowUpRight, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
+import { useThemeContext } from "@/hooks/use-theme-context";
 import type { Link } from "@/types/database";
 
+const hoverStyles: Record<string, string> = {
+  lift:  "translateY(-2px)",
+  glow:  "translateY(-1px)",
+  scale: "scale(1.02)",
+  shake: "shake",
+  none:  "none",
+};
+
 export function PublicLinkButton({ link }: { link: Link }) {
+  const ctx = useThemeContext();
+
   function trackClick() {
     const payload = JSON.stringify({ linkId: link.id, userId: link.user_id });
     const blob = new Blob([payload], { type: "application/json" });
@@ -20,6 +31,15 @@ export function PublicLinkButton({ link }: { link: Link }) {
   }
 
   const iconName = link.icone || link.icon;
+  const hoverEffect = ctx?.link_hover_effect ?? "lift";
+  const transition = ctx?.transition_effect ?? "float";
+
+  const hoverTransform = hoverStyles[hoverEffect] ?? hoverStyles.lift;
+  const isShake = hoverEffect === "shake";
+
+  const glowShadow = ctx?.button_glow
+    ? `0 0 16px ${ctx.link_glow_color}40`
+    : "none";
 
   function renderIcon() {
     if (link.is_custom_icon && link.icon_blob) {
@@ -27,7 +47,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
         <img
           src={link.icon_blob}
           alt=""
-          className="h-10 w-10 shrink-0 rounded-xl object-contain"
+          className="h-10 w-10 shrink-0 object-contain"
         />
       );
     }
@@ -39,7 +59,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
           alt=""
           width={40}
           height={40}
-          className="h-10 w-10 shrink-0 rounded-xl object-contain"
+          className="h-10 w-10 shrink-0 object-contain"
           unoptimized
         />
       );
@@ -58,13 +78,16 @@ export function PublicLinkButton({ link }: { link: Link }) {
       target="_blank"
       rel="noreferrer"
       onClick={trackClick}
-      className="group flex min-h-16 items-center justify-between px-5 py-4 font-bold transition hover:-translate-y-0.5"
+      className={`group flex min-h-16 items-center justify-between px-5 py-4 font-bold transition-all duration-300 ${
+        isShake ? "hover:animate-ut-shake" : ""
+      }`}
       style={{
         background: "var(--ut-link-bg, rgba(255,255,255,0.8))",
         borderRadius: "calc(var(--ut-card-radius, 1rem) - 4px)",
-        border: "var(--ut-card-border, 1px solid rgba(255,255,255,0.15))",
-        boxShadow: "var(--ut-card-shadow, 0 4px 16px rgba(0,0,0,0.05))",
+        border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.15))",
+        boxShadow: glowShadow,
         color: "var(--ut-text-primary, #0b1829)",
+        transform: isShake ? "none" : hoverTransform,
       }}
     >
       <span className="flex min-w-0 items-center gap-3">

@@ -4,9 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart3, Link2, MousePointerClick } from "lucide-react";
 
 const container = {
-  animate: {
-    transition: { staggerChildren: 0.08 },
-  },
+  animate: { transition: { staggerChildren: 0.08 } },
 };
 
 const itemAnim = {
@@ -26,7 +24,7 @@ export function StatsCards({
   const stats = [
     { label: "Links ativos", value: totalLinks, icon: Link2, accent: "text-brand" },
     { label: "Cliques totais", value: totalClicks, icon: MousePointerClick, accent: "text-accent" },
-    { label: "Top link", value: topLink ?? "Sem dados", icon: BarChart3, accent: "text-brand-strong" },
+    { label: "Top link", value: topLink ?? "Sem dados", icon: BarChart3, accent: "text-fg-secondary" },
   ];
 
   return (
@@ -43,13 +41,13 @@ export function StatsCards({
             key={stat.label}
             variants={itemAnim}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="glass-strong rounded-[1.5rem] p-5"
+            className="card p-5"
           >
-            <Icon className={stat.accent} size={22} />
-            <div className="mt-5 font-mono text-3xl font-black">
+            <Icon className={stat.accent} size={20} />
+            <div className="mt-4 text-2xl font-bold text-foreground">
               {stat.value}
             </div>
-            <div className="mt-1 text-sm font-semibold text-muted">
+            <div className="mt-0.5 text-xs font-medium text-fg-secondary uppercase tracking-wider">
               {stat.label}
             </div>
           </motion.div>

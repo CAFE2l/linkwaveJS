@@ -19,21 +19,35 @@ export const reorderLinksSchema = z.object({
   ids: z.array(z.string().uuid()).min(1),
 });
 
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida");
+
 export const userThemeSchema = z.object({
-  background_type: z.enum(["solid", "gradient"]),
-  background_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
-  background_gradient_start: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
-  background_gradient_end: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
-  card_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
+  background_type: z.enum(["solid", "gradient", "galaxy"]),
+  background_color: hexColor,
+  background_gradient_start: hexColor,
+  background_gradient_end: hexColor,
+  background_effect: z.enum(["none", "pulse", "shimmer"]),
+  galaxy_theme: z.enum(["milkyway", "andromeda", "nebula", "blackhole"]),
+  enable_stars: z.boolean(),
+  card_color: hexColor,
   card_opacity: z.number().min(0).max(100),
   card_blur: z.number().min(0).max(30),
   card_border_radius: z.number().min(0).max(48),
   card_shadow: z.boolean(),
-  text_color_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
-  text_color_secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
-  button_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
+  card_glass_style: z.enum(["dark", "light", "frosted", "neon"]),
+  text_color_primary: hexColor,
+  text_color_secondary: hexColor,
+  button_color: hexColor,
   button_glow: z.boolean(),
-  border_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida"),
+  border_color: hexColor,
+  link_glow_color: hexColor,
+  link_hover_effect: z.enum(["lift", "glow", "scale", "shake", "none"]),
+  transition_effect: z.enum(["none", "fade", "slide", "zoom", "float"]),
+  font_style: z.enum(["space", "nunito", "mono", "serif"]),
+  avatar_led_color: hexColor,
+  avatar_ring_style: z.enum(["gradient", "solid", "none"]),
+  banner_led_color: hexColor,
+  icon_style: z.enum(["8bit", "clay"]),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;

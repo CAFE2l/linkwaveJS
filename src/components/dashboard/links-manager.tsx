@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, useEffect } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -48,39 +48,32 @@ function getFallbackStyle(icon: string | null): string {
   return FALLBACK_STYLES[key] ?? "linear-gradient(135deg, #38bdf8, #0284c7)";
 }
 
-function getIconLabel(icon: string | null): string {
-  if (!icon) return "🔗";
-  return icon.slice(0, 2).toUpperCase();
-}
-
 function IconDisplay({ icon }: { icon: string | null }) {
   if (!icon || icon === "link") {
     return (
       <div
-        className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
+        className="flex size-10 shrink-0 items-center justify-center rounded-xl shadow-sm"
         style={{ background: getFallbackStyle(icon) }}
       >
-        🔗
+        <span className="text-white text-xs font-bold">🔗</span>
       </div>
     );
   }
   return (
     <IconImage
       name={icon}
-      className="size-10 shrink-0 rounded-xl object-contain"
+      className="size-10 shrink-0 object-contain"
       fallback={
         <div
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl shadow-sm"
           style={{ background: getFallbackStyle(icon) }}
-        >
-          {getIconLabel(icon)}
-        </div>
+        />
       }
     />
   );
 }
 
-export function LinksManager({ links }: { links: Link[] }) {
+export function LinksManager({ links, onLinksChange }: { links: Link[]; onLinksChange?: (links: Link[]) => void; }) {
   const { addToast } = useToast();
   const [items, setItems] = useState(links);
   const [editLink, setEditLink] = useState<Link | null>(null);
@@ -89,6 +82,11 @@ export function LinksManager({ links }: { links: Link[] }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
+  // sync prop-driven updates (e.g., parent append/reorder)
+  useEffect(() => {
+    setItems(links);
+  }, [links]);
+
   const ids = useMemo(() => items.map((link) => link.id), [items]);
 
   function onDragEnd(event: DragEndEvent) {
@@ -99,6 +97,7 @@ export function LinksManager({ links }: { links: Link[] }) {
     const newIndex = items.findIndex((item) => item.id === over.id);
     const ordered = arrayMove(items, oldIndex, newIndex);
     setItems(ordered);
+    onLinksChange?.(ordered);
     startTransition(() => {
       reorderLinksAction({ ids: ordered.map((item) => item.id) }).then(
         (res) => {
@@ -115,7 +114,9 @@ export function LinksManager({ links }: { links: Link[] }) {
     startTransition(async () => {
       const result = await deleteLinkAction(id);
       if (result.ok) {
-        setItems((current) => current.filter((item) => item.id !== id));
+        const updated = items.filter((item) => item.id !== id);
+        setItems(updated);
+        onLinksChange?.(updated);
         setDeleteLink(null);
         addToast(result.message, "success");
       } else {
@@ -126,13 +127,43 @@ export function LinksManager({ links }: { links: Link[] }) {
 
   return (
     <div className="space-y-5">
-      <div className="glass-panel rounded-[1.75rem] p-6">
+      <div className="card p-6">
         <h3 className="text-lg font-black">Novo link</h3>
-        <p className="mt-1 text-sm font-medium text-muted">
+        <p className="mt-1 text-sm font-medium text-fg-secondary">
           Adicione um link à sua página pública.
         </p>
         <div className="mt-4">
-          <LinkForm onToast={addToast} />
+          <LinkForm onToast={addToast} onSaved={async (newLink) => {
+            if (newLink) {
+              // append new link to local state (avoid overwrite)
+              setItems((prev) => {
+                // avoid duplicates: if id exists, replace
+                const exists = prev.find((p) => p.id === newLink.id);
+                if (exists) {
+                  const replaced = prev.map((p) => (p.id === newLink.id ? newLink : p));
+                  onLinksChange?.(replaced);
+                  return replaced;
+                }
+                const next = [newLink, ...prev];
+                onLinksChange?.(next);
+                return next;
+              });
+              addToast('Link criado.', 'success');
+            } else {
+              // fallback: full refresh
+              try {
+                const clientModule = await import("@/lib/supabaseClient");
+                const client = clientModule.supabase;
+                const { data } = await client.from("links").select("id, title, url, description, clicks, created_at, icon").order("created_at", { ascending: false }).limit(200);
+                const refreshed = data ?? [];
+                setItems(refreshed as unknown as typeof items);
+                onLinksChange?.(refreshed as unknown as typeof items);
+                addToast('Link criado.', 'success');
+              } catch (e) {
+                addToast('Link criado, mas não foi possível atualizar a lista local.', 'success');
+              }
+            }
+          }} />
         </div>
       </div>
 
@@ -161,6 +192,16 @@ export function LinksManager({ links }: { links: Link[] }) {
         link={editLink}
         open={!!editLink}
         onClose={() => setEditLink(null)}
+        onSaved={(updated) => {
+          if (!updated) return;
+          setItems((prev) => {
+            const next = prev.map((p) => (p.id === updated.id ? updated : p));
+            onLinksChange?.(next);
+            return next;
+          });
+          setEditLink(null);
+          addToast('Link atualizado.', 'success');
+        }}
         onToast={addToast}
       />
       <DeleteLinkModal
@@ -182,7 +223,7 @@ function EmptyState() {
       </div>
       <div>
         <p className="text-base font-black">Nenhum link ainda</p>
-        <p className="mt-1 text-sm font-medium text-muted">
+        <p className="mt-1 text-sm font-medium text-fg-secondary">
           Crie seu primeiro link acima e ele aparecerá aqui.
         </p>
       </div>
@@ -205,7 +246,7 @@ function SortableLink({
   return (
     <Card
       ref={setNodeRef}
-      className={`p-4 transition-shadow ${
+      className={`link-card p-4 transition-shadow ${
         isDragging ? "z-10 opacity-90 shadow-xl shadow-brand/20" : ""
       }`}
       style={{
@@ -215,7 +256,7 @@ function SortableLink({
     >
       <div className="flex items-center gap-3">
         <button
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-muted transition hover:bg-white/40 hover:text-foreground dark:hover:bg-white/10"
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-fg-secondary transition hover:bg-surface-hover hover:text-foreground dark:hover:bg-surface"
           aria-label="Reordenar link"
           {...attributes}
           {...listeners}
@@ -227,7 +268,7 @@ function SortableLink({
 
         <div className="min-w-0 flex-1">
           <div className="truncate font-black">{link.title}</div>
-          <div className="flex items-center gap-1 truncate text-sm font-medium text-muted">
+          <div className="flex items-center gap-1 truncate text-sm font-medium text-fg-secondary">
             <ExternalLink size={12} className="shrink-0" />
             <span className="truncate">{link.url}</span>
           </div>
@@ -236,18 +277,22 @@ function SortableLink({
         <div className="flex shrink-0 gap-1">
           <Button
             type="button"
-            variant="subtle"
+            variant="ghost"
             size="sm"
             onClick={onEdit}
+            title="Editar link"
+            aria-label="Editar"
             className="!h-9 !w-9 !p-0"
           >
             <Pencil size={15} />
           </Button>
           <Button
             type="button"
-            variant="subtle"
+            variant="ghost"
             size="sm"
             onClick={onDelete}
+            title="Excluir link"
+            aria-label="Excluir"
             className="!h-9 !w-9 !p-0 !text-red-400 hover:!text-red-500"
           >
             <Trash2 size={15} />

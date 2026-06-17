@@ -9,6 +9,9 @@ create table if not exists public.users (
   username text not null,
   name text not null default '',
   avatar_url text,
+  banner_url text,
+  theme_json jsonb not null default '{}'::jsonb,
+  role text not null default 'user' check (role in ('user', 'admin')),
   active boolean not null default true,
   created_at timestamptz not null default now()
 );

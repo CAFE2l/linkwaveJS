@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ButtonLink } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Termos de Uso",
@@ -10,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="aurora-shell relative min-h-screen overflow-hidden px-4 py-6">
-      <div className="pointer-events-none absolute left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/25 blur-[120px] dark:bg-emerald-500/12 animate-blob" />
-      <div className="pointer-events-none absolute right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/30 blur-[120px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
+    <main className="bg-bg min-h-screen overflow-hidden">
+      <div className="pointer-events-none fixed left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/25 blur-[120px] dark:bg-emerald-500/12 animate-blob" />
+      <div className="pointer-events-none fixed right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/30 blur-[120px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
 
-      <div className="relative mx-auto min-h-[calc(100vh-3rem)] w-full max-w-4xl">
-        <header className="glass-nav mb-8 flex items-center justify-between rounded-full px-4 py-3 shadow-lg shadow-sky-950/5">
+      <div className="page-container min-h-screen flex-col">
+        <header className="border-b border-border/50 bg-surface/80 backdrop-blur-xl rounded-xl mb-8 flex items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative">
               <Image
@@ -28,33 +29,27 @@ export default function TermsPage() {
               />
               <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/30 to-transparent opacity-50" />
             </div>
-            <span className="text-lg font-black text-foreground">
-              LinkWave
-            </span>
+            <span className="text-lg font-black text-foreground">LinkWave</span>
           </Link>
-          <Link
-            href="/register"
-            className="relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-white/20 to-white/5 px-4 text-sm font-bold text-foreground shadow-lg shadow-black/5 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-white/8 dark:from-white/8 dark:to-white/3"
-          >
-            <div className="pointer-events-none absolute inset-x-[15%] top-0 h-[1px] rounded-full bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+          <ButtonLink href="/register" variant="secondary" size="sm">
             Criar conta
             <ArrowRight className="size-4" />
-          </Link>
+          </ButtonLink>
         </header>
 
-        <div className="glass-panel rounded-[2rem] p-8 sm:p-10">
+        <div className="card p-8 sm:p-10">
           <Link
             href="/register"
-            className="mb-6 flex items-center gap-2 text-sm font-semibold text-muted transition hover:text-foreground"
+            className="mb-6 flex items-center gap-2 text-sm font-semibold text-fg-secondary transition hover:text-foreground"
           >
             <ArrowLeft className="size-4" />
             Voltar ao cadastro
           </Link>
 
-          <h1 className="text-4xl font-black tracking-tight">Termos de Uso</h1>
-          <p className="mt-2 text-sm text-muted">Última atualização: junho de 2026</p>
+          <h1 className="text-4xl font-black tracking-tight text-foreground">Termos de Uso</h1>
+          <p className="mt-2 text-sm text-fg-secondary">Última atualização: junho de 2026</p>
 
-          <div className="mt-10 space-y-8 text-sm leading-relaxed text-card-foreground">
+          <div className="mt-10 space-y-8 text-sm leading-relaxed text-foreground">
             <section className="space-y-2">
               <h2 className="text-lg font-bold">1. Aceitação dos Termos</h2>
               <p>
@@ -166,7 +161,7 @@ export default function TermsPage() {
           </div>
         </div>
 
-        <footer className="mt-5 rounded-2xl border border-white/20 bg-white/30 p-4 text-center text-xs text-muted shadow-sm backdrop-blur-md dark:bg-white/5">
+        <footer className="mt-5 rounded-2xl border border-border/50 bg-surface/80 p-4 text-center text-xs text-fg-secondary shadow-sm backdrop-blur-md">
           LinkWave &copy; {new Date().getFullYear()} &mdash; Todos os direitos
           reservados.
         </footer>

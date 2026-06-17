@@ -51,32 +51,27 @@ export function IconPicker({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-14 w-full items-center gap-3 rounded-2xl border border-white/20 bg-white/30 px-4 text-left backdrop-blur-md transition hover:bg-white/50 dark:border-[rgba(0,180,255,0.12)] dark:bg-[rgba(8,18,38,0.4)] dark:hover:bg-[rgba(8,18,38,0.6)]"
+        className="flex h-14 w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 text-left transition hover:bg-surface-hover"
       >
         {selectedIcon ? (
-          <>
-            <Image
-              src={selectedIcon.path}
-              alt={selectedIcon.name}
-              width={32}
-              height={32}
-              className="rounded-lg object-contain"
-            />
-            <span className="text-sm font-semibold text-foreground">
-              {selectedIcon.name}
-            </span>
-          </>
+          <Image
+            src={selectedIcon.path}
+            alt={selectedIcon.name}
+            width={32}
+            height={32}
+            className="object-contain"
+          />
         ) : (
-          <span className="text-sm text-muted">
-            {value || "Selecionar ícone..."}
+          <span className="text-sm text-fg-secondary">
+            {value && value !== "link" ? value : "Selecionar ícone..."}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="rounded-2xl border border-white/20 bg-white/40 p-3 backdrop-blur-xl dark:border-[rgba(0,180,255,0.12)] dark:bg-[rgba(8,18,38,0.6)]">
+        <div className="card p-3">
           <div className="relative mb-3">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-secondary" />
             <Input
               placeholder="Buscar ícone..."
               value={search}
@@ -86,7 +81,7 @@ export function IconPicker({
           </div>
 
           {filtered.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">
+            <p className="py-6 text-center text-sm text-fg-secondary">
               Nenhum ícone encontrado
             </p>
           ) : (
@@ -105,8 +100,8 @@ export function IconPicker({
                     }}
                     className={`relative flex flex-col items-center gap-1 rounded-xl p-2 transition-all duration-200 ${
                       selected
-                        ? "ring-2 ring-brand bg-brand/10"
-                        : "hover:bg-white/40 dark:hover:bg-[rgba(0,180,255,0.08)]"
+                        ? "ring-2 ring-brand bg-brand-soft"
+                        : "hover:bg-surface-hover"
                     }`}
                     title={icon.name}
                   >
@@ -115,7 +110,7 @@ export function IconPicker({
                       alt={icon.name}
                       width={28}
                       height={28}
-                      className="rounded-lg object-contain"
+                      className="object-contain"
                     />
                     {selected && (
                       <div className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-brand text-white">

@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Nunito } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -49,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${nunito.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -59,7 +66,24 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Script
+          src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
+          strategy="lazyOnload"
+        />
+        <Script
+          src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"
+          strategy="lazyOnload"
+        />
+        <Script
+          id="firebase-init"
+          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof firebase !== "undefined"){firebase.initializeApp({apiKey:"AIzaSyAnLjNIr5KQ42kZNOKzMG3vEPlJd4_ik-U",authDomain:"linkwave-5bfb1.firebaseapp.com",projectId:"linkwave-5bfb1",storageBucket:"linkwave-5bfb1.firebasestorage.app",messagingSenderId:"462579547054",appId:"1:462579547054:web:b0c9034f0f6d64021ea63f",measurementId:"G-JS525M5ZZK"});firebase.analytics();}`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

@@ -38,7 +38,7 @@ export function GoogleAuthButton() {
       {loading ? (
         <Loader2 className="size-4 animate-spin" />
       ) : (
-        <Image src={googleIcon} alt="" className="size-5" />
+        <Image src={googleIcon} alt="" width={20} height={20} className="size-5" />
       )}
       <span>Continuar com Google</span>
     </motion.button>

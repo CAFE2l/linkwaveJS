@@ -37,9 +37,9 @@
   --brand: #00c8ff;
   --brand-strong: #0099dd;
   --brand-light: #001a33;
-  --accent: #00ff88;
-  --accent-strong: #00cc66;
-  --accent-light: #002a10;
+  --accent: #0088ff; /* changed from green to blue in dark mode */
+  --accent-strong: #0066cc;
+  --accent-light: #001633;
   --cyan: #00e5ff;
   --cyan-light: #60e8ff;
 }
@@ -131,10 +131,9 @@ button, a, input, textarea {
 
 .dark .aero-shell {
   background:
-    radial-gradient(ellipse 80% 45% at 20% -10%, rgba(0, 180, 255, 0.035) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 15%, rgba(0, 200, 255, 0.025) 0%, transparent 50%),
-    radial-gradient(ellipse 55% 35% at 50% 100%, rgba(0, 255, 136, 0.015) 0%, transparent 50%),
-    linear-gradient(180deg, #050b18 0%, #071a2e 40%, #091d35 65%, #050b18 100%);
+    radial-gradient(ellipse 70% 40% at 15% -10%, rgba(0, 180, 255, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(0, 200, 255, 0.015) 0%, transparent 50%),
+    linear-gradient(180deg, #020810 0%, #051020 40%, #030a18 100%);
   position: relative;
 }
 
@@ -143,9 +142,20 @@ button, a, input, textarea {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0, 180, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 180, 255, 0.02) 1px, transparent 1px);
-  background-size: 80px 80px;
+    linear-gradient(rgba(0, 180, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 180, 255, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.dark .aero-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
   pointer-events: none;
   z-index: -1;
 }
@@ -227,12 +237,22 @@ button, a, input, textarea {
 }
 
 .dark .text-gradient {
-  background: linear-gradient(135deg, #00c8ff 0%, #00e5ff 30%, #00ff88 55%, #00c8ff 80%);
+  /* Dark-mode high-tech blue gradient (no green) */
+  background: linear-gradient(135deg, #001826 0%, #00345a 35%, #0066cc 70%, #001220 100%);
 }
 
 .dark .text-gradient-glow {
-  background: linear-gradient(135deg, #00c8ff 0%, #00e5ff 30%, #00ff88 55%, #00c8ff 80%);
-  filter: drop-shadow(0 0 40px rgba(0, 200, 255, 0.25));
+  /* Stronger glow variant for headlines in dark mode */
+  background: linear-gradient(135deg, #001826 0%, #00345a 35%, #00c8ff 70%, #001220 100%);
+  filter: drop-shadow(0 0 40px rgba(0, 200, 255, 0.18));
+  -webkit-text-fill-color: transparent !important; /* ensure clipping works in WebKit-based browsers */
+}
+
+/* Optional: high-tech font variant users can opt into by adding the class `font-hightech` to the root element `html` or `body` */
+.dark.font-hightech,
+.font-hightech {
+  --font-sans: "Orbitron", "Rajdhani", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Share Tech Mono", ui-monospace, monospace;
 }
 
 .text-gradient-blue {
@@ -275,6 +295,14 @@ button, a, input, textarea {
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+/* Title shadow that adapts to theme */
+.hero-title-shadow {
+  text-shadow: 0 2px 0 rgba(255,255,255,0.88);
+}
+.dark .hero-title-shadow {
+  text-shadow: 0 2px 0 rgba(0,0,0,0.6);
 }
 
 @keyframes blob-float {
@@ -652,3 +680,169 @@ button, a, input, textarea {
 .animate-orb { animation: orb-drift 12s ease-in-out infinite; }
 .animate-orb-2 { animation: orb-drift 16s ease-in-out 2s infinite reverse; }
 .animate-orb-3 { animation: orb-drift 20s ease-in-out 5s infinite; }
+
+/* ─── AERO TAG ─── */
+
+.aero-tag {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  padding: 0.3rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.dark .aero-tag {
+  background: rgba(0, 180, 255, 0.06);
+  border-color: rgba(0, 180, 255, 0.15);
+  color: #6090b0;
+}
+
+/* ─── STAT CARD ─── */
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  padding: 1.2rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(80, 180, 220, 0.1);
+}
+
+.dark .stat-card {
+  background: rgba(3, 10, 25, 0.5);
+  border-color: rgba(0, 180, 255, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── BUTTON CTA ─── */
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(180deg, #5ed490 0%, #28b060 100%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 1rem 2.5rem;
+  color: white;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(40, 176, 96, 0.4);
+  transition: all 0.25s;
+}
+
+.btn-cta:hover {
+  background: linear-gradient(180deg, #72e0a0 0%, #38c070 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(40, 176, 96, 0.5);
+}
+
+.dark .btn-cta {
+  background: linear-gradient(180deg, #008855 0%, #006644 100%);
+  border-color: rgba(0, 255, 136, 0.12);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.08);
+}
+
+.dark .btn-cta:hover {
+  background: linear-gradient(180deg, #009966 0%, #007755 100%);
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
+}
+
+/* ─── BUTTON OUTLINE ─── */
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  padding: 0.9rem 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 2px 10px rgba(80, 180, 220, 0.1);
+  transition: all 0.25s;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.65);
+  transform: translateY(-2px);
+}
+
+.dark .btn-outline {
+  background: rgba(0, 180, 255, 0.04);
+  border-color: rgba(0, 180, 255, 0.1);
+  color: #6090b0;
+}
+
+.dark .btn-outline:hover {
+  background: rgba(0, 180, 255, 0.08);
+  color: #80d0ff;
+}
+
+/* ─── DIVIDER ─── */
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+/* ─── LOGO HERO ─── */
+
+.logo-hero {
+  animation: floatLogo 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(80, 180, 220, 0.3));
+}
+
+.dark .logo-hero {
+  filter: drop-shadow(0 4px 12px rgba(0, 180, 255, 0.15));
+}
+
+/* ─── STEP NUMBER ─── */
+
+.step-num {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5bc8f5, #2aa8e0);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 12px rgba(42, 168, 224, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dark .step-num {
+  background: linear-gradient(180deg, #006699, #004d80);
+  border-color: rgba(0, 180, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 180, 255, 0.1);
+}
+
+/* ─── FEATURE ICON ─── */
+
+.feat-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(210, 240, 255, 0.7));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 12px rgba(80, 180, 220, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dark .feat-icon {
+  background: rgba(3, 10, 25, 0.6);
+  border-color: rgba(0, 180, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

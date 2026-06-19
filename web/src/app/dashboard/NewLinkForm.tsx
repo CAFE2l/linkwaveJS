@@ -2,25 +2,7 @@
 import React, { useState } from "react";
 import { createLink } from "@/lib/api";
 
-interface Link {
-  id: string;
-  title: string;
-  url: string;
-  icon?: string | null;
-}
-
-interface User {
-  id: string;
-  username: string;
-}
-
-interface Props {
-  user: User;
-  links: Link[];
-  setLinks: React.Dispatch<React.SetStateAction<Link[]>>;
-}
-
-export default function NewLinkForm({ user, links, setLinks }: Props) {
+export default function NewLinkForm({ user, links, setLinks }) {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
 
@@ -37,16 +19,18 @@ export default function NewLinkForm({ user, links, setLinks }: Props) {
   return (
     <form onSubmit={handleSubmit} className="glass p-6 space-y-4">
       <input
+        type="text"
+        placeholder="Título"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Título"
         className="aero-input w-full"
         required
       />
       <input
+        type="url"
+        placeholder="https://..."
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://..."
         className="aero-input w-full"
         required
       />

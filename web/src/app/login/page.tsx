@@ -1,4 +1,10 @@
 "use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+export default function Lo"use client";
 import React, { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -46,5 +52,78 @@ export default function LoginPage() {
         </form>
       </div>
     </main>
+  );
+}
+ginPage() {
+  const supabase = createClientComponentClient();
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      router.push("/dashboard"); // Redireciona para o dashboard
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#a8edcf] via-[#78d4f0] to-[#6ec6f7]">
+      <div className="glass-strong p-8 md:p-10 rounded-xl w-full max-w-md">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-black text-ocean mb-2">
+            Bem-vindo de volta
+          </h1>
+          <p className="text-gray-600">Entre com sua conta LinkWave</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input"
+            required
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button type="submit" disabled={loading} className="btn-primary mt-2">
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+
+        <p className="text-gray-500 text-sm mt-4 text-center">
+          Não tem conta?{" "}
+          <a href="/register" className="text-blue-600">
+            Cadastre-se
+          </a>
+        </p>
+      </div>
+    </div>
   );
 }

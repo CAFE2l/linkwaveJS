@@ -1,16 +1,26 @@
 "use client";
 
-import React from 'react';
+import React from "react";
+import { CheckCircle2, XCircle } from "lucide-react";
 
-export type ToastObj = { id: string; type: 'success'|'error'; msg: string };
+export type ToastObj = { id: string; type: "success" | "error"; msg: string };
 
-export default function Toast({ id, type, msg }: ToastObj){
+export default function Toast({ type, msg }: ToastObj) {
+  const isSuccess = type === "success";
   return (
-    <div className={`flex items-center gap-3 p-3 rounded shadow-md max-w-xs ${type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-        {type === 'success' ? '✓' : '✕'}
-      </div>
-      <div className="text-sm">{msg}</div>
+    <div
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium animate-fade-in-up ${
+        isSuccess
+          ? "bg-surface border-accent/30 text-fg"
+          : "bg-surface border-danger/30 text-fg"
+      }`}
+    >
+      {isSuccess ? (
+        <CheckCircle2 size={16} className="text-accent flex-shrink-0" />
+      ) : (
+        <XCircle size={16} className="text-danger flex-shrink-0" />
+      )}
+      <span>{msg}</span>
     </div>
   );
 }

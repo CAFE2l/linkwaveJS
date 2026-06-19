@@ -1,108 +1,153 @@
 "use client";
 
-import React, { useState } from 'react';
-import ProfileCard from './ProfileCard';
-import NewLinkForm from './NewLinkForm';
-import LinkList from './LinkList';
-import PreviewCard from './PreviewCard';
-import Toast, { ToastObj } from './Toast';
-import type { AppUser, Link as DbLink } from '@/types/database';
+import React, { useState } from "react";
+import { LogOut, ExternalLink, User } from "lucide-react";
+import ProfileCard from "./ProfileCard";
+import NewLinkForm from "./NewLinkForm";
+import LinkList from "./LinkList";
+import PreviewCard from "./PreviewCard";
+import Toast, { ToastObj } from "./Toast";
+import { logoutAction } from "@/lib/actions/auth";
+import type { AppUser, Link as DbLink } from "@/types/database";
 
-export default function FullDashboard({ initialUser, initialLinks, initialClicks }: {
+export default function FullDashboard({
+  initialUser,
+  initialLinks,
+  initialClicks,
+}: {
   initialUser: AppUser;
   initialLinks: DbLink[];
   initialClicks?: number;
 }) {
-  const [user, setUser] = useState<AppUser | null>(initialUser ?? null);
+  const [user, setUser] = useState<AppUser>(initialUser);
   const [links, setLinks] = useState<DbLink[]>(initialLinks ?? []);
-  const [clicks, setClicks] = useState<number>(initialClicks ?? 0);
   const [toasts, setToasts] = useState<ToastObj[]>([]);
   const [preview, setPreview] = useState<Partial<DbLink> | null>(null);
 
   function pushToast(t: ToastObj) {
     setToasts((s) => [...s, t]);
-    setTimeout(() => setToasts((s) => s.filter(x => x.id !== t.id)), 3500);
+    setTimeout(() => setToasts((s) => s.filter((x) => x.id !== t.id)), 3500);
   }
 
   async function handleAddLink(p: Partial<DbLink>) {
     try {
-      const payload: any = {
-        title: p.titulo || p.title || 'Untitled',
-        url: p.url || p.url || '#',
-        icon: (p as any).icone || (p as any).icon || null,
-        is_custom_icon: (p as any).is_custom_icon ? 1 : 0,
-        icon_blob: (p as any).icon_blob || null,
+      const payload = {
+        title: p.title || "Untitled",
+        url: p.url || "#",
+        icon: p.icon || null,
+        is_custom_icon: p.is_custom_icon ? 1 : 0,
+        icon_blob: p.icon_blob || null,
       };
-      // basic duplicate check (client-side)
-      if (links.some(l => String(l.url).toLowerCase() === String(payload.url).toLowerCase())) {
-        pushToast({ id: String(Date.now()), type: 'error', msg: 'URL já existe' });
+      if (links.some((l) => String(l.url).toLowerCase() === String(payload.url).toLowerCase())) {
+        pushToast({ id: String(Date.now()), type: "error", msg: "URL já existe" });
         return;
       }
-
-      const res = await fetch('/api/links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!data.ok) {
-        pushToast({ id: String(Date.now()), type: 'error', msg: data.message || 'Erro ao criar link' });
+        pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao criar link" });
         return;
       }
-      setLinks(s => [data.link, ...s]);
-      pushToast({ id: String(Date.now()), type: 'success', msg: 'Link criado' });
-    } catch (e) {
-      console.error(e);
-      pushToast({ id: String(Date.now()), type: 'error', msg: 'Erro ao criar link' });
+      setLinks((s) => [...s, data.link]);
+      setPreview(null);
+      pushToast({ id: String(Date.now()), type: "success", msg: "Link adicionado!" });
+    } catch {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao criar link" });
     }
   }
 
-  function handleReorder(newOrder: DbLink[]) {
-    setLinks(newOrder);
-    pushToast({ id: String(Date.now()), type: 'success', msg: 'Ordem atualizada' });
-  }
-
   function handleDelete(id: string | number) {
-    setLinks(s => s.filter(l => String(l.id) !== String(id)));
-    pushToast({ id: String(Date.now()), type: 'success', msg: 'Link removido' });
+    setLinks((s) => s.filter((l) => String(l.id) !== String(id)));
+    pushToast({ id: String(Date.now()), type: "success", msg: "Link removido" });
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-bg">
       {/* Header */}
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full overflow-hidden border" style={{ borderColor: 'var(--color-brand)' }}>
-            {user?.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-[var(--color-brand)] text-white">@</div>}
+      <header className="border-b border-border bg-surface/80 backdrop-blur-xl sticky top-0 z-40">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 h-14">
+          <div className="flex items-center gap-3">
+            <img src="/brand/icon.png" alt="LinkWave" className="h-7 w-7" />
+            <span className="text-base font-black text-fg">LinkWave</span>
+            <div className="h-4 w-px bg-border hidden sm:block" />
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-subtle border border-border flex items-center justify-center flex-shrink-0">
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} className="w-full h-full object-cover" alt="" />
+                ) : (
+                  <User size={14} className="text-fg-secondary" />
+                )}
+              </div>
+              <span className="text-sm text-fg-secondary">@{user.username}</span>
+            </div>
           </div>
-          <div className="font-bold">@{user?.username ?? 'you'}</div>
-        </div>
-        <div className="flex items-center gap-3">
-          <a href={`/u/${user?.username}`} className="px-3 py-1 rounded-md bg-[var(--color-brand)] text-white hover:opacity-95">Ver página</a>
-          <a href="/api/auth/logout" className="px-3 py-1 rounded-md border" style={{ borderColor: 'var(--color-border)' }}>Sair</a>
+          <div className="flex items-center gap-2">
+            <a
+              href={`/u/${user.username}`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-fg-secondary hover:text-fg hover:bg-bg-subtle transition"
+            >
+              <ExternalLink size={13} />
+              <span className="hidden sm:inline">Ver perfil</span>
+            </a>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-fg-secondary hover:text-fg hover:bg-bg-subtle transition"
+              >
+                <LogOut size={13} />
+                <span className="hidden sm:inline">Sair</span>
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <aside className="lg:col-span-4">
-          <ProfileCard user={user} setUser={setUser} linksCount={links.length} clicks={clicks} pushToast={pushToast} />
-        </aside>
+      {/* Content */}
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Left: Profile card */}
+          <aside className="lg:col-span-3">
+            <ProfileCard
+              user={user}
+              setUser={setUser}
+              linksCount={links.length}
+              clicks={initialClicks ?? 0}
+              pushToast={pushToast}
+            />
+          </aside>
 
-        <main className="lg:col-span-8 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <NewLinkForm onAdd={handleAddLink} pushToast={pushToast} onPreviewChange={(p)=>setPreview(p)} />
-            {/* Live preview card */}
-            <div>
-              <PreviewCard user={user} links={links} preview={preview ?? undefined} />
+          {/* Center: Add link + links list */}
+          <main className="lg:col-span-6 space-y-5">
+            <NewLinkForm
+              onAdd={handleAddLink}
+              pushToast={pushToast}
+              onPreviewChange={setPreview}
+            />
+            <LinkList
+              links={links}
+              onReorder={setLinks}
+              onDelete={handleDelete}
+            />
+          </main>
+
+          {/* Right: Live preview */}
+          <aside className="lg:col-span-3">
+            <div className="sticky top-20">
+              <PreviewCard user={user} links={links} preview={preview} />
             </div>
-          </div>
-
-          <LinkList links={links} onReorder={handleReorder} onDelete={handleDelete} />
-        </main>
+          </aside>
+        </div>
       </div>
 
-      <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
-        {toasts.map(t => <Toast key={t.id} {...t} />)}
+      {/* Toasts */}
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+        {toasts.map((t) => <Toast key={t.id} {...t} />)}
       </div>
     </div>
   );

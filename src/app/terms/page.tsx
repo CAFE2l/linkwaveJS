@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { ButtonLink } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { PublicPageLayout } from "@/components/shared/public-page-layout";
 
 export const metadata: Metadata = {
   title: "Termos de Uso",
@@ -11,32 +10,8 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="bg-bg min-h-screen overflow-hidden">
-      <div className="pointer-events-none fixed left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/25 blur-[120px] dark:bg-emerald-500/12 animate-blob" />
-      <div className="pointer-events-none fixed right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/30 blur-[120px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
-
-      <div className="page-container min-h-screen flex-col">
-        <header className="border-b border-border/50 bg-surface/80 backdrop-blur-xl rounded-xl mb-8 flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative">
-              <Image
-                src="/brand/icon.png"
-                alt="LinkWave"
-                width={44}
-                height={44}
-                className="rounded-2xl"
-                priority
-              />
-              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/30 to-transparent opacity-50" />
-            </div>
-            <span className="text-lg font-black text-foreground">LinkWave</span>
-          </Link>
-          <ButtonLink href="/register" variant="secondary" size="sm">
-            Criar conta
-            <ArrowRight className="size-4" />
-          </ButtonLink>
-        </header>
-
+    <PublicPageLayout isLoggedIn={false}>
+      <div className="page-container pb-8 pt-24">
         <div className="card p-8 sm:p-10">
           <Link
             href="/register"
@@ -160,12 +135,7 @@ export default function TermsPage() {
             </section>
           </div>
         </div>
-
-        <footer className="mt-5 rounded-2xl border border-border/50 bg-surface/80 p-4 text-center text-xs text-fg-secondary shadow-sm backdrop-blur-md">
-          LinkWave &copy; {new Date().getFullYear()} &mdash; Todos os direitos
-          reservados.
-        </footer>
       </div>
-    </main>
+    </PublicPageLayout>
   );
 }

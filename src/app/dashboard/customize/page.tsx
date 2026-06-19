@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { CustomizePanel } from "@/components/customize/customize-panel";
+import FullDashboard from "@/components/customize/FullDashboard";
 
 export const metadata = { title: "Customizar | LinkWave" };
 
@@ -24,6 +24,6 @@ export default async function CustomizePage() {
     .order("order_position");
 
   return (
-    <CustomizePanel user={user} links={links ?? []} />
+    <FullDashboard initialUser={user} initialLinks={links ?? []} initialClicks={0} />
   );
 }

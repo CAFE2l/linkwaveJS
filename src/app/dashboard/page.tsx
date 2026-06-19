@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import DashboardConverted from "@/components/dashboard/dashboard-converted";
-import { LinksManager } from "@/components/dashboard/links-manager";
-import { StatsCards } from "@/components/dashboard/stats-cards";
+import FullDashboard from "@/components/customize/FullDashboard";
 import { createClient } from "@/lib/supabase/server";
 import type { Link } from "@/types/database";
 
@@ -51,7 +49,8 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell user={user}>
-      <DashboardConverted user={user} links={links} totalClicks={totalClicks} />
+      {/* New FullDashboard (client) rebuilt from scratch */}
+      <FullDashboard initialUser={user} initialLinks={links} initialClicks={totalClicks} />
     </DashboardShell>
   );
 }

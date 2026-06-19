@@ -59,10 +59,12 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
         <p className="mt-1 text-sm text-fg-secondary">Avatar, banner, username e bio.</p>
       </div>
 
-      <div className="card p-6 space-y-6">
+      {/* Frutiger Aero styled panel */}
+      <div className="glass-card p-6 space-y-6">
         <div className="relative">
           <div
-            className="h-40 rounded-2xl bg-gradient-to-br from-brand/20 to-cyan/20 flex items-center justify-center overflow-hidden cursor-pointer group"
+            className="h-40 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer group"
+            style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))' }}
             onClick={() => bannerRef.current?.click()}
           >
             {bannerPreview ? (
@@ -73,25 +75,25 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
                 <span className="text-sm font-semibold">Adicionar banner</span>
               </div>
             )}
+            <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)' }} />
           </div>
           <input ref={bannerRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
         </div>
 
         <div className="flex items-end gap-4 -mt-12 pl-6">
           <div className="relative">
-            <div className="size-24 rounded-2xl border-4 border-border overflow-hidden bg-surface shadow-lg flex items-center justify-center">
+            <div className="size-24 rounded-full overflow-hidden border-4 flex items-center justify-center" style={{ borderColor: 'var(--color-brand)', boxShadow: '0 6px 20px rgba(99,102,241,0.18)' }}>
               {avatarPreview ? (
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
               ) : (
-                  <span className="text-3xl font-black text-fg-secondary/30">
-                  {user.username[0].toUpperCase()}
-                </span>
+                <span className="text-3xl font-black text-fg-secondary/30">{user.username[0].toUpperCase()}</span>
               )}
             </div>
             <button
               type="button"
               onClick={() => avatarRef.current?.click()}
-              className="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full bg-brand text-white shadow-md hover:bg-brand-strong transition"
+              className="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full bg-[var(--color-brand)] text-white shadow-md hover:brightness-95 transition"
+              title="Upload avatar"
             >
               <Upload size={14} />
             </button>
@@ -102,7 +104,7 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-bold">Username</label>
-            <div className="flex items-center gap-2 rounded-2xl border border-border bg-surface px-4 dark:bg-[rgba(8,18,38,0.4)]">
+            <div className="flex items-center gap-2 rounded-2xl border border-border bg-[var(--color-surface)] px-4 dark:bg-[rgba(8,18,38,0.4)]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)' }}>
               <span className="text-sm font-semibold text-fg-secondary">@</span>
               <input
                 value={username}
@@ -119,7 +121,7 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
               onChange={(e) => setBio(e.target.value)}
               placeholder="Fale sobre você..."
               maxLength={180}
-              className="h-24 w-full resize-none rounded-2xl border border-border bg-surface p-4 text-sm font-medium outline-none backdrop-blur-sm dark:bg-[rgba(8,18,38,0.4)]"
+              className="h-24 w-full resize-none rounded-2xl border border-border bg-[var(--color-surface)] p-4 text-sm font-medium outline-none backdrop-blur-sm dark:bg-[rgba(8,18,38,0.4)]"
             />
             <p className="text-xs text-fg-secondary">{bio.length}/180</p>
           </div>
@@ -129,10 +131,12 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
           <p className={`text-sm font-semibold ${msg.includes("sucesso") ? "text-accent" : "text-fg-secondary"}`}>{msg}</p>
         )}
 
-        <Button type="button" variant="accent" onClick={handleSave} disabled={saving} className="w-full">
-          {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-          Salvar perfil
-        </Button>
+        <div className="pt-2">
+          <Button type="button" variant="accent" onClick={handleSave} disabled={saving} className="w-full glass-button">
+            {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            Salvar perfil
+          </Button>
+        </div>
       </div>
     </div>
   );

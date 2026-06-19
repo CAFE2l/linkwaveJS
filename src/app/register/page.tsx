@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Shield, Sparkles, Zap } from "lucide-react";
+import { Shield, Sparkles, Zap } from "lucide-react";
 import { RegisterForm } from "@/components/auth/register-form";
 import { createClient } from "@/lib/supabase/server";
-import { ButtonLink } from "@/components/ui/button";
+import { PublicPageLayout } from "@/components/shared/public-page-layout";
 
 export const metadata: Metadata = {
   title: "Criar conta",
@@ -25,34 +24,9 @@ export default async function RegisterPage() {
   if (user) redirect("/dashboard");
 
   return (
-    <main className="bg-bg min-h-screen overflow-hidden">
-      <div className="pointer-events-none fixed left-[-12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/25 blur-[120px] dark:bg-emerald-500/12 animate-blob" />
-      <div className="pointer-events-none fixed right-[-10rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-sky-300/30 blur-[120px] dark:bg-sky-500/14 animate-blob-2" style={{ animationDelay: "-4s" }} />
-      <div className="pointer-events-none fixed left-[40%] top-[10%] h-[25rem] w-[25rem] rounded-full bg-indigo-300/15 blur-[100px] dark:bg-indigo-500/10 animate-blob-3" style={{ animationDelay: "-8s" }} />
-
-      <div className="page-container flex min-h-screen flex-col">
-        <header className="border-b border-border/50 bg-surface/80 backdrop-blur-xl rounded-xl mb-8 flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative">
-              <Image
-                src="/brand/icon.png"
-                alt="LinkWave"
-                width={44}
-                height={44}
-                className="rounded-2xl"
-                priority
-              />
-              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/30 to-transparent opacity-50" />
-            </div>
-            <span className="text-lg font-black text-foreground">LinkWave</span>
-          </Link>
-          <ButtonLink href="/login" variant="secondary" size="sm">
-            Login
-            <ArrowRight className="size-4" />
-          </ButtonLink>
-        </header>
-
-        <section className="grid flex-1 items-center gap-10 pb-8 lg:grid-cols-[1fr_30rem]">
+    <PublicPageLayout isLoggedIn={false}>
+      <div className="page-container flex flex-1 flex-col justify-center pb-8 pt-24">
+        <section className="grid items-center gap-10 lg:grid-cols-[1fr_30rem]">
           <div className="hidden lg:block">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-surface/80 px-4 py-2 text-sm font-bold text-brand shadow-sm backdrop-blur-md">
               <Sparkles className="size-4" />
@@ -103,13 +77,9 @@ export default async function RegisterPage() {
 
               <RegisterForm />
             </div>
-
-            <footer className="mt-5 rounded-2xl border border-border/50 bg-surface/80 p-4 text-center text-xs text-fg-secondary shadow-sm backdrop-blur-md">
-              © 2026 LinkWave. Todos os direitos reservados.
-            </footer>
           </div>
         </section>
       </div>
-    </main>
+    </PublicPageLayout>
   );
 }

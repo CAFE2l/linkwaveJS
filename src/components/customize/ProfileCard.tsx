@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Camera, ExternalLink, Pencil, User } from "lucide-react";
 import type { AppUser } from "@/types/database";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ProfileCard({
   user,
@@ -21,10 +21,11 @@ export default function ProfileCard({
   const avatarRef = useRef<HTMLInputElement | null>(null);
   const bannerRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
+  const supabaseRef = useRef(createClient());
 
   async function uploadFile(file: File, folder: string) {
     const filename = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage
+    const { error } = await supabaseRef.current.storage
       .from("user-content")
       .upload(`${folder}/${filename}`, file, { upsert: true });
     if (error) return null;
@@ -42,7 +43,7 @@ export default function ProfileCard({
     const url = await uploadFile(f, folder);
     setUploading(false);
     if (!url) { pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao enviar imagem" }); return; }
-    await supabase.from("users").update({ [field]: url }).eq("id", user?.id);
+    await supabaseRef.current.from("users").update({ [field]: url }).eq("id", user?.id);
     if (user) setUser({ ...user, [field]: url });
     pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
   }
@@ -50,14 +51,14 @@ export default function ProfileCard({
   const satisfaction = linksCount > 0 ? Math.min(100, Math.round((clicks / (linksCount || 1)) * 10)) : 0;
 
   return (
-    <div className="card overflow-hidden">
+    <div className="glass-card-strong overflow-hidden">
       {/* Banner */}
-      <div className="relative h-24 bg-gradient-to-r from-brand to-cyan-400">
+      <div className="relative h-24 bg-gradient-to-r from-cyan-400/60 to-blue-400/60">
         {user?.banner_url && (
           <img src={user.banner_url} className="absolute inset-0 w-full h-full object-cover" alt="" />
         )}
-        <label className="absolute right-2 top-2 p-1.5 rounded-lg bg-black/30 hover:bg-black/50 cursor-pointer transition" title="Alterar banner">
-          <Camera size={14} className="text-white" />
+        <label className="absolute right-2 top-2 p-1.5 rounded-lg bg-white/30 hover:bg-white/50 backdrop-blur-sm cursor-pointer transition" title="Alterar banner">
+          <Camera size={14} className="text-ocean" />
           <input ref={bannerRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, "banners", "banner_url")} />
         </label>
       </div>
@@ -66,40 +67,40 @@ export default function ProfileCard({
         {/* Avatar row */}
         <div className="flex items-end justify-between -mt-8 mb-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-surface bg-bg-subtle overflow-hidden flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border-4 border-white/60 bg-white/30 overflow-hidden flex items-center justify-center backdrop-blur-sm">
               {user?.avatar_url ? (
                 <img src={user.avatar_url} className="w-full h-full object-cover" alt={user.username} />
               ) : (
-                <User size={24} className="text-fg-secondary" />
+                <User size={24} className="text-ocean" />
               )}
             </div>
-            <label className="absolute -right-1 -bottom-1 p-1 rounded-full bg-brand border-2 border-surface cursor-pointer hover:bg-brand-hover transition" title="Alterar avatar">
-              <Camera size={10} className="text-white" />
+            <label className="absolute -right-1 -bottom-1 p-1 rounded-full bg-white/40 backdrop-blur-sm border-2 border-white/60 cursor-pointer hover:bg-white/60 transition" title="Alterar avatar">
+              <Camera size={10} className="text-ocean" />
               <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, "avatars", "avatar_url")} />
             </label>
           </div>
           {uploading && (
-            <span className="text-xs text-fg-secondary animate-pulse">Enviando...</span>
+            <span className="text-xs text-ocean-light animate-pulse">Enviando...</span>
           )}
         </div>
 
         {/* Info */}
         <div className="mb-4">
-          <h2 className="text-base font-bold text-fg">@{user?.username ?? "username"}</h2>
-          <p className="text-sm text-fg-secondary mt-0.5 line-clamp-2">
-            {(user as any)?.bio ?? "Sem bio ainda."}
+          <h2 className="text-base font-bold text-ocean">@{user?.username ?? "username"}</h2>
+          <p className="text-sm text-muted mt-0.5 line-clamp-2">
+            {(user as { bio?: string })?.bio ?? "Sem bio ainda."}
           </p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="text-center p-3 rounded-xl bg-bg-subtle">
-            <p className="text-xl font-black text-fg">{linksCount}</p>
-            <p className="text-xs text-fg-secondary mt-0.5">Links</p>
+          <div className="glass-stat !p-3">
+            <p className="text-xl font-black text-ocean">{linksCount}</p>
+            <p className="text-xs text-muted mt-0.5">Links</p>
           </div>
-          <div className="text-center p-3 rounded-xl bg-bg-subtle">
-            <p className="text-xl font-black text-fg">{satisfaction}%</p>
-            <p className="text-xs text-fg-secondary mt-0.5">Satisfação</p>
+          <div className="glass-stat !p-3">
+            <p className="text-xl font-black text-ocean">{satisfaction}%</p>
+            <p className="text-xs text-muted mt-0.5">Satisfação</p>
           </div>
         </div>
 
@@ -109,13 +110,13 @@ export default function ProfileCard({
             href={`/u/${user?.username}`}
             target="_blank"
             rel="noreferrer"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold bg-brand text-white hover:bg-brand-hover transition"
+            className="flex-1 glass-button !text-xs !py-2 justify-center"
           >
             <ExternalLink size={14} /> Ver perfil
           </a>
           <a
             href="/dashboard/customize"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold border border-border text-fg hover:bg-bg-subtle transition"
+            className="flex-1 glass-button-outline !text-xs !py-2 justify-center"
           >
             <Pencil size={14} /> Editar
           </a>

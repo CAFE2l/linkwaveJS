@@ -32,18 +32,18 @@ export default function PreviewCard({
   preview?: Partial<DbLink> | null;
 }) {
   const previewLinks: Partial<DbLink>[] = preview?.title || preview?.url
-    ? [preview, ...links.slice(0, 4)]
-    : links.slice(0, 5);
+    ? [preview, ...links]
+    : links;
 
   return (
-    <div className="card p-5 h-full flex flex-col">
+    <div className="glass-card p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-fg">Prévia</h3>
-        <span className="text-xs text-fg-secondary bg-bg-subtle px-2 py-0.5 rounded-full">ao vivo</span>
+        <h3 className="text-base font-bold text-ocean">Prévia</h3>
+        <span className="glass-tag !text-[10px] !px-2 !py-0.5">ao vivo</span>
       </div>
 
       {/* Phone mockup */}
-      <div className="flex-1 flex items-start justify-center">
+      <div className="flex items-start justify-center">
         <div
           className="w-48 rounded-3xl overflow-hidden border-2 border-border"
           style={{ background: "linear-gradient(160deg, #a8edcf 0%, #78d4f0 50%, #4ab8f5 100%)" }}

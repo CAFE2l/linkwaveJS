@@ -2,24 +2,18 @@
 
 import React from "react";
 
-const ICONS = [
-  "Discord", "Facebook", "Gmail", "Google", "Instagram", "Ko_Fi",
-  "LinkedIn", "Notion", "Patreon", "PayPal", "Pinterest", "Reddit",
-  "Snapchat", "SoundCloud", "Spotify", "Steam", "Telegram", "TikTok",
-  "Twitch", "Twitter", "Whatsapp", "Youtube",
-  "Amazon", "GitHub", "Netflix", "Slack", "Trello",
-];
-
 export default function IconGrid({
+  icons,
   onSelect,
   selectedKey,
 }: {
+  icons: string[];
   onSelect: (key: string) => void;
   selectedKey?: string;
 }) {
   return (
     <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-48 overflow-y-auto p-1">
-      {ICONS.map((name) => {
+      {icons.map((name) => {
         const isSel = selectedKey === name;
         return (
           <button
@@ -29,8 +23,8 @@ export default function IconGrid({
             onClick={() => onSelect(name)}
             className={`p-1.5 rounded-lg flex items-center justify-center transition-all ${
               isSel
-                ? "ring-2 ring-brand bg-brand/10"
-                : "hover:bg-surface-hover"
+                ? "ring-2 ring-white/80 bg-white/40 backdrop-blur-sm"
+                : "hover:bg-white/20"
             }`}
           >
             <img

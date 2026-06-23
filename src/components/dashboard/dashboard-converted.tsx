@@ -110,7 +110,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
       showToast('✅ Nome atualizado!', 'success');
       setNameModalOpen(false);
       // update local user object (best-effort)
-      (user as any).name = nameInput;
+      (user as Record<string, unknown>).name = nameInput;
     } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
   }
 
@@ -121,7 +121,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
       if (error) throw error;
       showToast('✅ Bio atualizada!', 'success');
       setBioModalOpen(false);
-      (user as any).bio = bioInput;
+      (user as Record<string, unknown>).bio = bioInput;
     } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
   }
 
@@ -144,8 +144,14 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   useEffect(() => {
     // init sortable if available
     if (!linksRef.current) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let Sortable: any;
-    try { Sortable = require('sortablejs'); } catch (e) { Sortable = (window as any).Sortable; }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      Sortable = require('sortablejs');
+    } catch (e) {
+      Sortable = (window as unknown as Record<string, unknown>).Sortable;
+    }
     if (!Sortable) return;
     const instance = Sortable.create(linksRef.current, {
       handle: '.drag-handle',
@@ -195,7 +201,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
 
     const urlFinal = createUrl.match(/^https?:\/\//) ? createUrl : `https://${createUrl}`;
 
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       user_id: user.id,
       titulo: createTitle,
       url: urlFinal,
@@ -234,7 +240,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
     const novaUrl = (document.getElementById('edit_url') as HTMLInputElement).value.trim();
     const novoIcone = (document.getElementById('edit_icon') as HTMLSelectElement).value;
 
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       titulo: novoTitulo,
       url: novaUrl.match(/^https?:\/\//) ? novaUrl : `https://${novaUrl}`,
       icone: novoIcone || null,
@@ -764,7 +770,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                   <button onClick={() => setNameModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar nome">✎</button>
                 </p>
                 <p className="text-muted text-sm mb-1 inline-flex items-center gap-2">
-                  <span id="bioText">{(user as any)?.bio ?? 'Sem bio ainda'}</span>
+                  <span id="bioText">{(user as Record<string, unknown>)?.bio ?? 'Sem bio ainda'}</span>
                   <button onClick={() => setBioModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar bio">✎</button>
                 </p>
               </div>

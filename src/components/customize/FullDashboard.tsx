@@ -14,10 +14,12 @@ export default function FullDashboard({
   initialUser,
   initialLinks,
   initialClicks,
+  initialIcons,
 }: {
   initialUser: AppUser;
   initialLinks: DbLink[];
   initialClicks?: number;
+  initialIcons: string[];
 }) {
   const [user, setUser] = useState<AppUser>(initialUser);
   const [links, setLinks] = useState<DbLink[]>(initialLinks ?? []);
@@ -60,29 +62,50 @@ export default function FullDashboard({
     }
   }
 
+  async function handleEditLink(id: string, title: string, url: string): Promise<boolean> {
+    try {
+      const res = await fetch("/api/links", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, title, url }),
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao atualizar" });
+        return false;
+      }
+      setLinks((s) => s.map((l) => (String(l.id) === id ? { ...l, title, url } : l)));
+      pushToast({ id: String(Date.now()), type: "success", msg: "Link atualizado!" });
+      return true;
+    } catch {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao atualizar link" });
+      return false;
+    }
+  }
+
   function handleDelete(id: string | number) {
     setLinks((s) => s.filter((l) => String(l.id) !== String(id)));
     pushToast({ id: String(Date.now()), type: "success", msg: "Link removido" });
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-border bg-surface/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 h-14">
+      <header className="mx-3 mt-3 glass-nav sticky top-3 z-40 px-5 h-14">
+        <div className="mx-auto flex max-w-6xl items-center justify-between h-full">
           <div className="flex items-center gap-3">
             <img src="/brand/icon.png" alt="LinkWave" className="h-7 w-7" />
-            <span className="text-base font-black text-fg">LinkWave</span>
-            <div className="h-4 w-px bg-border hidden sm:block" />
+            <span className="text-base font-black text-ocean">LinkWave</span>
+            <div className="h-4 w-px bg-white/40 hidden sm:block" />
             <div className="hidden sm:flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-subtle border border-border flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full overflow-hidden bg-white/30 border border-white/60 flex items-center justify-center flex-shrink-0">
                 {user.avatar_url ? (
                   <img src={user.avatar_url} className="w-full h-full object-cover" alt="" />
                 ) : (
-                  <User size={14} className="text-fg-secondary" />
+                  <User size={14} className="text-ocean" />
                 )}
               </div>
-              <span className="text-sm text-fg-secondary">@{user.username}</span>
+              <span className="text-sm text-ocean">@{user.username}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -90,7 +113,7 @@ export default function FullDashboard({
               href={`/u/${user.username}`}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-fg-secondary hover:text-fg hover:bg-bg-subtle transition"
+              className="glass-button-outline text-xs !py-1.5 !px-3"
             >
               <ExternalLink size={13} />
               <span className="hidden sm:inline">Ver perfil</span>
@@ -98,7 +121,7 @@ export default function FullDashboard({
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-fg-secondary hover:text-fg hover:bg-bg-subtle transition"
+                className="glass-button-outline text-xs !py-1.5 !px-3"
               >
                 <LogOut size={13} />
                 <span className="hidden sm:inline">Sair</span>
@@ -125,6 +148,7 @@ export default function FullDashboard({
           {/* Center: Add link + links list */}
           <main className="lg:col-span-6 space-y-5">
             <NewLinkForm
+              icons={initialIcons}
               onAdd={handleAddLink}
               pushToast={pushToast}
               onPreviewChange={setPreview}
@@ -133,6 +157,7 @@ export default function FullDashboard({
               links={links}
               onReorder={setLinks}
               onDelete={handleDelete}
+              onEdit={handleEditLink}
             />
           </main>
 

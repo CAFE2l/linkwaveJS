@@ -45,8 +45,11 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
                 borderRadius: "12px",
                 fontSize: "13px",
               }}
-              formatter={(value: number) => [value, "cliques"]}
-              labelFormatter={(_label: string, payload: { payload?: { fullTitle?: string } }[]) => payload[0]?.payload?.fullTitle ?? ""}
+              formatter={(value) => [String(value), "cliques"]}
+              labelFormatter={(_label, payload) => {
+                const item = payload?.[0] as { payload?: { fullTitle?: string } } | undefined;
+                return item?.payload?.fullTitle ?? "";
+              }}
             />
             <Bar
               dataKey="clicks"

@@ -43,8 +43,8 @@ export function ClickActivityChart({ data }: { data: DailyCount[] }) {
                 borderRadius: "12px",
                 fontSize: "13px",
               }}
-              labelFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "numeric", month: "long" })}
-              formatter={(value: number) => [value, "cliques"]}
+              labelFormatter={(v) => new Date(String(v)).toLocaleDateString("pt-BR", { day: "numeric", month: "long" })}
+              formatter={(value) => [String(value), "cliques"]}
             />
             <Bar
               dataKey="count"

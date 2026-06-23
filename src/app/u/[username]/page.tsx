@@ -87,7 +87,7 @@ export default async function PublicProfilePage({ params }: Props) {
       >
         {/* Banner */}
         {user.banner_url && (
-          <div className="relative h-48 w-full overflow-hidden md:h-64">
+          <div className="relative h-48 w-full overflow-hidden md:h-56">
             <Image
               src={user.banner_url}
               alt=""
@@ -95,11 +95,20 @@ export default async function PublicProfilePage({ params }: Props) {
               className="object-cover"
               priority
             />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(180deg, transparent 40%, var(--ut-bg, var(--background)) 100%)",
+              }}
+            />
           </div>
         )}
 
-        <main className="relative px-4 py-10">
-          <section className="mx-auto flex max-w-xl flex-col items-center justify-center">
+        <main
+          className="relative px-4 pb-12"
+          style={{ marginTop: user.banner_url ? "-3rem" : "2rem" }}
+        >
+          <section className="mx-auto flex max-w-lg flex-col items-center justify-center">
             <div
               className="w-full text-center"
               style={{
@@ -114,56 +123,71 @@ export default async function PublicProfilePage({ params }: Props) {
             >
               <CosmicAvatar theme={theme} avatarUrl={user.avatar_url} username={user.username} />
 
-              {bio && (
+              <div className="px-6 pb-2">
+                <h1
+                  className="text-2xl font-black leading-tight"
+                  style={{ fontFamily: "var(--ut-font)" }}
+                >
+                  {user.name || user.username}
+                </h1>
                 <p
-                  className="mx-auto mt-1 max-w-xs text-sm leading-relaxed"
+                  className="text-sm font-medium mt-0.5"
                   style={{ color: "var(--ut-text-secondary)" }}
                 >
-                  {bio}
+                  @{user.username}
                 </p>
-              )}
 
-              <h1 className="mt-5 text-3xl font-black" style={{ fontFamily: "var(--ut-font)" }}>
-                @{user.username}
-              </h1>
+                {bio && (
+                  <p
+                    className="mx-auto mt-3 max-w-xs text-sm leading-relaxed"
+                    style={{ color: "var(--ut-text-secondary)" }}
+                  >
+                    {bio}
+                  </p>
+                )}
+              </div>
 
-            {/* Links */}
-            <div className="mt-7 space-y-3 px-5 pb-7">
-              {hasLinks ? (
-                <AnimatedLinks>
-                  {links.map((link, i) => (
-                    <div
-                      key={link.id}
-                      style={{
-                        animation: `ut-quantumEntrance 0.5s ease-out ${i * 0.07}s both`,
-                      }}
-                    >
-                      <PublicLinkButton link={link} />
-                    </div>
-                  ))}
-                </AnimatedLinks>
-              ) : (
-                <div
-                  className="rounded-2xl p-5 text-center text-sm font-semibold"
-                  style={{
-                    background: "var(--ut-card-glass-bg, rgba(255,255,255,0.06))",
-                    border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.1))",
-                    color: "var(--ut-text-secondary)",
-                  }}
-                >
-                  Este perfil ainda não publicou links.
-                </div>
-              )}
+              <div
+                className="mx-6 my-1 h-px"
+                style={{ background: "var(--ut-card-glass-border, rgba(255,255,255,0.15))" }}
+              />
+
+              <div className="px-6 pb-7 pt-4 space-y-3">
+                {hasLinks ? (
+                  <AnimatedLinks>
+                    {links.map((link, i) => (
+                      <div
+                        key={link.id}
+                        style={{
+                          animation: `ut-quantumEntrance 0.5s ease-out ${i * 0.07}s both`,
+                        }}
+                      >
+                        <PublicLinkButton link={link} />
+                      </div>
+                    ))}
+                  </AnimatedLinks>
+                ) : (
+                  <div
+                    className="rounded-2xl p-5 text-center text-sm font-semibold"
+                    style={{
+                      background: "var(--ut-card-glass-bg, rgba(255,255,255,0.06))",
+                      border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.1))",
+                      color: "var(--ut-text-secondary)",
+                    }}
+                  >
+                    Este perfil ainda não publicou links.
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <Link
-            href="/"
-            className="mt-6 text-center text-sm font-bold transition hover:opacity-80"
-            style={{ color: "var(--ut-text-secondary)" }}
-          >
-            Criado com LinkWave
-          </Link>
+            <Link
+              href="/"
+              className="mt-6 text-center text-xs font-bold transition hover:opacity-80 tracking-wider uppercase"
+              style={{ color: "var(--ut-text-secondary)" }}
+            >
+              Criado com LinkWave
+            </Link>
           </section>
         </main>
       </div>

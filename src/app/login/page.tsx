@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { Lock, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { LoginForm } from "@/components/shared/login-form";
 import { createClient } from "@/lib/supabase/server";
 import { PublicPageLayout } from "@/components/shared/public-page-layout";

@@ -46,7 +46,7 @@ export function EngagementChart({ data }: { data: EngagementItem[] }) {
                 borderRadius: "12px",
                 fontSize: "13px",
               }}
-              formatter={(value: number, _name: string, props: { payload?: Record<string, unknown> }) => [`${value}`, `${props.payload?.links ?? "?"} link(s)`]}
+              formatter={(value) => [String(value), "usuários"]}
             />
             <Bar
               dataKey="users"

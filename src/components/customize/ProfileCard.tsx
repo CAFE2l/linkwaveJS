@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Camera, ExternalLink, Pencil, User } from "lucide-react";
-import type { AppUser } from "@/types/database";
+import type { AppUser, Database } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ProfileCard({
@@ -13,7 +13,7 @@ export default function ProfileCard({
   pushToast,
 }: {
   user: AppUser | null;
-  setUser: (u: AppUser | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<AppUser>>;
   linksCount: number;
   clicks: number;
   pushToast: (t: { id: string; type: "success" | "error"; msg: string }) => void;
@@ -42,9 +42,9 @@ export default function ProfileCard({
     setUploading(true);
     const url = await uploadFile(f, folder);
     setUploading(false);
-    if (!url) { pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao enviar imagem" }); return; }
-    await supabaseRef.current.from("users").update({ [field]: url }).eq("id", user?.id);
-    if (user) setUser({ ...user, [field]: url });
+    if (!user || !url) { pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao enviar imagem" }); return; }
+    await supabaseRef.current.from("users").update({ [field]: url } as unknown as Database["public"]["Tables"]["users"]["Update"]).eq("id", user.id);
+    setUser({ ...user, [field as keyof AppUser]: url });
     pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
   }
 
@@ -86,10 +86,8 @@ export default function ProfileCard({
 
         {/* Info */}
         <div className="mb-4">
-          <h2 className="text-base font-bold text-ocean">@{user?.username ?? "username"}</h2>
-          <p className="text-sm text-muted mt-0.5 line-clamp-2">
-            {(user as { bio?: string })?.bio ?? "Sem bio ainda."}
-          </p>
+          <h2 className="text-base font-bold text-ocean truncate">{user?.name || user?.username || "username"}</h2>
+          <p className="text-xs text-muted">@{user?.username ?? "username"}</p>
         </div>
 
         {/* Stats */}

@@ -53,8 +53,11 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
                 borderRadius: "12px",
                 fontSize: "13px",
               }}
-              labelFormatter={(label: string, payload: { payload?: { hour?: number } }[]) => payload[0]?.payload?.hour !== undefined ? `${payload[0].payload.hour}h` : label}
-              formatter={(value: number) => [value, "cliques"]}
+              labelFormatter={(label, payload) => {
+                const item = payload?.[0] as { payload?: { hour?: number } } | undefined;
+                return item?.payload?.hour !== undefined ? `${item.payload.hour}h` : String(label);
+              }}
+              formatter={(value) => [String(value), "cliques"]}
             />
             <Area
               type="monotone"

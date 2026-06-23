@@ -99,7 +99,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [bioModalOpen, setBioModalOpen] = useState(false);
   const [nameInput, setNameInput] = useState<string>(user?.name ?? '');
-  const [bioInput, setBioInput] = useState<string>(user?.bio ?? '');
+  const [bioInput, setBioInput] = useState<string>((user as { bio?: string })?.bio ?? '');
 
   async function saveName() {
     if (!nameInput || nameInput.trim().length === 0) { showToast('❌ O nome não pode estar vazio', 'error'); return; }
@@ -203,7 +203,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
 
     const payload: Record<string, unknown> = {
       user_id: user.id,
-      titulo: createTitle,
+      title: createTitle,
       url: urlFinal,
       icone: iconMode === 'predefined' ? createIcon : null,
       is_custom_icon: iconMode === 'custom' ? 1 : 0,
@@ -241,7 +241,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
     const novoIcone = (document.getElementById('edit_icon') as HTMLSelectElement).value;
 
     const payload: Record<string, unknown> = {
-      titulo: novoTitulo,
+      title: novoTitulo,
       url: novaUrl.match(/^https?:\/\//) ? novaUrl : `https://${novaUrl}`,
       icone: novoIcone || null,
       is_custom_icon: editCustomIconDataUrl ? 1 : 0,
@@ -770,7 +770,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                   <button onClick={() => setNameModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar nome">✎</button>
                 </p>
                 <p className="text-muted text-sm mb-1 inline-flex items-center gap-2">
-                  <span id="bioText">{(user as Record<string, unknown>)?.bio ?? 'Sem bio ainda'}</span>
+                  <span id="bioText">{(user as { bio?: string })?.bio ?? 'Sem bio ainda'}</span>
                   <button onClick={() => setBioModalOpen(true)} className="ml-1 w-6 h-6 rounded-full bg-white/60 inline-flex items-center justify-center hover:bg-white transition text-ocean text-xs" title="Editar bio">✎</button>
                 </p>
               </div>
@@ -900,15 +900,15 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                     <div className="drag-handle cursor-grab pr-2">☰</div>
                     <div className="icon-bubble">
                       {link.is_custom_icon ? (
-                        <img src={link.icon_blob || ''} alt={link.titulo || ''} />
+                        <img src={link.icon_blob || ''} alt={link.title || ''} />
                       ) : link.icone ? (
-                        <IconImg name={String(link.icone)} className="w-8 h-8" alt={link.titulo || ''} />
+                        <IconImg name={String(link.icone)} className="w-8 h-8" alt={link.title || ''} />
                       ) : (
                         <i className="fa-solid fa-link" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-ocean truncate">{link.titulo}</h4>
+                      <h4 className="font-bold text-ocean truncate">{link.title}</h4>
                       <p className="text-muted text-xs truncate mt-0.5">{link.url}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -986,7 +986,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
               <form id="editLinkForm" onSubmit={(e) => handleEditSubmit(e)} className="space-y-4">
                 <div>
                   <label className="block text-xs mb-2">Título</label>
-                  <input id="edit_title" defaultValue={editingLink.titulo} className="aero-input w-full" required />
+                  <input id="edit_title" defaultValue={editingLink.title} className="aero-input w-full" required />
                 </div>
                 <div>
                   <label className="block text-xs mb-2">URL</label>

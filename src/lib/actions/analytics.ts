@@ -67,7 +67,7 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     { count: totalClicks },
     { data: recentClicks },
     { data: recentUsers },
-    { data: prevPeriodClicks },
+    { count: prevPeriodClicks },
     { data: allLinks },
     { data: allClickData },
     { data: countryData },
@@ -95,7 +95,7 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     admin.from("clicks").select("country"),
   ]);
 
-  const prevCount = prevPeriodClicks?.count ?? 0;
+  const prevCount = prevPeriodClicks ?? 0;
   const currCount = totalClicks ?? 0;
   const diff = currCount - prevCount;
   const totalClicksDelta = prevCount > 0 ? Math.round((diff / prevCount) * 100) : 0;
@@ -103,20 +103,26 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   const totalUsersDelta = 0;
 
   const userGrowth = fillDateGaps(
-    (recentUsers ?? []).reduce<Map<string, number>>((acc, u) => {
-      const key = u.created_at.slice(0, 10);
-      acc.set(key, (acc.get(key) ?? 0) + 1);
-      return acc;
-    }, new Map()),
+    Array.from(
+      (recentUsers ?? []).reduce<Map<string, number>>((acc, u) => {
+        const key = u.created_at.slice(0, 10);
+        acc.set(key, (acc.get(key) ?? 0) + 1);
+        return acc;
+      }, new Map()),
+      ([date, count]) => ({ date, count }),
+    ),
     30,
   );
 
   const clickActivity = fillDateGaps(
-    (recentClicks ?? []).reduce<Map<string, number>>((acc, c) => {
-      const key = c.created_at.slice(0, 10);
-      acc.set(key, (acc.get(key) ?? 0) + 1);
-      return acc;
-    }, new Map()),
+    Array.from(
+      (recentClicks ?? []).reduce<Map<string, number>>((acc, c) => {
+        const key = c.created_at.slice(0, 10);
+        acc.set(key, (acc.get(key) ?? 0) + 1);
+        return acc;
+      }, new Map()),
+      ([date, count]) => ({ date, count }),
+    ),
     30,
   );
 

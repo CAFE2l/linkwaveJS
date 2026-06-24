@@ -7,6 +7,7 @@ import { logoutAction } from "@/lib/actions/auth";
 import { ToastProvider } from "@/components/dashboard/toast";
 import { BlobBackground } from "@/components/landing/blob-background";
 import { ThemeProvider } from "@/components/landing/theme-provider";
+import { Footer } from "@/components/landing/footer";
 import Image from "next/image";
 import type { AppUser } from "@/types/database";
 
@@ -96,6 +97,8 @@ export function DashboardShell({
             <main className="mx-auto w-[min(100%-2rem,1120px)] px-4 py-6">
               {children}
             </main>
+
+            <Footer isLoggedIn />
           </ToastProvider>
         </div>
       </div>

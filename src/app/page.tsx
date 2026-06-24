@@ -36,7 +36,7 @@ export default async function Home() {
             <div className="glass-divider" />
           </div>
           <CTASection isLoggedIn={Boolean(user)} />
-          <Footer />
+          <Footer isLoggedIn={Boolean(user)} />
         </div>
       </div>
     </ThemeProvider>

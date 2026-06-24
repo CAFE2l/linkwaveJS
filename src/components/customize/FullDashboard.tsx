@@ -9,6 +9,7 @@ import LinkList from "./LinkList";
 import PreviewCard from "./PreviewCard";
 import Toast, { ToastObj } from "./Toast";
 import { logoutAction } from "@/lib/actions/auth";
+import { Footer } from "@/components/landing/footer";
 import type { AppUser, Link as DbLink } from "@/types/database";
 
 export default function FullDashboard({
@@ -191,6 +192,8 @@ export default function FullDashboard({
       <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
         {toasts.map((t) => <Toast key={t.id} {...t} />)}
       </div>
+
+      <Footer isLoggedIn />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function PublicPageLayout({
         <div className="relative z-10 flex min-h-screen flex-col">
           <Navbar isLoggedIn={isLoggedIn} />
           <main className="flex-1">{children}</main>
-          <Footer />
+          <Footer isLoggedIn={isLoggedIn} />
         </div>
       </div>
     </ThemeProvider>

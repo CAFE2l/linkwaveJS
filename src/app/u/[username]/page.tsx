@@ -7,7 +7,7 @@ import { ThemeProviderShell } from "@/components/shared/theme-provider-shell";
 import { StarCanvas } from "@/components/public-profile/star-canvas";
 import { CosmicAvatar } from "@/components/public-profile/cosmic-avatar";
 import { AnimatedLinks } from "@/components/public-profile/animated-links";
-import { BannerLED } from "@/components/public-profile/banner-led";
+import { DimensionalBanner } from "@/components/public-profile/dimensional-banner";
 import { BackgroundLayer } from "@/components/public-profile/background-layer";
 import { createClient } from "@/lib/supabase/server";
 import { getBaseUrl } from "@/lib/utils/url";
@@ -80,34 +80,39 @@ export default async function PublicProfilePage({ params }: Props) {
     <ThemeProviderShell theme={theme}>
       <BackgroundLayer theme={theme} />
       {theme?.enable_stars && <StarCanvas />}
-      <BannerLED />
+
+      {/* Nebula overlay for milkyway galaxy */}
+      {theme?.galaxy_theme === "milkyway" && (
+        <div className="pointer-events-none fixed inset-0 z-0" style={{ isolation: "isolate" }}>
+          <div
+            className="absolute -inset-[50%]"
+            style={{
+              background: [
+                "radial-gradient(ellipse at 20% 40%, rgba(10,50,160,0.28) 0%, transparent 55%)",
+                "radial-gradient(ellipse at 75% 65%, rgba(5,25,100,0.22) 0%, transparent 50%)",
+                "radial-gradient(ellipse at 50% 85%, rgba(15,70,200,0.16) 0%, transparent 50%)",
+                "radial-gradient(ellipse at 85% 20%, rgba(8,40,130,0.2) 0%, transparent 45%)",
+              ].join(","),
+              filter: "blur(55px)",
+              animation: "ut-nebulaMove 35s ease infinite",
+            }}
+          />
+        </div>
+      )}
+
+      <DimensionalBanner
+        bannerUrl={user.banner_url}
+        ledColor={theme?.banner_led_color ?? "#ffffff"}
+        username={user.username}
+      />
+
       <div
         className="relative min-h-screen"
         style={{ background: "var(--ut-bg, var(--background))" }}
       >
-        {/* Banner with darker overlay */}
-        {user.banner_url && (
-          <div className="relative h-48 w-full overflow-hidden md:h-56">
-            <Image
-              src={user.banner_url}
-              alt=""
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/15 backdrop-blur-[2px]" />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.25) 70%, var(--ut-bg, var(--background)) 100%)",
-              }}
-            />
-          </div>
-        )}
-
         <main
           className="relative px-4 pb-12"
-          style={{ marginTop: user.banner_url ? "-3rem" : "2rem" }}
+          style={{ marginTop: user.banner_url ? "-2rem" : "6rem" }}
         >
           <section className="mx-auto flex max-w-lg flex-col items-center justify-center">
             <div
@@ -164,16 +169,9 @@ export default async function PublicProfilePage({ params }: Props) {
 
               <div className="px-6 pb-7 pt-4 space-y-3">
                 {hasLinks ? (
-                  <AnimatedLinks>
-                    {links.map((link, i) => (
-                      <div
-                        key={link.id}
-                        style={{
-                          animation: `ut-quantumEntrance 0.5s ease-out ${i * 0.07}s both`,
-                        }}
-                      >
-                        <PublicLinkButton link={link} />
-                      </div>
+                  <AnimatedLinks transitionEffect={theme?.transition_effect}>
+                    {links.map((link) => (
+                      <PublicLinkButton key={link.id} link={link} />
                     ))}
                   </AnimatedLinks>
                 ) : (
@@ -191,13 +189,23 @@ export default async function PublicProfilePage({ params }: Props) {
               </div>
             </div>
 
-            <Link
-              href="/"
-              className="mt-6 text-center text-xs font-bold transition hover:opacity-80 tracking-wider uppercase"
-              style={{ color: "var(--ut-text-secondary)" }}
+            {/* Profile footer */}
+            <div
+              className="mt-6 rounded-2xl px-5 py-3 text-center"
+              style={{
+                background: "var(--ut-card-glass-bg, rgba(255,255,255,0.06))",
+                border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.1))",
+              }}
             >
-              Criado com LinkWave
-            </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase transition hover:opacity-80"
+                style={{ color: "var(--ut-text-secondary)" }}
+              >
+                <Image src="/brand/icon.png" alt="" width={16} height={16} className="opacity-60" />
+                LinkWave | @{user.username}
+              </Link>
+            </div>
           </section>
         </main>
       </div>

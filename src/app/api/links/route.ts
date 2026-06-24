@@ -87,3 +87,34 @@ export async function PUT(req: Request) {
     return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+    if (!id) {
+      return NextResponse.json({ ok: false, message: 'ID é obrigatório' }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
+
+    const { error } = await supabase
+      .from('links')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('delete link err', error);
+      return NextResponse.json({ ok: false, message: 'Erro ao excluir link' }, { status: 500 });
+    }
+
+    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
+
+    return NextResponse.json({ ok: true, message: 'Link excluído' });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
+  }
+}

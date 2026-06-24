@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { AppUser, Json } from "@/types/database";
 
 type ActionState = {
   ok: boolean;
@@ -29,44 +28,6 @@ async function requireAdmin() {
   }
 
   return supabase;
-}
-
-export async function getAdminOverview() {
-  await requireAdmin();
-  const supabase = await createClient();
-  const admin = await createAdminClient();
-
-  const [{ count: totalUsers }, { count: totalLinks }, { count: totalClicks }] =
-    await Promise.all([
-      supabase.from("users").select("*", { count: "exact", head: true }),
-      supabase.from("links").select("*", { count: "exact", head: true }),
-      supabase.from("clicks").select("*", { count: "exact", head: true }),
-    ]);
-
-  const { data: recentUsers } = await supabase
-    .from("users")
-    .select("id, username, email, avatar_url, role, active, created_at")
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  const { data: topLinks } = await supabase
-    .from("links")
-    .select("id, title, url, user_id, created_at")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const { data: usersWithLinks } = await supabase
-    .from("users")
-    .select("id, username, email, role, active, created_at");
-
-  return {
-    totalUsers: totalUsers ?? 0,
-    totalLinks: totalLinks ?? 0,
-    totalClicks: totalClicks ?? 0,
-    recentUsers: recentUsers ?? [],
-    topLinks: topLinks ?? [],
-    allUsers: usersWithLinks ?? [],
-  };
 }
 
 export async function getAdminUsers() {

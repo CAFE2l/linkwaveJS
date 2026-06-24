@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { LogOut, ExternalLink, User } from "lucide-react";
 import ProfileCard from "./ProfileCard";
 import NewLinkForm from "./NewLinkForm";
@@ -83,19 +84,35 @@ export default function FullDashboard({
     }
   }
 
-  function handleDelete(id: string | number) {
-    setLinks((s) => s.filter((l) => String(l.id) !== String(id)));
-    pushToast({ id: String(Date.now()), type: "success", msg: "Link removido" });
+  async function handleDelete(id: string | number) {
+    try {
+      const res = await fetch("/api/links", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: String(id) }),
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao excluir link" });
+        return;
+      }
+      setLinks((s) => s.filter((l) => String(l.id) !== String(id)));
+      pushToast({ id: String(Date.now()), type: "success", msg: "Link removido" });
+    } catch {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao excluir link" });
+    }
   }
 
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="mx-3 mt-3 glass-nav sticky top-3 z-40 px-5 h-14">
-        <div className="mx-auto flex max-w-6xl items-center justify-between h-full">
+      <header className="sticky top-0 z-20 mt-4 w-[min(100%-2rem,1120px)] mx-auto glass-nav px-5 py-2.5 shadow-sm">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/brand/icon.png" alt="LinkWave" className="h-7 w-7" />
-            <span className="text-base font-black text-ocean">LinkWave</span>
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/brand/icon.png" alt="LinkWave" className="h-7 w-7" />
+              <span className="text-base font-black text-ocean">LinkWave</span>
+            </Link>
             <div className="h-4 w-px bg-white/40 hidden sm:block" />
             <div className="hidden sm:flex items-center gap-2">
               <div className="w-7 h-7 rounded-full overflow-hidden bg-white/30 border border-white/60 flex items-center justify-center flex-shrink-0">

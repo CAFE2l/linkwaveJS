@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X, UserPlus, Gauge } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
@@ -8,21 +8,10 @@ import Image from "next/image";
 
 export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
-      <div
-        className={`glass-nav mx-auto flex max-w-5xl items-center justify-between px-5 py-2.5 transition-all duration-300 ${
-          scrolled ? "shadow-lg" : ""
-        }`}
-      >
+    <header className="relative w-[min(100%-2rem,1120px)] mx-auto mt-4 z-20 px-4">
+      <div className="glass-nav mx-auto flex items-center justify-between px-5 py-2.5 shadow-sm">
         <Link href="/" className="flex items-center gap-2.5">
           <Image src="/brand/icon.png" alt="LinkWave" width={36} height={36} className="h-9 w-9" />
           <span className="text-lg font-black text-ocean">LinkWave</span>
@@ -47,7 +36,7 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {open && (
-        <div className="mx-auto mt-2 max-w-5xl rounded-2xl border border-white/70 bg-white/60 px-5 py-4 backdrop-blur-xl flex flex-col gap-3 sm:hidden">
+        <div className="mx-auto mt-2 rounded-2xl border border-white/70 bg-white/60 px-5 py-4 backdrop-blur-xl flex flex-col gap-3 sm:hidden">
           <ThemeToggle />
           {isLoggedIn ? (
             <a href="/dashboard" className="glass-button w-full justify-center px-5 py-2 text-sm">

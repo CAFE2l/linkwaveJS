@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { ExternalLink, LayoutDashboard, LogOut, Palette, Sliders, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import { ToastProvider } from "@/components/dashboard/toast";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { BlobBackground } from "@/components/landing/blob-background";
+import { ThemeProvider } from "@/components/landing/theme-provider";
+import Image from "next/image";
 import type { AppUser } from "@/types/database";
 
 const navItems = [
@@ -26,63 +27,78 @@ export function DashboardShell({
   const pathname = usePathname();
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-bg">
-        <header className="border-b border-border/50 bg-surface/80 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-5 h-16">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-2.5">
-                <span className="text-lg font-bold text-foreground">LinkWave</span>
-              </Link>
-              <div className="h-5 w-px bg-border" />
-              <div className="flex items-center gap-2.5">
-                <Avatar src={user.avatar_url} alt={user.username} size="sm" />
-                <span className="text-sm font-medium text-fg-secondary">@{user.username}</span>
+    <ThemeProvider>
+      <div className="min-h-screen landing-bg">
+        <BlobBackground />
+        <div className="relative z-10 flex flex-col">
+          <ToastProvider>
+            <header className="sticky top-0 z-20 mt-4 w-[min(100%-2rem,1120px)] mx-auto glass-nav px-5 py-2.5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Link href="/" className="flex items-center gap-2">
+                    <Image src="/brand/icon.png" alt="LinkWave" width={28} height={28} className="h-7 w-7" />
+                    <span className="text-base font-black text-ocean">LinkWave</span>
+                  </Link>
+                  <div className="h-4 w-px bg-white/40 hidden sm:block" />
+                  <div className="hidden sm:flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full overflow-hidden bg-white/30 border border-white/60 flex items-center justify-center flex-shrink-0">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} className="w-full h-full object-cover" alt="" />
+                      ) : (
+                        <User size={14} className="text-ocean" />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-ocean">@{user.username}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/u/${user.username}`}
+                    className="glass-button-outline text-xs !py-1.5 !px-3"
+                  >
+                    <ExternalLink size={13} />
+                    <span className="hidden sm:inline">Ver perfil</span>
+                  </Link>
+                  <form action={logoutAction}>
+                    <button
+                      type="submit"
+                      className="glass-button-outline text-xs !py-1.5 !px-3"
+                    >
+                      <LogOut size={13} />
+                      <span className="hidden sm:inline">Sair</span>
+                    </button>
+                  </form>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/u/${user.username}`}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-sm font-medium text-fg-secondary hover:text-foreground hover:bg-surface-hover transition"
-              >
-                <ExternalLink size={14} />
-                <span className="hidden sm:inline">Ver perfil</span>
-              </Link>
-              <form action={logoutAction}>
-                <Button variant="ghost" size="sm" type="submit">
-                  <LogOut size={14} />
-                  <span className="hidden sm:inline">Sair</span>
-                </Button>
-              </form>
-            </div>
-          </div>
+            </header>
 
-          <nav className="mx-auto flex max-w-5xl gap-1 px-5 pb-0">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 rounded-t-xl px-4 py-2.5 text-sm font-medium transition border-b-2 ${
-                    active
-                      ? "border-brand text-foreground bg-bg-subtle"
-                      : "border-transparent text-fg-secondary hover:text-foreground hover:bg-surface-hover"
-                  }`}
-                >
-                  <Icon size={15} />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </header>
+            <nav className="mx-auto mt-4 flex w-[min(100%-2rem,1120px)] gap-1 px-4">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold transition-all ${
+                      active
+                        ? "bg-white/50 text-ocean shadow-sm backdrop-blur-md border border-white/70"
+                        : "text-ocean/60 hover:text-ocean hover:bg-white/30 border border-transparent"
+                    }`}
+                  >
+                    <Icon size={15} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
 
-        <main className="mx-auto max-w-5xl px-5 py-8">
-          {children}
-        </main>
+            <main className="mx-auto w-[min(100%-2rem,1120px)] px-4 py-6">
+              {children}
+            </main>
+          </ToastProvider>
+        </div>
       </div>
-    </ToastProvider>
+    </ThemeProvider>
   );
 }

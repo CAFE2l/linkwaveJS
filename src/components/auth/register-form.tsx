@@ -16,17 +16,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   checkUsernameAvailabilityAction,
   registerUserAction,
 } from "@/lib/actions/auth";
 import type { ActionState } from "@/lib/actions/auth";
-import { cn } from "@/lib/utils/cn";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { GoogleAuthButton } from "./google-auth-button";
 import { PasswordStrengthMeter } from "./password-strength-meter";
@@ -42,6 +38,10 @@ const fieldAnimation = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
 };
+
+const glassInput = "h-12 w-full rounded-xl border border-white/70 bg-white/40 px-4 pl-11 text-sm text-ocean placeholder:text-ocean/50 backdrop-blur-md transition-all focus:border-white/90 focus:bg-white/60 focus:shadow-lg focus:outline-none";
+
+const glassButton = "inline-flex items-center justify-center gap-2 h-13 w-full rounded-xl bg-gradient-to-b from-cyan-400 to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-300/40 transition-all duration-200 hover:from-cyan-300 hover:to-blue-400 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-300/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -161,7 +161,7 @@ export function RegisterForm() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className="flex items-center gap-2 rounded-2xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          className="flex items-center gap-2 rounded-2xl border border-red-300/40 bg-red-400/20 px-4 py-3 text-sm font-medium text-red-700 backdrop-blur-sm"
         >
           <X className="size-4 shrink-0" />
           <span>{serverError}</span>
@@ -172,7 +172,7 @@ export function RegisterForm() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className="flex items-center gap-2 rounded-2xl border border-success/25 bg-success/10 px-4 py-3 text-sm font-medium text-success"
+          className="flex items-center gap-2 rounded-2xl border border-green-300/40 bg-green-400/20 px-4 py-3 text-sm font-medium text-green-700 backdrop-blur-sm"
         >
           <Check className="size-4 shrink-0" />
           <span>{successMessage}</span>
@@ -180,72 +180,87 @@ export function RegisterForm() {
       ) : null}
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.05 }}>
-        <Field
-          label="Nome completo"
-          error={errors.name?.message}
-          icon={<User className="size-4" />}
-        >
-          <Input
-            autoComplete="name"
-            placeholder="Seu nome completo"
-            className="h-12 rounded-full pl-11"
-            {...register("name")}
-          />
-        </Field>
+        <div>
+          <label className="mb-2 block text-sm font-bold text-ocean">
+            Nome completo
+          </label>
+          <div className="relative">
+            <User className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+            <input
+              autoComplete="name"
+              placeholder="Seu nome completo"
+              className={glassInput}
+              {...register("name")}
+            />
+          </div>
+          {errors.name?.message ? (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs font-medium text-red-600">{errors.name.message}</motion.p>
+          ) : null}
+        </div>
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.08 }}>
-        <Field
-          label="E-mail"
-          error={errors.email?.message}
-          icon={<Mail className="size-4" />}
-        >
-          <Input
-            autoComplete="email"
-            inputMode="email"
-            placeholder="seu@email.com"
-            className="h-12 rounded-full pl-11"
-            {...register("email")}
-          />
-        </Field>
+        <div>
+          <label className="mb-2 block text-sm font-bold text-ocean">
+            E-mail
+          </label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+            <input
+              autoComplete="email"
+              inputMode="email"
+              placeholder="seu@email.com"
+              className={glassInput}
+              {...register("email")}
+            />
+          </div>
+          {errors.email?.message ? (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs font-medium text-red-600">{errors.email.message}</motion.p>
+          ) : null}
+        </div>
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.11 }}>
-        <Field
-          label="Username"
-          error={errors.username?.message}
-          icon={<AtSign className="size-4" />}
-        >
-          <Input
-            autoComplete="username"
-            placeholder="seunome"
-            className="h-12 rounded-full pl-11 lowercase"
-            {...register("username")}
-          />
+        <div>
+          <label className="mb-2 block text-sm font-bold text-ocean">
+            Username
+          </label>
+          <div className="relative">
+            <AtSign className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+            <input
+              autoComplete="username"
+              placeholder="seunome"
+              className={`${glassInput} lowercase`}
+              {...register("username")}
+            />
+          </div>
           <UsernameAvailability
             checking={checkingUsername}
             available={usernameStatus.available}
             message={usernameStatus.message}
           />
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ocean/60">
             Seu perfil será linkwave.app/u/
             {normalizedUsername || "seunome"}
           </p>
-        </Field>
+          {errors.username?.message ? (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs font-medium text-red-600">{errors.username.message}</motion.p>
+          ) : null}
+        </div>
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.14 }}>
-        <Field
-          label="Senha"
-          error={errors.password?.message}
-          icon={<ShieldCheck className="size-4" />}
-        >
+        <div>
+          <label className="mb-2 block text-sm font-bold text-ocean">
+            Senha
+          </label>
           <div className="relative">
-            <Input
+            <ShieldCheck className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+            <input
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="Crie uma senha segura"
-              className="h-12 rounded-full pl-11 pr-12"
+              className={`${glassInput} pr-12`}
               {...register("password")}
             />
             <PasswordToggle
@@ -255,21 +270,24 @@ export function RegisterForm() {
             />
           </div>
           <PasswordStrengthMeter password={password ?? ""} />
-        </Field>
+          {errors.password?.message ? (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs font-medium text-red-600">{errors.password.message}</motion.p>
+          ) : null}
+        </div>
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.17 }}>
-        <Field
-          label="Confirmar senha"
-          error={errors.confirmPassword?.message}
-          icon={<ShieldCheck className="size-4" />}
-        >
+        <div>
+          <label className="mb-2 block text-sm font-bold text-ocean">
+            Confirmar senha
+          </label>
           <div className="relative">
-            <Input
+            <ShieldCheck className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+            <input
               type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="Repita sua senha"
-              className="h-12 rounded-full pl-11 pr-12"
+              className={`${glassInput} pr-12`}
               {...register("confirmPassword")}
             />
             <PasswordToggle
@@ -278,30 +296,30 @@ export function RegisterForm() {
               onClick={() => setShowConfirmPassword((v) => !v)}
             />
           </div>
-        </Field>
+          {errors.confirmPassword?.message ? (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs font-medium text-red-600">{errors.confirmPassword.message}</motion.p>
+          ) : null}
+        </div>
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.2 }}>
-        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/20 bg-white/30 p-3 text-sm text-card-foreground backdrop-blur-md transition hover:bg-white/50 dark:bg-white/5 dark:hover:bg-white/8">
+        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/70 bg-white/40 p-3 text-sm text-ocean backdrop-blur-md transition hover:bg-white/60">
           <input
             type="checkbox"
-            className={cn(
-              "mt-0.5 size-4 rounded border-border accent-brand",
-              errors.terms && "accent-destructive",
-            )}
+            className="mt-0.5 size-4 rounded border-white/60 bg-white/30 text-cyan-500 focus:ring-cyan-400"
             {...register("terms")}
           />
           <span>
             Li e aceito os{" "}
             <Link
               href="/terms"
-              className="font-semibold text-brand underline-offset-4 hover:underline"
+              className="font-bold text-ocean underline-offset-4 hover:text-ocean-light underline"
             >
               Termos de Uso
             </Link>
             .
             {errors.terms?.message ? (
-              <span className="mt-1 block text-xs text-destructive">
+              <span className="mt-1 block text-xs font-medium text-red-600">
                 {errors.terms.message}
               </span>
             ) : null}
@@ -310,29 +328,27 @@ export function RegisterForm() {
       </motion.div>
 
       <motion.div {...fieldAnimation} transition={{ delay: 0.23 }}>
-        <Button
+        <button
           type="submit"
-          size="lg"
-          variant="accent"
-          className="h-13 w-full"
+          className={glassButton}
           disabled={btnDisabled}
         >
           {btnDisabled ? (
-            <Loader2 className="size-4 animate-spin" />
+            <Loader2 size={16} className="animate-spin" />
           ) : (
-            <ArrowRight className="size-4" />
+            <ArrowRight size={16} />
           )}
           Criar minha conta
-        </Button>
+        </button>
       </motion.div>
 
       <motion.div
         {...fieldAnimation}
         transition={{ delay: 0.26 }}
-        className="relative py-1 text-center text-xs text-muted"
+        className="relative py-1 text-center text-xs text-ocean/60"
       >
-        <div className="absolute left-0 top-1/2 h-px w-full bg-border" />
-        <span className="relative bg-card px-4 text-muted-foreground">
+        <div className="absolute left-0 top-1/2 h-px w-full bg-white/40" />
+        <span className="relative bg-white/40 px-4 text-ocean/60 backdrop-blur-sm rounded-full">
           ou
         </span>
       </motion.div>
@@ -344,57 +360,17 @@ export function RegisterForm() {
       <motion.p
         {...fieldAnimation}
         transition={{ delay: 0.32 }}
-        className="text-center text-sm text-muted"
+        className="text-center text-sm text-ocean/70"
       >
         Já tem uma conta?{" "}
         <Link
           href="/login"
-          className="font-semibold text-brand hover:text-brand-strong"
+          className="font-bold text-ocean transition hover:text-ocean-light"
         >
           Fazer login →
         </Link>
       </motion.p>
     </motion.form>
-  );
-}
-
-function Field({
-  label,
-  error,
-  icon,
-  children,
-}: {
-  label: string;
-  error?: string;
-  icon: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-bold text-card-foreground">
-        {label}
-      </label>
-      <div className="relative">
-        <span
-          className={cn(
-            "pointer-events-none absolute left-4 top-4 z-10 text-brand/70",
-            error && "text-destructive",
-          )}
-        >
-          {icon}
-        </span>
-        {children}
-      </div>
-      {error ? (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-1.5 text-xs font-medium text-destructive"
-        >
-          {error}
-        </motion.p>
-      ) : null}
-    </div>
   );
 }
 
@@ -412,9 +388,9 @@ function PasswordToggle({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition hover:text-foreground"
+      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-ocean/60 transition hover:text-ocean hover:bg-white/30"
     >
-      {active ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+      {active ? <EyeOff size={15} /> : <Eye size={15} />}
     </button>
   );
 }

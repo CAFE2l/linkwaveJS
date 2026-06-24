@@ -85,7 +85,7 @@ export default async function PublicProfilePage({ params }: Props) {
         className="relative min-h-screen"
         style={{ background: "var(--ut-bg, var(--background))" }}
       >
-        {/* Banner */}
+        {/* Banner with darker overlay */}
         {user.banner_url && (
           <div className="relative h-48 w-full overflow-hidden md:h-56">
             <Image
@@ -95,10 +95,11 @@ export default async function PublicProfilePage({ params }: Props) {
               className="object-cover"
               priority
             />
+            <div className="absolute inset-0 bg-black/15 backdrop-blur-[2px]" />
             <div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(180deg, transparent 40%, var(--ut-bg, var(--background)) 100%)",
+                background: "linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.25) 70%, var(--ut-bg, var(--background)) 100%)",
               }}
             />
           </div>
@@ -110,10 +111,11 @@ export default async function PublicProfilePage({ params }: Props) {
         >
           <section className="mx-auto flex max-w-lg flex-col items-center justify-center">
             <div
-              className="w-full text-center"
+              className="relative w-full overflow-hidden text-center"
               style={{
                 background: "var(--ut-card-glass-bg, var(--ut-card-bg))",
-                backdropFilter: "blur(var(--ut-card-blur, 14px)) saturate(160%)",
+                backdropFilter: "blur(var(--ut-card-blur, 14px)) saturate(180%)",
+                WebkitBackdropFilter: "blur(var(--ut-card-blur, 14px)) saturate(180%)",
                 borderRadius: "var(--ut-card-radius, 2rem)",
                 boxShadow: "var(--ut-card-glass-shadow, 0 8px 32px rgba(0,0,0,0.15))",
                 border: "1px solid var(--ut-card-glass-border, var(--ut-card-border-color, rgba(255,255,255,0.25)))",
@@ -121,6 +123,14 @@ export default async function PublicProfilePage({ params }: Props) {
                 fontFamily: "var(--ut-font)",
               }}
             >
+              {/* Glass reflection highlight */}
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+                style={{
+                  background: "linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%)",
+                  borderRadius: "var(--ut-card-radius, 2rem) var(--ut-card-radius, 2rem) 0 0",
+                }}
+              />
               <CosmicAvatar theme={theme} avatarUrl={user.avatar_url} username={user.username} />
 
               <div className="px-6 pb-2">

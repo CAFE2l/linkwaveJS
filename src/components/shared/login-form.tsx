@@ -9,15 +9,16 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Loader2, LogIn, Mail, ShieldCheck, X } from "lucide-react";
 import { loginAction } from "@/lib/actions/auth";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils/cn";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 
 const fieldAnimation = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
 };
+
+const glassInput = "h-12 w-full rounded-xl border border-white/70 bg-white/40 px-4 pl-11 text-sm text-ocean placeholder:text-ocean/50 backdrop-blur-md transition-all focus:border-white/90 focus:bg-white/60 focus:shadow-lg focus:outline-none";
+
+const glassButton = "inline-flex items-center justify-center gap-2 h-13 w-full rounded-xl bg-gradient-to-b from-cyan-400 to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-300/40 transition-all duration-200 hover:from-cyan-300 hover:to-blue-400 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-300/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
 
 export function LoginForm() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export function LoginForm() {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            className="flex items-center gap-2 rounded-2xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive backdrop-blur-sm"
+            className="flex items-center gap-2 rounded-2xl border border-red-300/40 bg-red-400/20 px-4 py-3 text-sm font-medium text-red-700 backdrop-blur-sm"
           >
             <X className="size-4 shrink-0" />
             <span>{message}</span>
@@ -62,14 +63,17 @@ export function LoginForm() {
           <Field
             label="E-mail"
             error={form.formState.errors.email?.message}
-            icon={<Mail className="size-4" />}
           >
-            <Input
-              autoComplete="email"
-              inputMode="email"
-              placeholder="seu@email.com"
-              {...form.register("email")}
-            />
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+              <input
+                autoComplete="email"
+                inputMode="email"
+                placeholder="seu@email.com"
+                className={glassInput}
+                {...form.register("email")}
+              />
+            </div>
           </Field>
         </motion.div>
 
@@ -77,23 +81,23 @@ export function LoginForm() {
           <Field
             label="Senha"
             error={form.formState.errors.password?.message}
-            icon={<ShieldCheck className="size-4" />}
           >
             <div className="relative">
-              <Input
+              <ShieldCheck className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" size={16} />
+              <input
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="Sua senha"
-                className="pr-12"
+                className={`${glassInput} pr-12`}
                 {...form.register("password")}
               />
               <button
                 type="button"
                 aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-ocean/60 transition hover:text-ocean hover:bg-white/30"
               >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
           </Field>
@@ -103,7 +107,7 @@ export function LoginForm() {
           <div className="flex justify-end">
             <Link
               href="/reset-password"
-              className="text-sm font-semibold text-brand transition hover:text-brand-strong"
+              className="text-sm font-bold text-ocean/80 transition hover:text-ocean"
             >
               Esqueci minha senha
             </Link>
@@ -111,29 +115,28 @@ export function LoginForm() {
         </motion.div>
 
         <motion.div {...fieldAnimation} transition={{ delay: 0.14 }}>
-          <Button
+          <button
             type="submit"
-            variant="accent"
-            className="h-13 w-full"
+            className={glassButton}
             disabled={btnDisabled}
           >
             {btnDisabled ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 size={16} className="animate-spin" />
             ) : (
-              <LogIn className="size-4" />
+              <LogIn size={16} />
             )}
             Entrar
-          </Button>
+          </button>
         </motion.div>
       </form>
 
       <motion.div
         {...fieldAnimation}
         transition={{ delay: 0.17 }}
-        className="relative py-1 text-center text-xs text-muted"
+        className="relative py-1 text-center text-xs text-ocean/60"
       >
-        <div className="absolute left-0 top-1/2 h-px w-full bg-border" />
-        <span className="relative bg-card px-4 text-muted-foreground">
+        <div className="absolute left-0 top-1/2 h-px w-full bg-white/40" />
+        <span className="relative bg-white/40 px-4 text-ocean/60 backdrop-blur-sm rounded-full">
           ou
         </span>
       </motion.div>
@@ -145,12 +148,12 @@ export function LoginForm() {
       <motion.p
         {...fieldAnimation}
         transition={{ delay: 0.23 }}
-        className="text-center text-sm text-muted"
+        className="text-center text-sm text-ocean/70"
       >
         Ainda não tem conta?{" "}
         <Link
           href="/register"
-          className="font-semibold text-brand transition hover:text-brand-strong"
+          className="font-bold text-ocean transition hover:text-ocean-light"
         >
           Criar conta →
         </Link>
@@ -162,35 +165,25 @@ export function LoginForm() {
 function Field({
   label,
   error,
-  icon,
   children,
 }: {
   label: string;
   error?: string;
-  icon: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-bold text-card-foreground">
+      <label className="mb-2 block text-sm font-bold text-ocean">
         {label}
       </label>
-      <div className="relative">
-        <span
-          className={cn(
-            "pointer-events-none absolute left-4 top-4 z-10 text-brand/70",
-            error && "text-destructive",
-          )}
-        >
-          {icon}
-        </span>
+      <div>
         {children}
       </div>
       {error ? (
         <motion.p
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-1.5 text-xs font-medium text-destructive"
+          className="mt-1.5 text-xs font-medium text-red-600"
         >
           {error}
         </motion.p>

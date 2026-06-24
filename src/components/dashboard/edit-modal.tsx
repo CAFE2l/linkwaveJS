@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { LinkForm } from "@/components/dashboard/link-form";
-import { Button } from "@/components/ui/button";
 import type { Link } from "@/types/database";
 
 export function EditLinkModal({
@@ -57,13 +56,13 @@ export function EditLinkModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="card w-full max-w-md rounded-xl p-6 shadow-2xl"
+            className="glass-card-strong w-full max-w-md p-6"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-black">Editar link</h3>
+              <h3 className="text-lg font-black text-ocean">Editar link</h3>
               <button
                 onClick={onClose}
-                className="flex size-9 items-center justify-center rounded-xl text-fg-secondary transition hover:bg-surface-hover hover:text-foreground dark:hover:bg-surface"
+                className="flex size-9 items-center justify-center rounded-xl text-ocean/60 transition hover:text-ocean hover:bg-white/30"
               >
                 <X size={18} />
               </button>
@@ -126,31 +125,30 @@ export function DeleteLinkModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="card w-full max-w-sm rounded-xl p-6 shadow-2xl"
+            className="glass-card-strong w-full max-w-sm p-6"
           >
-            <h3 className="text-lg font-black">Excluir link</h3>
-            <p className="mt-2 text-sm font-medium text-fg-secondary">
+            <h3 className="text-lg font-black text-ocean">Excluir link</h3>
+            <p className="mt-2 text-sm font-bold text-ocean/70">
               Tem certeza que deseja excluir &ldquo;{link?.title}&rdquo;? Esta
               ação não pode ser desfeita.
             </p>
             <div className="mt-6 flex justify-end gap-3">
-              <Button
+              <button
                 type="button"
-                variant="ghost"
                 onClick={onClose}
                 disabled={pending}
+                className="px-5 py-2 rounded-xl border border-white/70 bg-white/40 text-ocean font-bold text-sm backdrop-blur-md transition hover:bg-white/60"
               >
                 Cancelar
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="primary"
                 onClick={onConfirm}
                 disabled={pending}
-                className="!border-red-400/40 !text-red-500 hover:!bg-red-500/10 dark:!border-red-400/20"
+                className="px-5 py-2 rounded-xl bg-gradient-to-b from-red-400 to-red-500 text-white font-bold text-sm shadow-lg shadow-red-300/30 transition hover:from-red-300 hover:to-red-400 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
               >
                 {pending ? "Excluindo..." : "Excluir"}
-              </Button>
+              </button>
             </div>
           </motion.div>
         </motion.div>

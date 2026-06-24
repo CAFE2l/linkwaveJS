@@ -18,7 +18,7 @@ export function HeroSection({
   stats: LandingStats;
 }) {
   return (
-    <section className="relative px-5 pb-24 pt-32 md:pb-32 md:pt-40">
+    <section className="relative px-5 pb-24 pt-8 md:pb-32 md:pt-12">
       <MotionReveal>
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6">
@@ -86,7 +86,7 @@ export function HeroSection({
             {[
               { label: "Usuários", value: formatNumber(stats.totalUsers) },
               { label: "Cliques", value: formatNumber(stats.totalClicks) },
-              { label: "Satisfação", value: `${stats.satisfaction}%` },
+              { label: "Personalizável", value: "100%" },
             ].map((s) => (
               <div key={s.label} className="glass-stat">
                 <p className="text-2xl font-black text-ocean-light">{s.value}</p>

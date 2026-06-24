@@ -1,9 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import FullDashboard from "@/components/customize/FullDashboard";
-import { ThemeProvider } from "@/components/landing/theme-provider";
-import { BlobBackground } from "@/components/landing/blob-background";
-import { listIconsAction } from "@/lib/actions/icons";
+import { CustomizePanel } from "@/components/customize/customize-panel";
 
 export const metadata = { title: "Customizar | LinkWave" };
 
@@ -26,17 +23,5 @@ export default async function CustomizePage() {
     .eq("user_id", authUser.id)
     .order("order_position");
 
-  const iconsData = await listIconsAction();
-  const allIcons = iconsData.map((i) => i.name);
-
-  return (
-    <ThemeProvider>
-      <div className="min-h-screen landing-bg">
-        <BlobBackground />
-        <div className="relative z-10">
-          <FullDashboard initialUser={user} initialLinks={links ?? []} initialClicks={0} initialIcons={allIcons} />
-        </div>
-      </div>
-    </ThemeProvider>
-  );
+  return <CustomizePanel user={user} links={links ?? []} />;
 }

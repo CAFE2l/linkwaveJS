@@ -13,26 +13,26 @@ export default function ResetPasswordPage() {
   return (
     <PublicPageLayout isLoggedIn={false}>
       <div className="page-container flex flex-1 flex-col justify-center pb-8 pt-24">
-        <section className="grid items-center gap-10 lg:grid-cols-[1fr_30rem]">
+        <section className="grid items-center gap-12 lg:grid-cols-[1fr_28rem]">
           <div className="hidden lg:block">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-surface/80 px-4 py-2 text-sm font-bold text-brand shadow-sm backdrop-blur-md">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/40 px-4 py-2 text-sm font-bold text-ocean shadow-sm backdrop-blur-md">
               <Sparkles className="size-4" />
               Recuperação segura
             </div>
-            <h1 className="max-w-2xl text-5xl font-black leading-tight tracking-tight text-foreground">
+            <h1 className="max-w-2xl text-5xl font-black leading-tight tracking-tight text-ocean" style={{ textShadow: "0 2px 0 rgba(255,255,255,0.5)" }}>
               Esqueceu sua senha?
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-fg-secondary">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
               Receba um link seguro no seu email para redefinir sua senha e
               voltar a surfar na sua onda de links.
             </p>
           </div>
 
           <div className="mx-auto w-full max-w-md">
-            <div className="card p-6 sm:p-8">
+            <div className="glass-card-strong p-8 sm:p-10">
               <div className="mb-8 text-center">
-                <div className="relative mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-brand/20 to-accent/10 p-0 shadow-inner">
-                  <div className="absolute inset-0 rounded-[1.25rem] bg-gradient-to-b from-white/30 to-transparent opacity-50" />
+                <div className="relative mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-cyan-300/40 to-blue-400/30 p-0 shadow-inner">
+                  <div className="absolute inset-0 rounded-[1.25rem] bg-gradient-to-b from-white/40 to-transparent opacity-60" />
                   <Image
                     src="/brand/icon.png"
                     alt="LinkWave"
@@ -42,8 +42,8 @@ export default function ResetPasswordPage() {
                     priority
                   />
                 </div>
-                <h2 className="text-3xl font-black text-foreground">Recuperar senha</h2>
-                <p className="mt-2 text-sm text-fg-secondary">
+                <h2 className="text-3xl font-black text-ocean" style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}>Recuperar senha</h2>
+                <p className="mt-2 text-sm text-ocean/70">
                   Receba um link seguro para redefinir sua senha.
                 </p>
               </div>

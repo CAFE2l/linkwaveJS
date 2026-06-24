@@ -22,9 +22,9 @@ export function StatsCards({
   topLink?: string;
 }) {
   const stats = [
-    { label: "Links ativos", value: totalLinks, icon: Link2, accent: "text-brand" },
-    { label: "Cliques totais", value: totalClicks, icon: MousePointerClick, accent: "text-accent" },
-    { label: "Top link", value: topLink ?? "Sem dados", icon: BarChart3, accent: "text-fg-secondary" },
+    { label: "Links ativos", value: totalLinks, icon: Link2 },
+    { label: "Cliques totais", value: totalClicks, icon: MousePointerClick },
+    { label: "Top link", value: topLink ?? "Sem dados", icon: BarChart3 },
   ];
 
   return (
@@ -41,13 +41,17 @@ export function StatsCards({
             key={stat.label}
             variants={itemAnim}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="card p-5"
+            className="glass-stat"
           >
-            <Icon className={stat.accent} size={20} />
-            <div className="mt-4 text-2xl font-bold text-foreground">
+            <div className="flex items-center justify-center mb-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-white/50 text-ocean shadow-sm">
+                <Icon size={20} />
+              </div>
+            </div>
+            <div className="text-2xl font-black text-ocean">
               {stat.value}
             </div>
-            <div className="mt-0.5 text-xs font-medium text-fg-secondary uppercase tracking-wider">
+            <div className="mt-0.5 text-xs font-bold text-ocean/60 uppercase tracking-wider">
               {stat.label}
             </div>
           </motion.div>

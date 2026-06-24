@@ -3,8 +3,6 @@
 import { useState, useRef } from "react";
 import { Camera, ImageIcon, Loader2 } from "lucide-react";
 import { uploadBannerAction } from "@/lib/actions/dashboard";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import type { AppUser } from "@/types/database";
 
 export function BannerUpload({
@@ -48,43 +46,33 @@ export function BannerUpload({
   const bannerUrl = preview ?? user.banner_url;
 
   return (
-    <Card>
-      <CardHeader>
-        <h3 className="font-bold text-foreground">Banner</h3>
-        <p className="text-sm text-fg-secondary">
-          Imagem de fundo do topo da sua página. Recomendado: 1200×300px.
-        </p>
-      </CardHeader>
-      <CardBody>
-        <div
-          className="relative flex h-40 items-center justify-center overflow-hidden rounded-xl bg-surface-hover border border-border"
-        >
+    <div className="glass-card-strong p-6">
+      <h3 className="text-base font-black text-ocean">Banner</h3>
+      <p className="mt-1 text-sm font-bold text-ocean/60">
+        Imagem de fundo do topo da sua página. Recomendado: 1200×300px.
+      </p>
+      <div className="mt-5">
+        <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-white/60 bg-white/20 backdrop-blur-sm">
           {bannerUrl ? (
-            <img
-              src={bannerUrl}
-              alt="Banner"
-              className="h-full w-full object-cover"
-            />
+            <img src={bannerUrl} alt="Banner" className="h-full w-full object-cover" />
           ) : (
-            <ImageIcon size={40} className="text-fg-secondary/40" />
+            <ImageIcon size={40} className="text-ocean/40" />
           )}
 
           {pending && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
               <Loader2 className="size-6 animate-spin text-white" />
             </div>
           )}
 
-          <Button
+          <button
             type="button"
-            variant="secondary"
-            size="sm"
             onClick={() => inputRef.current?.click()}
             disabled={pending}
-            className="absolute bottom-3 right-3"
+            className="absolute bottom-3 right-3 inline-flex items-center gap-2 h-9 px-4 rounded-xl border border-white/70 bg-white/40 text-ocean font-bold text-xs backdrop-blur-md transition hover:bg-white/60 disabled:opacity-50"
           >
             <Camera size={14} /> Alterar
-          </Button>
+          </button>
 
           <input
             ref={inputRef}
@@ -94,8 +82,8 @@ export function BannerUpload({
             onChange={handleFile}
           />
         </div>
-        {error && <p className="mt-2 text-xs font-medium text-red-500">{error}</p>}
-      </CardBody>
-    </Card>
+        {error && <p className="mt-2 text-xs font-bold text-red-600">{error}</p>}
+      </div>
+    </div>
   );
 }

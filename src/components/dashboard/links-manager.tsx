@@ -18,8 +18,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Link2, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { deleteLinkAction, reorderLinksAction } from "@/lib/actions/dashboard";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { LinkForm } from "@/components/dashboard/link-form";
 import { EditLinkModal, DeleteLinkModal } from "@/components/dashboard/edit-modal";
 import { useToast } from "@/components/dashboard/toast";
@@ -127,17 +125,15 @@ export function LinksManager({ links, onLinksChange }: { links: Link[]; onLinksC
 
   return (
     <div className="space-y-5">
-      <div className="card p-6">
-        <h3 className="text-lg font-black">Novo link</h3>
-        <p className="mt-1 text-sm font-medium text-fg-secondary">
+      <div className="glass-card-strong p-6">
+        <h3 className="text-lg font-black text-ocean">Novo link</h3>
+        <p className="mt-1 text-sm font-bold text-ocean/60">
           Adicione um link à sua página pública.
         </p>
         <div className="mt-4">
           <LinkForm onToast={addToast} onSaved={async (newLink) => {
             if (newLink) {
-              // append new link to local state (avoid overwrite)
               setItems((prev) => {
-                // avoid duplicates: if id exists, replace
                 const exists = prev.find((p) => p.id === newLink.id);
                 if (exists) {
                   const replaced = prev.map((p) => (p.id === newLink.id ? newLink : p));
@@ -150,7 +146,6 @@ export function LinksManager({ links, onLinksChange }: { links: Link[]; onLinksC
               });
               addToast('Link criado.', 'success');
             } else {
-              // fallback: full refresh
               try {
                 const clientModule = await import("@/lib/supabaseClient");
                 const client = clientModule.supabase;
@@ -217,17 +212,17 @@ export function LinksManager({ links, onLinksChange }: { links: Link[]; onLinksC
 
 function EmptyState() {
   return (
-    <Card className="flex flex-col items-center gap-3 p-10 text-center">
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-brand/10">
-        <Link2 size={28} className="text-brand" />
+    <div className="glass-card flex flex-col items-center gap-3 p-10 text-center">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-white/50 text-ocean">
+        <Link2 size={28} />
       </div>
       <div>
-        <p className="text-base font-black">Nenhum link ainda</p>
-        <p className="mt-1 text-sm font-medium text-fg-secondary">
-          Crie seu primeiro link acima e ele aparecerá aqui.
+        <p className="text-base font-black text-ocean">Nenhum link ainda</p>
+        <p className="mt-1 text-sm font-bold text-ocean/60">
+          Crie seu primeiro link acima e ele aparecera aqui.
         </p>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -244,10 +239,10 @@ function SortableLink({
     useSortable({ id: link.id });
 
   return (
-    <Card
+    <div
       ref={setNodeRef}
-      className={`link-card p-4 transition-shadow ${
-        isDragging ? "z-10 opacity-90 shadow-xl shadow-brand/20" : ""
+      className={`rounded-xl border border-white/60 bg-white/30 backdrop-blur-sm p-4 transition-all ${
+        isDragging ? "z-10 opacity-90 shadow-xl shadow-cyan-300/30" : ""
       }`}
       style={{
         transform: CSS.Transform.toString(transform),
@@ -256,7 +251,7 @@ function SortableLink({
     >
       <div className="flex items-center gap-3">
         <button
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-fg-secondary transition hover:bg-surface-hover hover:text-foreground dark:hover:bg-surface"
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ocean/50 transition hover:text-ocean hover:bg-white/30"
           aria-label="Reordenar link"
           {...attributes}
           {...listeners}
@@ -267,38 +262,34 @@ function SortableLink({
         <IconDisplay icon={link.icon} />
 
         <div className="min-w-0 flex-1">
-          <div className="truncate font-black">{link.title}</div>
-          <div className="flex items-center gap-1 truncate text-sm font-medium text-fg-secondary">
+          <div className="truncate font-black text-ocean">{link.title}</div>
+          <div className="flex items-center gap-1 truncate text-sm font-bold text-ocean/60">
             <ExternalLink size={12} className="shrink-0" />
             <span className="truncate">{link.url}</span>
           </div>
         </div>
 
         <div className="flex shrink-0 gap-1">
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
             onClick={onEdit}
             title="Editar link"
             aria-label="Editar"
-            className="!h-9 !w-9 !p-0"
+            className="flex items-center justify-center size-9 rounded-xl text-ocean/60 hover:text-ocean hover:bg-white/30 transition"
           >
             <Pencil size={15} />
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
             onClick={onDelete}
             title="Excluir link"
             aria-label="Excluir"
-            className="!h-9 !w-9 !p-0 !text-red-400 hover:!text-red-500"
+            className="flex items-center justify-center size-9 rounded-xl text-ocean/60 hover:text-red-500 hover:bg-white/30 transition"
           >
             <Trash2 size={15} />
-          </Button>
+          </button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

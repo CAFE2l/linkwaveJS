@@ -2,8 +2,6 @@ import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ProfileEditor } from "@/components/profile/profile-editor";
 import { createClient } from "@/lib/supabase/server";
-import { ThemeProvider } from "@/components/landing/theme-provider";
-import { BlobBackground } from "@/components/landing/blob-background";
 
 export const metadata = { title: "Perfil" };
 
@@ -29,18 +27,8 @@ export default async function ProfilePage() {
     .maybeSingle();
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen landing-bg">
-        <BlobBackground />
-        <div className="relative z-10">
-          <DashboardShell user={user}>
-            <div className="mx-auto max-w-5xl px-5">
-              <div className="glass-divider" />
-            </div>
-            <ProfileEditor user={user} initialBio={profile?.bio ?? ""} />
-          </DashboardShell>
-        </div>
-      </div>
-    </ThemeProvider>
+    <DashboardShell user={user}>
+      <ProfileEditor user={user} initialBio={profile?.bio ?? ""} />
+    </DashboardShell>
   );
 }

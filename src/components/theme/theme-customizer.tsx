@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { Loader2, Save } from "lucide-react";
 import { updateThemeAction } from "@/lib/actions/theme";
 import { type UserThemeConfig, DEFAULT_USER_THEME } from "@/types/database";
-import { Button } from "@/components/ui/button";
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -36,8 +35,8 @@ function ToggleBtn({ selected, label, onClick }: ToggleBtnProps) {
       onClick={onClick}
       className={`flex-1 rounded-xl py-2 text-xs font-bold transition ${
         selected
-          ? "bg-brand text-white shadow-md"
-          : "bg-white/30 text-muted hover:bg-white/50 dark:bg-[rgba(0,180,255,0.04)] dark:hover:bg-[rgba(0,180,255,0.1)]"
+          ? "bg-white/50 text-ocean shadow-sm border border-white/70 backdrop-blur-sm"
+          : "bg-white/30 text-ocean/50 hover:text-ocean hover:bg-white/40 border border-transparent"
       }`}
     >
       {label}
@@ -84,8 +83,8 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-      <div className="card p-6 space-y-6">
-        <h3 className="text-lg font-black">Personalizar tema</h3>
+      <div className="glass-card-strong p-6 space-y-6">
+        <h3 className="text-lg font-black text-ocean">Personalizar tema</h3>
 
         <div className="space-y-5">
           {/* Background */}
@@ -113,7 +112,7 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
               <ColorPicker label="Cor" value={cfg.background_color} onChange={(v) => update("background_color", v)} />
             )}
             <div className="mt-3">
-              <p className="text-xs font-bold text-muted mb-2">Efeito</p>
+              <p className="text-xs font-bold text-ocean/60 mb-2">Efeito</p>
               <div className="flex gap-2">
                 <ToggleBtn selected={cfg.background_effect === "none"} label="Nenhum" onClick={() => update("background_effect", "none")} />
                 <ToggleBtn selected={cfg.background_effect === "pulse"} label="Pulse" onClick={() => update("background_effect", "pulse")} />
@@ -125,16 +124,16 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
                 type="checkbox"
                 checked={cfg.enable_stars}
                 onChange={(e) => update("enable_stars", e.target.checked)}
-                className="size-4 accent-brand"
+                className="size-4 accent-cyan-500"
               />
-              <span className="text-xs font-bold text-muted">Estrelas animadas</span>
+              <span className="text-xs font-bold text-ocean">Estrelas animadas</span>
             </label>
           </Section>
 
           {/* Card */}
           <Section title="Card principal">
             <ColorPicker label="Cor do card" value={cfg.card_color} onChange={(v) => update("card_color", v)} />
-            <p className="text-xs font-bold text-muted mt-3 mb-2">Estilo do vidro</p>
+            <p className="text-xs font-bold text-ocean/60 mt-3 mb-2">Estilo do vidro</p>
             <div className="flex gap-2 flex-wrap">
               {Object.keys(glassStyles).map((g) => (
                 <ToggleBtn key={g} selected={cfg.card_glass_style === g} label={g} onClick={() => update("card_glass_style", g as UserThemeConfig["card_glass_style"])} />
@@ -146,8 +145,8 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
               <Slider label="Bordas" value={cfg.card_border_radius} min={0} max={48} suffix="px" onChange={(v) => update("card_border_radius", v)} />
             </div>
             <label className="mt-3 flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={cfg.card_shadow} onChange={(e) => update("card_shadow", e.target.checked)} className="size-4 accent-brand" />
-              <span className="text-xs font-bold text-muted">Sombra extra</span>
+              <input type="checkbox" checked={cfg.card_shadow} onChange={(e) => update("card_shadow", e.target.checked)} className="size-4 accent-cyan-500" />
+              <span className="text-xs font-bold text-ocean">Sombra extra</span>
             </label>
           </Section>
 
@@ -161,32 +160,32 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
               <ColorPicker label="Glow dos links" value={cfg.link_glow_color} onChange={(v) => update("link_glow_color", v)} />
             </div>
             <label className="mt-3 flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={cfg.button_glow} onChange={(e) => update("button_glow", e.target.checked)} className="size-4 accent-brand" />
-              <span className="text-xs font-bold text-muted">Glow nos botões</span>
+              <input type="checkbox" checked={cfg.button_glow} onChange={(e) => update("button_glow", e.target.checked)} className="size-4 accent-cyan-500" />
+              <span className="text-xs font-bold text-ocean">Glow nos botões</span>
             </label>
           </Section>
 
           {/* Effects */}
           <Section title="Efeitos & Estilo">
-            <p className="text-xs font-bold text-muted mb-2">Hover nos links</p>
+            <p className="text-xs font-bold text-ocean/60 mb-2">Hover nos links</p>
             <div className="flex gap-2 flex-wrap">
               {["lift", "glow", "scale", "shake", "none"].map((e) => (
                 <ToggleBtn key={e} selected={cfg.link_hover_effect === e} label={e} onClick={() => update("link_hover_effect", e as UserThemeConfig["link_hover_effect"])} />
               ))}
             </div>
-            <p className="text-xs font-bold text-muted mt-3 mb-2">Transição</p>
+            <p className="text-xs font-bold text-ocean/60 mt-3 mb-2">Transição</p>
             <div className="flex gap-2 flex-wrap">
               {["none", "fade", "slide", "zoom", "float"].map((e) => (
                 <ToggleBtn key={e} selected={cfg.transition_effect === e} label={e} onClick={() => update("transition_effect", e as UserThemeConfig["transition_effect"])} />
               ))}
             </div>
-            <p className="text-xs font-bold text-muted mt-3 mb-2">Fonte</p>
+            <p className="text-xs font-bold text-ocean/60 mt-3 mb-2">Fonte</p>
             <div className="flex gap-2 flex-wrap">
               {["space", "nunito", "mono", "serif"].map((f) => (
                 <ToggleBtn key={f} selected={cfg.font_style === f} label={f} onClick={() => update("font_style", f as UserThemeConfig["font_style"])} />
               ))}
             </div>
-            <p className="text-xs font-bold text-muted mt-3 mb-2">Ícone</p>
+            <p className="text-xs font-bold text-ocean/60 mt-3 mb-2">Ícone</p>
             <div className="flex gap-2">
               <ToggleBtn selected={cfg.icon_style === "8bit"} label="8-bit" onClick={() => update("icon_style", "8bit")} />
               <ToggleBtn selected={cfg.icon_style === "clay"} label="Clay" onClick={() => update("icon_style", "clay")} />
@@ -196,7 +195,7 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
           {/* Avatar */}
           <Section title="Avatar">
             <ColorPicker label="Cor do LED" value={cfg.avatar_led_color} onChange={(v) => update("avatar_led_color", v)} />
-            <p className="text-xs font-bold text-muted mt-2 mb-2">Anel</p>
+            <p className="text-xs font-bold text-ocean/60 mt-2 mb-2">Anel</p>
             <div className="flex gap-2">
               <ToggleBtn selected={cfg.avatar_ring_style === "gradient"} label="Gradiente" onClick={() => update("avatar_ring_style", "gradient")} />
               <ToggleBtn selected={cfg.avatar_ring_style === "solid"} label="Sólido" onClick={() => update("avatar_ring_style", "solid")} />
@@ -211,16 +210,26 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button type="button" variant="accent" onClick={save} disabled={pending} className="flex-1">
-            {pending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+          <button
+            type="button"
+            onClick={save}
+            disabled={pending}
+            className="inline-flex items-center justify-center gap-2 h-12 flex-1 rounded-xl bg-gradient-to-b from-cyan-400 to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-300/40 transition-all duration-200 hover:from-cyan-300 hover:to-blue-400 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-300/50 active:scale-[0.98] disabled:opacity-50"
+          >
+            {pending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar tema
-          </Button>
-          <Button type="button" variant="ghost" onClick={reset} disabled={pending}>
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            disabled={pending}
+            className="inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-white/70 bg-white/40 text-ocean font-bold text-sm backdrop-blur-md transition hover:bg-white/60 disabled:opacity-50"
+          >
             Reset
-          </Button>
+          </button>
         </div>
 
-        {msg ? <p className="text-center text-sm font-semibold text-muted">{msg}</p> : null}
+        {msg ? <p className="text-center text-sm font-bold text-ocean/60">{msg}</p> : null}
       </div>
 
       {/* Preview */}
@@ -293,8 +302,8 @@ export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border-t border-white/10 pt-4">
-      <p className="text-sm font-bold mb-3">{title}</p>
+    <div className="border-t border-white/20 pt-4">
+      <p className="text-sm font-bold text-ocean mb-3">{title}</p>
       {children}
     </div>
   );
@@ -305,7 +314,7 @@ function Slider({ label, value, min, max, step = 1, suffix = "", onChange }: {
 }) {
   return (
     <label className="space-y-1.5">
-      <span className="flex justify-between text-xs font-bold text-muted">
+      <span className="flex justify-between text-xs font-bold text-ocean/60">
         <span>{label}</span>
         <span>{value}{suffix}</span>
       </span>
@@ -313,7 +322,7 @@ function Slider({ label, value, min, max, step = 1, suffix = "", onChange }: {
         type="range"
         min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-brand dark:bg-[rgba(0,180,255,0.1)]"
+        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-cyan-500"
       />
     </label>
   );
@@ -324,12 +333,12 @@ function ColorPicker({ label, value, onChange, className }: {
 }) {
   return (
     <label className={`space-y-1.5 ${className ?? ""}`}>
-      <span className="text-xs font-bold text-muted">{label}</span>
+      <span className="text-xs font-bold text-ocean/60">{label}</span>
       <div className="flex items-center gap-2">
         <input
           type="color" value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-9 cursor-pointer rounded-lg border border-white/20 bg-transparent p-0.5"
+          className="h-9 w-9 cursor-pointer rounded-lg border border-white/50 bg-white/30 p-0.5"
         />
         <input
           type="text" value={value}
@@ -337,7 +346,7 @@ function ColorPicker({ label, value, onChange, className }: {
             const v = e.target.value;
             if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v);
           }}
-          className="h-9 flex-1 rounded-lg border border-white/20 bg-white/20 px-2 text-xs font-mono text-foreground backdrop-blur-sm dark:bg-[rgba(0,180,255,0.04)]"
+          className="h-9 flex-1 rounded-lg border border-white/50 bg-white/30 px-2 text-xs font-bold text-ocean backdrop-blur-sm"
           maxLength={7}
         />
       </div>

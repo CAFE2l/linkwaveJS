@@ -3,11 +3,9 @@
 import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2, Plus, Save } from "lucide-react";
+import { Loader2, Link2, Plus, Save } from "lucide-react";
 import { upsertLinkAction } from "@/lib/actions/dashboard";
 import { linkSchema, type LinkInput } from "@/lib/validations/profile";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { IconPicker } from "@/components/dashboard/icon-picker";
 import type { Link } from "@/types/database";
 
@@ -49,26 +47,34 @@ export function LinkForm({
     });
   }
 
+  const glassInput = "h-12 w-full rounded-xl border border-white/70 bg-white/40 px-4 pl-4 text-sm text-ocean placeholder:text-ocean/50 backdrop-blur-md transition-all focus:border-white/90 focus:bg-white/60 focus:shadow-lg focus:outline-none";
+  const glassBtn = "inline-flex items-center justify-center gap-2 h-12 w-full rounded-xl bg-gradient-to-b from-cyan-400 to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-300/40 transition-all duration-200 hover:from-cyan-300 hover:to-blue-400 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-300/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <Input
+        <input
           placeholder="Título do link"
+          className={glassInput}
           {...form.register("title")}
         />
         {form.formState.errors.title?.message ? (
-          <p className="mt-1 text-xs font-semibold text-red-500">
+          <p className="mt-1 text-xs font-semibold text-red-600">
             {form.formState.errors.title.message}
           </p>
         ) : null}
       </div>
       <div>
-        <Input
-          placeholder="https://seulink.com"
-          {...form.register("url")}
-        />
+        <div className="relative">
+          <Link2 size={14} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10 text-ocean/60" />
+          <input
+            placeholder="https://seulink.com"
+            className={`${glassInput} pl-11`}
+            {...form.register("url")}
+          />
+        </div>
         {form.formState.errors.url?.message ? (
-          <p className="mt-1 text-xs font-semibold text-red-500">
+          <p className="mt-1 text-xs font-semibold text-red-600">
             {form.formState.errors.url.message}
           </p>
         ) : null}
@@ -77,21 +83,20 @@ export function LinkForm({
         value={form.watch("icon") ?? "link"}
         onChange={(val) => form.setValue("icon", val, { shouldValidate: true })}
       />
-      <Button
+      <button
         type="submit"
-        variant="accent"
+        className={glassBtn}
         disabled={pending}
-        className="w-full"
       >
         {pending ? (
-          <Loader2 className="animate-spin" size={18} />
+          <Loader2 size={16} className="animate-spin" />
         ) : link ? (
-          <Save size={18} />
+          <Save size={16} />
         ) : (
-          <Plus size={18} />
+          <Plus size={16} />
         )}
         {link ? "Salvar link" : "Criar link"}
-      </Button>
+      </button>
     </form>
   );
 }

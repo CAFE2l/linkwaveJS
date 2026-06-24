@@ -10,8 +10,6 @@ import { ThemeSection } from "./theme-section";
 import { CustomizePreview } from "./preview";
 import { updateThemeAction } from "@/lib/actions/theme";
 import { updateProfileAction } from "@/lib/actions/profile";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { type UserThemeConfig, DEFAULT_USER_THEME, type AppUser, type Link } from "@/types/database";
 
 type Section = "avatar" | "banner" | "profile" | "links" | "theme";
@@ -56,16 +54,16 @@ export function CustomizePanel({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
         {/* Left: Customization panels */}
         <div className="space-y-6">
-          <div className="flex gap-1 border-b border-border overflow-x-auto">
+          <div className="flex gap-1 overflow-x-auto rounded-2xl bg-white/20 p-1 backdrop-blur-sm border border-white/50">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setActiveSection(t.id)}
-                className={`shrink-0 px-4 py-2.5 text-sm font-medium transition border-b-2 ${
+                className={`shrink-0 px-4 py-2 text-sm font-bold rounded-xl transition-all ${
                   activeSection === t.id
-                    ? "border-brand text-foreground"
-                    : "border-transparent text-fg-secondary hover:text-foreground"
+                    ? "bg-white/60 text-ocean shadow-sm border border-white/70"
+                    : "text-ocean/50 hover:text-ocean hover:bg-white/20 border border-transparent"
                 }`}
               >
                 {t.label}
@@ -96,37 +94,32 @@ export function CustomizePanel({
           )}
 
           {activeSection === "links" && (
-            <Card>
-              <CardHeader>
-                <h3 className="font-bold text-foreground">Links</h3>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-fg-secondary">
-                  Gerencie seus links na{" "}
-                  <a href="/dashboard" className="text-brand hover:underline">
-                    página de links
-                  </a>
-                  .
-                </p>
-              </CardBody>
-            </Card>
+            <div className="glass-card-strong p-6">
+              <h3 className="font-bold text-ocean">Links</h3>
+              <p className="mt-1 text-sm font-bold text-ocean/60">
+                Gerencie seus links na{" "}
+                <a href="/dashboard" className="text-ocean underline">
+                  página de links
+                </a>
+                .
+              </p>
+            </div>
           )}
 
           {activeSection === "theme" && (
             <div className="space-y-5">
               <ThemeSection theme={theme} onUpdate={bubbleUpdate} />
-              <Button
+              <button
                 type="button"
-                variant="primary"
                 onClick={saveTheme}
                 disabled={saving}
-                className="w-full"
+                className="inline-flex items-center justify-center gap-2 h-12 w-full rounded-xl bg-gradient-to-b from-cyan-400 to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-300/40 transition-all duration-200 hover:from-cyan-300 hover:to-blue-400 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-300/50 active:scale-[0.98] disabled:opacity-50"
               >
-                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 Salvar tema
-              </Button>
+              </button>
               {msg && (
-                <p className="text-center text-sm font-medium text-fg-secondary">{msg}</p>
+                <p className="text-center text-sm font-bold text-ocean/60">{msg}</p>
               )}
             </div>
           )}
@@ -135,7 +128,7 @@ export function CustomizePanel({
         {/* Right: Live preview */}
         <div className="hidden lg:block">
           <div className="sticky top-24">
-            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-secondary">
+            <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-ocean/60">
               Preview ao vivo
             </h4>
             <CustomizePreview user={user} links={links} theme={theme} bio={bio} />

@@ -53,7 +53,7 @@ function fillDateGaps(data: DailyCount[], days: number): DailyCount[] {
 }
 
 export async function getAnalyticsOverview(): Promise<AnalyticsData> {
-  const { admin } = await requireAdmin();
+  const { supabase, admin } = await requireAdmin();
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now);
@@ -69,8 +69,8 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     { data: recentUsers },
     { count: prevPeriodClicks },
     { data: allLinks },
+    { data: allUsers },
     { data: allClickData },
-    { data: countryData },
   ] = await Promise.all([
     admin.from("users").select("*", { count: "exact", head: true }),
     admin.from("links").select("*", { count: "exact", head: true }),
@@ -91,8 +91,8 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
       .gte("created_at", sixtyDaysAgo.toISOString())
       .lt("created_at", thirtyDaysAgo.toISOString()),
     admin.from("links").select("id, title, url, user_id").limit(200),
+    admin.from("users").select("id, username"),
     admin.from("clicks").select("link_id, created_at, country"),
-    admin.from("clicks").select("country"),
   ]);
 
   const prevCount = prevPeriodClicks ?? 0;
@@ -100,7 +100,14 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   const diff = currCount - prevCount;
   const totalClicksDelta = prevCount > 0 ? Math.round((diff / prevCount) * 100) : 0;
 
-  const totalUsersDelta = 0;
+  const { count: prevUsers } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", sixtyDaysAgo)
+    .lt("created_at", thirtyDaysAgo);
+  const totalUsersDelta = prevUsers
+    ? Math.round((((totalUsers ?? 0) - prevUsers) / prevUsers) * 100)
+    : 0;
 
   const userGrowth = fillDateGaps(
     Array.from(
@@ -131,19 +138,21 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     clickCounts.set(c.link_id, (clickCounts.get(c.link_id) ?? 0) + 1);
   }
 
+  const usersMap = new Map((allUsers ?? []).map((u) => [u.id, u.username]));
+
   const sortedLinks = (allLinks ?? [])
     .map((l) => ({
       id: l.id,
       title: l.title,
       url: l.url,
-      username: l.user_id.slice(0, 8),
+      username: usersMap.get(l.user_id) ?? l.user_id.slice(0, 8),
       clicks: clickCounts.get(l.id) ?? 0,
     }))
     .sort((a, b) => b.clicks - a.clicks)
     .slice(0, 10);
 
   const countryMap = new Map<string, number>();
-  for (const c of countryData ?? []) {
+  for (const c of allClickData ?? []) {
     if (c.country) {
       countryMap.set(c.country, (countryMap.get(c.country) ?? 0) + 1);
     }

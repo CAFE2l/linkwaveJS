@@ -106,10 +106,7 @@ export default async function PublicProfilePage({ params }: Props) {
         username={user.username}
       />
 
-      <div
-        className="relative min-h-screen"
-        style={{ background: "var(--ut-bg, var(--background))" }}
-      >
+      <div className="relative">
         <main
           className="relative px-4 pb-12"
           style={{ marginTop: user.banner_url ? "-2rem" : "6rem" }}

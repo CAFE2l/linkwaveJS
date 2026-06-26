@@ -82,7 +82,7 @@ export function ThemeProviderShell({
 
   return (
     <ThemeContext.Provider value={t}>
-      <div style={cssVars}>
+      <div style={{ ...cssVars, background: "var(--ut-bg)", backgroundSize: "var(--ut-bg-size, 100%)", minHeight: "100vh" }}>
         {children}
         <style>{generateKeyframes(t)}</style>
       </div>

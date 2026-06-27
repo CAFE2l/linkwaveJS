@@ -15,8 +15,6 @@ function isLightColor(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 >= 128;
 }
 
-
-
 export function PublicLinkButton({ link }: { link: Link }) {
   const ctx = useThemeContext();
 
@@ -42,7 +40,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
 
   const glowEnabled = ctx?.enable_led_glow ?? ctx?.button_glow;
   const glowShadow = glowEnabled
-    ? `0 0 16px ${ctx?.link_glow_color ?? "#38bdf8"}40`
+    ? `0 0 20px ${ctx?.link_glow_color ?? "#38bdf8"}50`
     : "none";
   const borderRadius =
     linkStyle === "pill"
@@ -56,10 +54,16 @@ export function PublicLinkButton({ link }: { link: Link }) {
       : "var(--ut-link-bg, rgba(255,255,255,0.1))";
   const styleGlow =
     linkStyle === "led" && glowEnabled
-      ? `0 0 24px ${ctx?.link_glow_color ?? "#38bdf8"}73, 0 4px 12px rgba(0,0,0,0.08)`
-      : `0 4px 12px rgba(0,0,0,0.06), ${glowShadow}`;
+      ? `0 0 28px ${ctx?.link_glow_color ?? "#38bdf8"}73, 0 4px 12px rgba(0,0,0,0.08)`
+      : `0 4px 16px rgba(0,0,0,0.06), ${glowShadow}`;
 
   function renderIcon() {
+    const iconClass =
+      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:shadow-lg";
+    const iconBg = isLight
+      ? "rgba(255,255,255,0.65)"
+      : "rgba(255,255,255,0.12)";
+
     if (link.is_custom_icon && link.icon_blob) {
       return (
         <CustomLinkIcon
@@ -72,12 +76,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
 
     if (iconName && iconName !== "link") {
       return (
-        <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105"
-          style={{
-            background: isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.1)",
-          }}
-        >
+        <span className={iconClass} style={{ background: iconBg }}>
           <Image
             src={`/imgs/icons/links/${iconName}.png`}
             alt=""
@@ -91,12 +90,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
     }
 
     return (
-      <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105"
-        style={{
-          background: isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.1)",
-        }}
-      >
+      <span className={iconClass} style={{ background: iconBg }}>
         <LinkIcon size={16} />
       </span>
     );
@@ -116,27 +110,31 @@ export function PublicLinkButton({ link }: { link: Link }) {
           el.style.boxShadow = "0 12px 32px rgba(0,0,0,0.12)";
         } else if (hoverEffect === "glow") {
           el.style.transform = "translateY(-1px)";
-          el.style.boxShadow = `0 0 20px var(--ut-link-glow, rgba(0,150,255,0.3)), 0 4px 12px rgba(0,0,0,0.06)`;
+          el.style.boxShadow = `0 0 24px var(--ut-link-glow, rgba(0,150,255,0.3)), 0 4px 12px rgba(0,0,0,0.06)`;
         } else if (hoverEffect === "scale") {
           el.style.transform = "scale(1.03)";
           el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)";
         }
-        el.style.borderColor = "rgba(255,255,255,0.45)";
+        el.style.borderColor = "rgba(255,255,255,0.55)";
+        el.style.background =
+          "color-mix(in srgb, var(--ut-link-bg, rgba(255,255,255,0.1)) 80%, rgba(255,255,255,0.3))";
       }}
       onMouseLeave={(e) => {
         if (isShake) return;
         const el = e.currentTarget;
         el.style.transform = "";
         el.style.boxShadow = "";
-        el.style.borderColor = "var(--ut-card-glass-border, rgba(255,255,255,0.2))";
+        el.style.borderColor =
+          "var(--ut-card-glass-border, rgba(255,255,255,0.2))";
+        el.style.background = "";
       }}
-      className={`group relative flex items-center gap-3 px-4 py-3 transition-all duration-300 ${
+      className={`group relative flex items-center gap-3 px-4 py-3 transition-all duration-300 ease-out ${
         isShake ? "hover:animate-ut-shake" : ""
       }`}
       style={{
-        background: linkBackground,
-        backdropFilter: "blur(10px) saturate(145%)",
-        WebkitBackdropFilter: "blur(10px) saturate(145%)",
+        background: `${linkBackground}`,
+        backdropFilter: "blur(12px) saturate(150%)",
+        WebkitBackdropFilter: "blur(12px) saturate(150%)",
         borderRadius,
         border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.2))",
         boxShadow: styleGlow,
@@ -151,7 +149,10 @@ export function PublicLinkButton({ link }: { link: Link }) {
         </span>
         <span
           className="mt-0.5 block truncate text-xs leading-tight"
-          style={{ color: "var(--ut-text-secondary, rgba(0,0,0,0.5))", opacity: 0.65 }}
+          style={{
+            color: "var(--ut-text-secondary, rgba(0,0,0,0.5))",
+            opacity: 0.65,
+          }}
         >
           {(() => {
             try {
@@ -166,7 +167,10 @@ export function PublicLinkButton({ link }: { link: Link }) {
       <ArrowUpRight
         size={15}
         className="shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-        style={{ color: "var(--ut-btn-bg, #0ea5e9)", opacity: isLight ? 0.5 : 0.7 }}
+        style={{
+          color: "var(--ut-btn-bg, #0ea5e9)",
+          opacity: isLight ? 0.5 : 0.7,
+        }}
       />
     </a>
   );

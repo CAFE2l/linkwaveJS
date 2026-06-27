@@ -7,13 +7,13 @@ export default async function AdminThemesPage() {
   const themes = await getAdminThemes();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 admin-fade-in">
       <div>
-        <h1 className="text-3xl font-black text-ocean">Temas personalizados</h1>
-        <p className="mt-1 text-sm font-semibold text-ocean/60">{themes.length} usuário(s) com personalização ativa.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Temas</h1>
+        <p className="mt-1 text-sm text-slate-400">{themes.length} usuário(s) com personalização ativa.</p>
       </div>
 
-      <div className="glass-card-strong overflow-hidden">
+      <div className="admin-card overflow-hidden">
         <AdminThemesTable themes={themes} />
       </div>
     </div>

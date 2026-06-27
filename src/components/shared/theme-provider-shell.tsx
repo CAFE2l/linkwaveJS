@@ -164,5 +164,14 @@ function generateKeyframes(t: UserThemeConfig): string {
       30%, 50%, 70% { transform: translateX(-4px); }
       40%, 60% { transform: translateX(4px); }
     }
+    @keyframes ut-float {
+      0%, 100% { transform: translateY(0px); }
+      50%      { transform: translateY(-6px); }
+    }
+    @keyframes ut-shimmerSweep {
+      0%   { background-position: -200% 0; opacity: 0.2; }
+      50%  { opacity: 0.5; }
+      100% { background-position: 200% 0; opacity: 0.2; }
+    }
   `;
 }

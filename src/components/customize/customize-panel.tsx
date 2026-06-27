@@ -233,6 +233,26 @@ export function CustomizePanel({
               />
             </div>
 
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-ocean/65">
+                Foco do banner:
+              </span>
+              {["top", "center", "bottom"].map((pos) => (
+                <button
+                  key={pos}
+                  type="button"
+                  onClick={() => updateTheme({ banner_position: pos as UserThemeConfig["banner_position"] })}
+                  className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                    theme.banner_position === pos
+                      ? "bg-white/60 text-ocean shadow-sm border border-white/80 backdrop-blur-sm"
+                      : "bg-white/20 text-ocean/60 hover:text-ocean border border-transparent hover:bg-white/30"
+                  }`}
+                >
+                  {pos === "top" ? "Topo" : pos === "center" ? "Centro" : "Base"}
+                </button>
+              ))}
+            </div>
+
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label>
                 <span className="mb-1.5 block text-xs font-black uppercase tracking-wider text-ocean/65">

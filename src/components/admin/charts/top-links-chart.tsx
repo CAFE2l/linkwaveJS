@@ -3,12 +3,14 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { TopLink } from "@/lib/actions/analytics";
 
+const CHART_HEIGHT = 220;
+
 export function TopLinksChart({ data }: { data: TopLink[] }) {
   if (data.length === 0) {
     return (
-      <div className="glass-card-strong p-6">
-        <h2 className="text-lg font-black text-foreground mb-1">Links mais clicados</h2>
-        <p className="text-sm text-fg-secondary">Nenhum dado de clique disponível.</p>
+      <div className="admin-card p-5">
+        <h2 className="text-base font-semibold text-white mb-1">Links mais clicados</h2>
+        <p className="text-xs text-slate-400">Nenhum dado de clique disponível.</p>
       </div>
     );
   }
@@ -18,64 +20,31 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
     clicks: l.clicks,
     fullTitle: l.title,
     url: l.url,
-    username: l.username,
   }));
 
   return (
-    <div className="glass-card-strong p-6">
-      <h2 className="text-lg font-black text-foreground mb-1">Links mais clicados</h2>
-      <p className="text-sm text-fg-secondary mb-4">Top 10 links por número de cliques</p>
-      <div className="h-72">
+    <div className="admin-card p-5">
+      <h2 className="text-base font-semibold text-white mb-1">Links mais clicados</h2>
+      <p className="text-xs text-slate-400 mb-4">Top 10 links com mais acessos</p>
+      <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e2e8f0)" horizontal={false} />
-            <XAxis type="number" tick={{ fontSize: 11, fill: "var(--color-fg-secondary, #64748b)" }} tickLine={false} axisLine={false} />
-            <YAxis
-              type="category"
-              dataKey="name"
-              tick={{ fontSize: 11, fill: "var(--color-fg-secondary, #64748b)" }}
-              tickLine={false}
-              axisLine={false}
-              width={140}
-            />
+          <BarChart data={chartData} layout="vertical" margin={{ left: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.06)" horizontal={false} />
+            <XAxis type="number" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis dataKey="name" type="category" tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} width={150} />
             <Tooltip
               contentStyle={{
-                background: "var(--color-surface, #fff)",
-                border: "1px solid var(--color-border, #e2e8f0)",
-                borderRadius: "12px",
+                background: "#0f172a",
+                border: "1px solid rgba(148,163,184,0.15)",
+                borderRadius: "8px",
                 fontSize: "13px",
-              }}
-              formatter={(value) => [String(value), "cliques"]}
-              labelFormatter={(_label, payload) => {
-                const item = payload?.[0] as { payload?: { fullTitle?: string } } | undefined;
-                return item?.payload?.fullTitle ?? "";
+                color: "#e2e8f0",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
               }}
             />
-            <Bar
-              dataKey="clicks"
-              fill="var(--color-brand, #6366f1)"
-              radius={[0, 4, 4, 0]}
-              opacity={0.85}
-            />
+            <Bar dataKey="clicks" fill="#a78bfa" radius={[0, 3, 3, 0]} opacity={0.8} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-      <div className="mt-4 space-y-2">
-        {data.slice(0, 5).map((link) => (
-          <a
-            key={link.id}
-            href={link.url}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-between rounded-lg border border-border bg-surface-hover/50 px-3 py-2 text-sm transition hover:bg-surface-hover"
-          >
-            <div className="min-w-0 flex-1">
-              <span className="font-semibold text-foreground">{link.title}</span>
-              <span className="ml-2 text-xs text-fg-secondary">@{link.username}</span>
-            </div>
-            <span className="ml-3 shrink-0 font-bold text-brand">{link.clicks} cliques</span>
-          </a>
-        ))}
       </div>
     </div>
   );

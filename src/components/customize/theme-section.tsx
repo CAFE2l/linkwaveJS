@@ -170,6 +170,14 @@ export function ThemeSection({
           </div>
           <ColorRow label="LED avatar" value={theme.avatar_led_color} onChange={(v) => onUpdate({ avatar_led_color: v })} />
           <ColorRow label="LED banner" value={theme.banner_led_color} onChange={(v) => onUpdate({ banner_led_color: v })} />
+          <div>
+            <p className="text-xs font-bold text-ocean/60 mb-1">Foco do banner</p>
+            <div className="flex gap-2 flex-wrap">
+              {[{id:"top",label:"Topo"},{id:"center",label:"Centro"},{id:"bottom",label:"Base"}].map(({id,label}) => (
+                <Toggle key={id} selected={theme.banner_position === id} label={label} onClick={() => onUpdate({ banner_position: id as UserThemeConfig["banner_position"] })} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -86,14 +86,14 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 border-b border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-slate-700/30 p-4 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block min-w-0 flex-1 sm:max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ocean/45" size={17} />
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por nome, email ou username"
-            className="h-11 w-full rounded-xl border border-white/70 bg-white/40 pl-10 pr-4 text-sm text-ocean outline-none backdrop-blur-md placeholder:text-ocean/40 focus:bg-white/60 focus:ring-2 focus:ring-white/70"
+            className="admin-input-dark pl-10"
           />
         </label>
         <button
@@ -102,9 +102,9 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
             setFeedback(null);
             setCreating(true);
           }}
-          className="glass-button inline-flex h-11 items-center justify-center gap-2 px-5 text-sm"
+          className="admin-btn admin-btn-primary h-10"
         >
-          <Plus size={17} />
+          <Plus size={16} />
           Novo usuário
         </button>
       </div>
@@ -112,74 +112,74 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
       {feedback && (
         <div
           role="status"
-          className={`mx-4 mt-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold ${
+          className={`mx-4 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium ${
             feedback.ok
-              ? "border-emerald-300/70 bg-emerald-100/50 text-emerald-800"
-              : "border-red-300/70 bg-red-100/50 text-red-700"
+              ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-400"
+              : "border-red-500/20 bg-red-500/8 text-red-400"
           }`}
         >
-          {feedback.ok ? <CheckCircle2 size={17} /> : <TriangleAlert size={17} />}
+          {feedback.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}
           {feedback.message}
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[860px] text-sm">
+      <div className="overflow-x-auto admin-scrollbar">
+        <table className="admin-table min-w-[860px]">
           <thead>
-            <tr className="border-b border-white/50 text-ocean/60">
-              <th className="px-6 py-4 text-left font-bold">Usuário</th>
-              <th className="px-6 py-4 text-left font-bold">Email</th>
-              <th className="px-6 py-4 text-left font-bold">Role</th>
-              <th className="px-6 py-4 text-left font-bold">Status</th>
-              <th className="px-6 py-4 text-left font-bold">Cadastro</th>
-              <th className="px-6 py-4 text-right font-bold">Ações</th>
+            <tr>
+              <th>Usuário</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Cadastro</th>
+              <th className="text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/40">
+          <tbody>
             {filteredUsers.map((user) => {
               const primaryAdmin = user.email.toLowerCase() === "gutiajs@gmail.com";
               return (
-                <tr key={user.id} className="transition hover:bg-white/20">
-                  <td className="px-6 py-4">
+                <tr key={user.id}>
+                  <td>
                     <div className="flex items-center gap-3">
-                      <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-white/40 shadow-sm">
+                      <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt="" className="size-full object-cover" />
                         ) : (
-                          <UserRound size={18} className="text-ocean/55" />
+                          <UserRound size={15} className="text-slate-500" />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 font-black text-ocean">
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-slate-200">
                           <span className="truncate">@{user.username}</span>
-                          {primaryAdmin && <ShieldCheck size={15} className="shrink-0 text-amber-500" />}
+                          {primaryAdmin && <ShieldCheck size={13} className="shrink-0 text-amber-400" />}
                         </div>
-                        <div className="max-w-48 truncate text-xs font-semibold text-ocean/55">{user.name}</div>
+                        <div className="max-w-48 truncate text-xs text-slate-500">{user.name}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-semibold text-ocean/65">{user.email}</td>
-                  <td className="px-6 py-4">
-                    <span className={`rounded-full border px-2.5 py-1 text-xs font-black uppercase ${
+                  <td className="text-slate-400">{user.email}</td>
+                  <td>
+                    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase ${
                       user.role === "admin"
-                        ? "border-amber-300/70 bg-amber-100/60 text-amber-700"
-                        : "border-white/60 bg-white/30 text-ocean/60"
+                        ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                        : "border-slate-600/30 bg-slate-700/30 text-slate-400"
                     }`}>
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${
-                      user.active ? "text-emerald-700" : "text-red-600"
+                  <td>
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+                      user.active ? "text-emerald-400" : "text-red-400"
                     }`}>
-                      <span className={`size-2 rounded-full ${user.active ? "bg-emerald-500" : "bg-red-500"}`} />
+                      <span className={`size-1.5 rounded-full ${user.active ? "bg-emerald-500" : "bg-red-500"}`} />
                       {user.active ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-xs font-semibold text-ocean/55">
+                  <td className="text-xs text-slate-500">
                     {new Date(user.created_at).toLocaleDateString("pt-BR")}
                   </td>
-                  <td className="px-6 py-4">
+                  <td>
                     <div className="flex justify-end gap-1">
                       <button
                         type="button"
@@ -187,19 +187,19 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
                           setFeedback(null);
                           setEditing(user);
                         }}
-                        className="flex size-9 items-center justify-center rounded-xl text-ocean/60 transition hover:bg-white/40 hover:text-ocean"
+                        className="flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
                         aria-label={`Editar ${user.username}`}
                       >
-                        <Pencil size={15} />
+                        <Pencil size={14} />
                       </button>
                       <button
                         type="button"
                         onClick={() => deleteUser(user)}
                         disabled={pending || primaryAdmin}
-                        className="flex size-9 items-center justify-center rounded-xl text-ocean/50 transition hover:bg-red-100/50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                        className="flex size-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
                         aria-label={`Excluir ${user.username}`}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </td>
@@ -208,7 +208,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
             })}
             {filteredUsers.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-14 text-center text-sm font-semibold text-ocean/55">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-500">
                   Nenhum usuário encontrado.
                 </td>
               </tr>
@@ -273,24 +273,25 @@ function UserModal({
   const primaryAdmin = user?.email.toLowerCase() === "gutiajs@gmail.com";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cyan-950/35 p-4 backdrop-blur-sm">
+    <div className="admin-modal-overlay">
       <form
         onSubmit={(event) => {
           event.preventDefault();
           onSubmit(draft);
         }}
-        className="glass-card-strong relative w-full max-w-lg p-6 shadow-2xl"
+        className="admin-modal admin-fade-in"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-xl bg-white/30 text-ocean/60 transition hover:bg-white/50 hover:text-ocean"
+          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
           aria-label="Fechar"
         >
-          <X size={17} />
+          <X size={16} />
         </button>
-        <h2 className="text-xl font-black text-ocean">{user ? "Editar usuário" : "Novo usuário"}</h2>
-        <p className="mt-1 text-sm font-semibold text-ocean/55">
+
+        <h2 className="text-lg font-bold text-white">{user ? "Editar usuário" : "Novo usuário"}</h2>
+        <p className="mt-1 text-sm text-slate-400">
           {user ? "Atualize os dados e permissões da conta." : "Crie uma conta confirmada no Supabase Auth."}
         </p>
 
@@ -300,7 +301,7 @@ function UserModal({
               required
               value={draft.name}
               onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-              className="admin-input"
+              className="admin-input-dark"
             />
           </AdminField>
           <AdminField label="Username">
@@ -308,7 +309,7 @@ function UserModal({
               required
               value={draft.username}
               onChange={(event) => setDraft({ ...draft, username: event.target.value.toLowerCase() })}
-              className="admin-input"
+              className="admin-input-dark"
             />
           </AdminField>
           <AdminField label="Email">
@@ -318,7 +319,7 @@ function UserModal({
               value={draft.email}
               disabled={primaryAdmin}
               onChange={(event) => setDraft({ ...draft, email: event.target.value })}
-              className="admin-input disabled:opacity-60"
+              className="admin-input-dark disabled:opacity-50"
             />
           </AdminField>
           {!user && (
@@ -329,7 +330,7 @@ function UserModal({
                 minLength={8}
                 value={draft.password}
                 onChange={(event) => setDraft({ ...draft, password: event.target.value })}
-                className="admin-input"
+                className="admin-input-dark"
               />
             </AdminField>
           )}
@@ -338,7 +339,7 @@ function UserModal({
               value={draft.role}
               disabled={primaryAdmin}
               onChange={(event) => setDraft({ ...draft, role: event.target.value as "user" | "admin" })}
-              className="admin-input disabled:opacity-60"
+              className="admin-input-dark disabled:opacity-50"
             >
               <option value="user">Usuário</option>
               <option value="admin">Administrador</option>
@@ -349,7 +350,7 @@ function UserModal({
               value={draft.active ? "active" : "inactive"}
               disabled={primaryAdmin}
               onChange={(event) => setDraft({ ...draft, active: event.target.value === "active" })}
-              className="admin-input disabled:opacity-60"
+              className="admin-input-dark disabled:opacity-50"
             >
               <option value="active">Ativo</option>
               <option value="inactive">Inativo</option>
@@ -358,7 +359,7 @@ function UserModal({
         </div>
 
         {primaryAdmin && (
-          <p className="mt-4 rounded-xl border border-amber-300/60 bg-amber-100/50 px-4 py-3 text-xs font-bold text-amber-800">
+          <p className="mt-4 rounded-lg border border-amber-500/15 bg-amber-500/8 px-4 py-3 text-xs font-medium text-amber-400">
             O administrador principal não pode ser desativado, rebaixado ou excluído.
           </p>
         )}
@@ -366,22 +367,22 @@ function UserModal({
         {feedback && (
           <p
             role="status"
-            className={`mt-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-bold ${
+            className={`mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-xs font-medium ${
               feedback.ok
-                ? "border-emerald-300/70 bg-emerald-100/50 text-emerald-800"
-                : "border-red-300/70 bg-red-100/50 text-red-700"
+                ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-400"
+                : "border-red-500/20 bg-red-500/8 text-red-400"
             }`}
           >
-            {feedback.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}
+            {feedback.ok ? <CheckCircle2 size={15} /> : <TriangleAlert size={15} />}
             {feedback.message}
           </p>
         )}
 
         <div className="mt-6 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="glass-button-outline px-5 py-2.5 text-sm">
+          <button type="button" onClick={onClose} className="admin-btn admin-btn-ghost">
             Cancelar
           </button>
-          <button type="submit" disabled={pending} className="glass-button px-5 py-2.5 text-sm disabled:opacity-50">
+          <button type="submit" disabled={pending} className="admin-btn admin-btn-primary disabled:opacity-50">
             {pending ? "Salvando..." : user ? "Salvar alterações" : "Criar usuário"}
           </button>
         </div>
@@ -393,7 +394,7 @@ function UserModal({
 function AdminField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-black uppercase tracking-wider text-ocean/60">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</span>
       {children}
     </label>
   );

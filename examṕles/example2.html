@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LinkWave – Links para criadores, do seu jeito.</title>
+<link rel="icon" type="image/png" href="./imgs/icon.png"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Nunito', 'sans-serif'] },
+      colors: {
+        sky: { 50: '#f0f9ff', 100: '#e0f4fe', 200: '#bae8fd', 300: '#7dd8fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
+        mint: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e' },
+      },
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    overflow-x: hidden;
+    background: #e8f4f8;
+  }
+
+  /* ─── PAGE INTRO — PREMIUM SPOTLIGHT ─── */
+  .page-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    background: #0b1622;
+    transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .page-intro.intro-hidden {
+    opacity: 0;
+  }
+
+  /* Vignette — dark edges, bright center */
+  .intro-vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 1100px 800px at 65% 45%, transparent 30%, rgba(11,22,34,0.4) 60%, #0b1622 100%);
+  }
+
+  /* Outer aura — large diffuse blue */
+  .intro-glow-outer {
+    position: absolute;
+    width: 750px;
+    height: 750px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,0.18) 0%, rgba(134,239,172,0.08) 30%, transparent 65%);
+    filter: blur(120px);
+    transition: all 2.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Mid aura — white-blue blend */
+  .intro-glow-mid {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.20) 0%, rgba(56,189,248,0.25) 25%, rgba(134,239,172,0.10) 50%, transparent 70%);
+    filter: blur(60px);
+    transition: all 2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Core glow — bright focused hotspot */
+  .intro-glow-core {
+    position: absolute;
+    width: 220px;
+    height: 340px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.50) 0%, rgba(186,232,253,0.35) 25%, rgba(56,189,248,0.15) 50%, transparent 70%);
+    filter: blur(35px);
+    transition: all 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Glass shine — simulates glass reflection + shadow over the phone area */
+  .intro-glass-shine {
+    position: absolute;
+    width: 280px;
+    aspect-ratio: 500 / 938;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+    border-radius: 44px;
+    background: linear-gradient(155deg,
+      rgba(255,255,255,0.18) 0%,
+      rgba(255,255,255,0.04) 25%,
+      transparent 45%,
+      rgba(255,255,255,0.06) 65%,
+      transparent 100%
+    );
+    box-shadow:
+      0 40px 100px rgba(0,0,0,0.55),
+      0 0 80px rgba(56,189,248,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.06);
+    opacity: 0.9;
+    transition: all 2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Hidden state — everything disperses */
+  .page-intro.intro-hidden .intro-glow-outer,
+  .page-intro.intro-hidden .intro-glow-mid,
+  .page-intro.intro-hidden .intro-glow-core {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+  }
+  .page-intro.intro-hidden .intro-glass-shine {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+  .page-intro.intro-hidden .intro-vignette {
+    opacity: 0;
+  }
+
+  /* Instant dismiss on scroll */
+  .intro-scrolled,
+  .intro-scrolled .intro-glow-outer,
+  .intro-scrolled .intro-glow-mid,
+  .intro-scrolled .intro-glow-core,
+  .intro-scrolled .intro-glass-shine,
+  .intro-scrolled .intro-vignette {
+    transition-duration: 0s !important;
+    opacity: 0 !important;
+  }
+
+  /* ─── PERMANENT PHONE AURA ─── */
+  .aero-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 700px 500px at 20% 30%, rgba(125,216,252,0.20) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 600px at 80% 80%, rgba(134,239,172,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 500px at 50% 10%, rgba(56,189,248,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 400px at 70% 20%, rgba(186,232,253,0.18) 0%, transparent 70%),
+      linear-gradient(160deg, #e8f4f8 0%, #d0ecf8 30%, #c0e8f5 55%, #e0f4ee 80%, #f0faf5 100%);
+  }
+
+  /* ─── AERO BUBBLES ─── */
+  .aero-bubble {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    background: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.5);
+    backdrop-filter: blur(2px);
+    animation: bubbleFloat linear infinite;
+  }
+  @keyframes bubbleFloat {
+    0%   { transform: translateY(105vh) scale(0.8); opacity: 0; }
+    5%   { opacity: 0.6; }
+    50%  { opacity: 0.4; }
+    95%  { opacity: 0.6; }
+    100% { transform: translateY(-5vh) scale(1.2); opacity: 0; }
+  }
+
+  /* ─═══ PREMIUM HEADER ═══─ */
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 10px 16px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .header.scrolled {
+    background: rgba(255,255,255,0.50);
+    backdrop-filter: blur(28px) saturate(200%);
+    border-bottom: 1px solid rgba(255,255,255,0.50);
+    box-shadow: 0 4px 24px rgba(80, 160, 200, 0.06);
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Logo */
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    position: relative;
+  }
+  .header-logo img {
+    width: 36px;
+    height: 36px;
+    transition: transform 0.3s ease;
+  }
+  .header-logo:hover img { transform: scale(1.08) rotate(-4deg); }
+  .header-logo span {
+    font-size: 20px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0ea5e9, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Nav Links Desktop */
+  .nav-list {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .nav-link {
+    position: relative;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(30, 80, 120, 0.55);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.30);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: #0369a1;
+  }
+  .nav-link:hover::before { opacity: 1; }
+
+  .nav-link.active {
+    color: #0369a1;
+    background: rgba(255,255,255,0.50);
+    box-shadow: 0 2px 8px rgba(80,160,200,0.08);
+  }
+
+  /* Header CTA */
+  .header-cta {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    background: linear-gradient(180deg, #7dd8fc 0%, #38bdf8 40%, #0ea5e9 100%);
+    border: 1.5px solid rgba(255,255,255,0.70);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 16px rgba(14,165,233,0.25), inset 0 1px 0 rgba(255,255,255,0.50);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .header-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(14,165,233,0.35), inset 0 1px 0 rgba(255,255,255,0.50);
+  }
+
+  /* ─── HAMBURGER ─── */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.30);
+    border: 1.5px solid rgba(255,255,255,0.50);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 110;
+    position: relative;
+  }
+  .hamburger:hover { background: rgba(255,255,255,0.50); }
+
+  .hamburger span {
+    display: block;
+    width: 20px;
+    height: 2.5px;
+    background: #0369a1;
+    border-radius: 2px;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: absolute;
+  }
+  .hamburger span:nth-child(1) { transform: translateY(-6px); }
+  .hamburger span:nth-child(2) { transform: translateY(0); }
+  .hamburger span:nth-child(3) { transform: translateY(6px); }
+
+  .hamburger.active span:nth-child(1) { transform: translateY(0) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.active span:nth-child(3) { transform: translateY(0) rotate(-45deg); }
+
+  /* ─── MOBILE MENU ─── */
+  .mobile-menu {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 105;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.60);
+    backdrop-filter: blur(40px) saturate(220%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .mobile-menu.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-link {
+    font-size: 24px;
+    font-weight: 900;
+    color: #0369a1;
+    text-decoration: none;
+    padding: 12px 32px;
+    border-radius: 999px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .mobile-menu.open .mobile-link {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mobile-menu.open .mobile-link:nth-child(1) { transition-delay: 0.05s; }
+  .mobile-menu.open .mobile-link:nth-child(2) { transition-delay: 0.10s; }
+  .mobile-menu.open .mobile-link:nth-child(3) { transition-delay: 0.15s; }
+  .mobile-menu.open .mobile-link:nth-child(4) { transition-delay: 0.20s; }
+  .mobile-menu.open .mobile-link:nth-child(5) { transition-delay: 0.25s; }
+
+  .mobile-link:hover {
+    background: rgba(255,255,255,0.50);
+    transform: scale(1.05);
+  }
+
+  .mobile-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(14,165,233,0.30), rgba(34,197,94,0.30));
+    border-radius: 2px;
+    margin: 8px 0;
+    opacity: 0;
+  }
+
+  .mobile-menu.open .mobile-divider { opacity: 1; transition-delay: 0.18s; transition: opacity 0.4s ease; }
+
+  /* ─═══ GLASS ═══─ */
+  .glass-card {
+    background: rgba(255,255,255,0.50);
+    backdrop-filter: blur(22px) saturate(190%);
+    border: 1.5px solid rgba(255,255,255,0.78);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(80,160,200,0.10), inset 0 1px 0 rgba(255,255,255,0.92);
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .glass-card:hover {
+    background: rgba(255,255,255,0.65);
+    border-color: rgba(255,255,255,0.92);
+    box-shadow: 0 16px 48px rgba(80,160,200,0.18), inset 0 1px 0 rgba(255,255,255,1);
+    transform: translateY(-3px);
+  }
+
+  .glass-strong {
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(30px) saturate(220%);
+    border: 2px solid rgba(255,255,255,0.88);
+    box-shadow: 0 16px 56px rgba(80,160,200,0.14), inset 0 2px 0 rgba(255,255,255,1);
+  }
+
+  .glass-stat {
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1.5px solid rgba(255,255,255,0.72);
+    border-radius: 20px;
+    padding: 1.2rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(80,160,200,0.08), inset 0 1px 0 rgba(255,255,255,0.90);
+    transition: all 0.3s ease;
+  }
+  .glass-stat:hover {
+    background: rgba(255,255,255,0.60);
+    box-shadow: 0 8px 24px rgba(80,160,200,0.15), inset 0 1px 0 rgba(255,255,255,1);
+    transform: translateY(-2px);
+  }
+
+  /* ─── TYPOGRAPHY ─── */
+  .text-ocean { color: #0369a1; }
+  .text-muted { color: rgba(30, 80, 120, 0.50); }
+  .heading-shadow { text-shadow: 0 2px 0 rgba(255, 255, 255, 0.80); }
+
+  .tag-aero {
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid rgba(255,255,255,0.78);
+    border-radius: 999px;
+    padding: 0.3rem 1rem;
+    font-size: 0.82rem;
+    color: #0284c7;
+    font-weight: 700;
+    display: inline-block;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.90);
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn-aero {
+    border-radius: 999px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-aero-green {
+    background: linear-gradient(180deg, #86efac 0%, #4ade80 40%, #22c55e 100%);
+    border: 1.5px solid rgba(255,255,255,0.7);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(34,197,94,0.30), inset 0 1px 0 rgba(255,255,255,0.50);
+  }
+  .btn-aero-green:hover {
+    background: linear-gradient(180deg, #a2f4be 0%, #5ee490 40%, #34d46a 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(34,197,94,0.40), inset 0 1px 0 rgba(255,255,255,0.50);
+  }
+
+  .btn-aero-ghost {
+    background: rgba(255,255,255,0.40);
+    border: 1.5px solid rgba(255,255,255,0.72);
+    color: #0284c7;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(80,160,200,0.06), inset 0 1px 0 rgba(255,255,255,0.90);
+  }
+  .btn-aero-ghost:hover {
+    background: rgba(255,255,255,0.60);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(80,160,200,0.12), inset 0 1px 0 rgba(255,255,255,1);
+  }
+
+  /* ─── PHONE FRAME ─── */
+  /* ─── PHONE ─── */
+  .phone-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 360px;
+    perspective: 1200px;
+    cursor: default;
+  }
+  .phone-tilt {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .phone-wrap {
+    position: relative;
+    width: 200px;
+    aspect-ratio: 500 / 938;
+    flex-shrink: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .phone-wrap.phone-entrance {
+    animation: phoneEntrance 3.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .phone-wrap.phone-float {
+    animation: phoneFloatHD 7s ease-in-out infinite alternate;
+  }
+
+  .phone-wrap img.frame {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    position: relative;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ─── LIGHT SWEEP (cinematic glare across glass) ─── */
+  .phone-light-sweep {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    border-radius: 24px;
+    background: linear-gradient(
+      110deg,
+      transparent 15%,
+      rgba(255,255,255,0.60) 25%,
+      rgba(255,255,255,0.85) 28%,
+      rgba(255,255,255,0.30) 33%,
+      transparent 42%
+    );
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    opacity: 0;
+  }
+  .phone-wrap.phone-entrance .phone-light-sweep {
+    animation: lightSweep 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  }
+  .phone-wrap.phone-float .phone-light-sweep {
+    animation: lightBreathe 5s ease-in-out 1s infinite alternate;
+  }
+
+  @keyframes lightSweep {
+    0%   { opacity: 0; background-position: 80% 0; }
+    15%  { opacity: 0.9; }
+    45%  { opacity: 0.5; background-position: 20% 0; }
+    70%  { opacity: 0.15; background-position: 0% 0; }
+    100% { opacity: 0.08; background-position: 0% 0; }
+  }
+  @keyframes lightBreathe {
+    0%   { opacity: 0.04; background-position: 0% 0; }
+    50%  { opacity: 0.10; background-position: 40% 0; }
+    100% { opacity: 0.04; background-position: 0% 0; }
+  }
+
+  /* ─── CINEMATIC ENTRANCE ─── */
+  @keyframes phoneEntrance {
+    0% {
+      transform: perspective(1300px) translateZ(-500px) rotateY(40deg) rotateX(-12deg) rotateZ(5deg) scale(0.05);
+      filter: blur(18px);
+      opacity: 0;
+    }
+    4% {
+      transform: perspective(1200px) translateZ(-350px) rotateY(32deg) rotateX(-9deg) rotateZ(3deg) scale(0.12);
+      filter: blur(12px);
+      opacity: 1;
+    }
+    12% {
+      transform: perspective(1000px) translateZ(-150px) rotateY(18deg) rotateX(-5deg) rotateZ(1deg) scale(0.45);
+      filter: blur(5px);
+    }
+    22% {
+      transform: perspective(850px) translateZ(-30px) rotateY(6deg) rotateX(-1deg) rotateZ(0deg) scale(0.85);
+      filter: blur(1px);
+    }
+    32% {
+      transform: perspective(800px) translateZ(15px) rotateY(-1deg) rotateX(3deg) rotateZ(-1deg) scale(1.06);
+      filter: blur(0);
+    }
+    42% {
+      transform: perspective(800px) translateZ(-5px) rotateY(-3deg) rotateX(4deg) rotateZ(-2deg) scale(0.97);
+    }
+    55% {
+      transform: perspective(800px) rotateY(-1deg) rotateX(2deg) rotateZ(-1deg) translateY(-4px) scale(1.01);
+    }
+    72% {
+      transform: perspective(800px) rotateY(-2deg) rotateX(1.5deg) rotateZ(-1.5deg) translateY(-2px) scale(1);
+    }
+    100% {
+      transform: perspective(800px) rotateY(-2deg) rotateX(2deg) rotateZ(-2deg) translateY(0) scale(1);
+    }
+  }
+
+  /* ─── 3D FLOAT HD ─── */
+  @keyframes phoneFloatHD {
+    0%   { transform: perspective(800px) rotateY(-2.5deg) rotateX(2.5deg) rotateZ(-2deg) translateY(0); }
+    20%  { transform: perspective(800px) rotateY(0deg) rotateX(-1deg) rotateZ(0deg) translateY(-7px); }
+    40%  { transform: perspective(800px) rotateY(1.5deg) rotateX(-2deg) rotateZ(1.5deg) translateY(-14px); }
+    55%  { transform: perspective(800px) rotateY(3deg) rotateX(-1deg) rotateZ(2.5deg) translateY(-10px); }
+    70%  { transform: perspective(800px) rotateY(-1deg) rotateX(3deg) rotateZ(-0.5deg) translateY(-5px); }
+    85%  { transform: perspective(800px) rotateY(-3deg) rotateX(1deg) rotateZ(-2.5deg) translateY(-2px); }
+    100% { transform: perspective(800px) rotateY(-1.5deg) rotateX(1.5deg) rotateZ(-1deg) translateY(0); }
+  }
+
+  .phone-screen {
+    position: absolute;
+    z-index: 1;
+    top: 8.5%;
+    left: 10.5%;
+    width: 79%;
+    height: 82%;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(24px) saturate(200%);
+    border-radius: 16px;
+    padding: 24px 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.90);
+  }
+
+  .phone-screen::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+    border-radius: 16px 16px 0 0;
+    pointer-events: none;
+  }
+
+  .phone-bg-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 110%;
+    border-radius: 80px;
+    background: radial-gradient(ellipse, rgba(125,216,252,0.20) 0%, rgba(134,239,172,0.12) 35%, rgba(255,255,255,0.05) 70%, transparent 100%);
+    filter: blur(60px);
+    z-index: -1;
+    pointer-events: none;
+    animation: glowPulse 4s ease-in-out infinite alternate;
+    transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .phone-container:hover .phone-bg-glow {
+    width: 160%;
+    height: 150%;
+    filter: blur(80px);
+    background: radial-gradient(ellipse, rgba(56,189,248,0.35) 0%, rgba(134,239,172,0.20) 30%, rgba(255,255,255,0.08) 60%, transparent 100%);
+  }
+  .phone-bg-glow.glow-intro {
+    width: 200%;
+    height: 200%;
+    filter: blur(100px);
+    background: radial-gradient(ellipse, rgba(56,189,248,0.50) 0%, rgba(134,239,172,0.30) 30%, rgba(255,255,255,0.10) 60%, transparent 100%);
+    animation: glowIntro 3.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes glowPulse {
+    0%   { opacity: 0.5; transform: translate(-50%, -50%) scale(0.95); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+  }
+  @keyframes glowIntro {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+    15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    35%  { opacity: 0.8; transform: translate(-50%, -50%) scale(0.9); }
+    60%  { opacity: 0.6; transform: translate(-50%, -50%) scale(0.7); }
+    100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.6); }
+  }
+
+  /* ─── SPARKLE PARTICLES ─── */
+  .sparkle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 6px 2px rgba(56,189,248,0.4);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    animation: sparkleAnim var(--dur) ease-out var(--delay) forwards;
+  }
+  @keyframes sparkleAnim {
+    0%   { opacity: 0; transform: scale(0) translateY(0); }
+    20%  { opacity: 1; transform: scale(1) translateY(-8px); }
+    80%  { opacity: 0.6; transform: scale(0.6) translateY(-20px); }
+    100% { opacity: 0; transform: scale(0.2) translateY(-30px); }
+  }
+  .sparkle-loop {
+    animation: sparkleAnim var(--dur) ease-out var(--delay) infinite;
+  }
+
+  .phone-link-aero {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.70);
+    border-radius: 10px;
+    padding: 5px 8px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #0369a1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    max-width: 150px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.80);
+    position: relative;
+    z-index: 2;
+  }
+  .phone-link-aero:hover {
+    background: rgba(255,255,255,0.75);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(80,160,200,0.12), inset 0 1px 0 rgba(255,255,255,1);
+  }
+
+  .phone-badge-aero {
+    display: inline-block;
+    margin-top: auto;
+    margin-bottom: 2px;
+    padding: 3px 10px;
+    border-radius: 50px;
+    background: rgba(134,239,172,0.20);
+    border: 1px solid rgba(134,239,172,0.35);
+    font-size: 7px;
+    color: #059669;
+    font-weight: 700;
+    text-align: center;
+    width: 100%;
+    max-width: 150px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes phoneDance {
+    0%   { transform: perspective(800px) rotateY(-2deg) rotateX(2deg) rotateZ(-2deg) translateY(0); }
+    25%  { transform: perspective(800px) rotateY(1deg) rotateX(-1deg) rotateZ(1deg) translateY(-6px); }
+    50%  { transform: perspective(800px) rotateY(-3deg) rotateX(3deg) rotateZ(-1deg) translateY(-12px); }
+    75%  { transform: perspective(800px) rotateY(2deg) rotateX(-2deg) rotateZ(3deg) translateY(-6px); }
+    100% { transform: perspective(800px) rotateY(-1deg) rotateX(1deg) rotateZ(-2deg) translateY(0); }
+  }
+
+  /* ─── SCATTERED ─── */
+  .sl-aero {
+    background: rgba(255,255,255,0.50);
+    border: 1.5px solid rgba(255,255,255,0.72);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0369a1;
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    transition: all 0.3s ease;
+    animation: scatter 8s ease-in-out infinite;
+  }
+  .sl-aero:hover {
+    background: rgba(255,255,255,0.70);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(80,160,200,0.12), inset 0 1px 0 rgba(255,255,255,1);
+  }
+  @keyframes scatter {
+    0%, 100% { transform: translate(0,0); }
+    25%  { transform: translate(2px, -3px); }
+    75%  { transform: translate(-2px, 2px); }
+  }
+
+  .lw-aero {
+    grid-column: span 2;
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid rgba(255,255,255,0.78);
+    border-radius: 18px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px rgba(80,160,200,0.10), inset 0 1px 0 rgba(255,255,255,0.90);
+  }
+  .lw-icon-aero {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, #7dd8fc, #86efac);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(14,165,233,0.25), inset 0 1px 0 rgba(255,255,255,0.50);
+    flex-shrink: 0;
+  }
+
+  /* ─── FEATURE ICON ─── */
+  .feat-icon-aero {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    background: rgba(255,255,255,0.70);
+    border: 1.5px solid rgba(255,255,255,0.85);
+    box-shadow: 0 4px 12px rgba(80,160,200,0.08), inset 0 1px 0 rgba(255,255,255,1);
+  }
+
+  /* ─── STEP ─── */
+  .step-aero {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 24px;
+    color: white;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #7dd8fc, #38bdf8);
+    border: 2px solid rgba(255,255,255,0.75);
+    box-shadow: 0 4px 20px rgba(14,165,233,0.20), inset 0 1px 0 rgba(255,255,255,0.60);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .flow-step:hover .step-aero { transform: scale(1.1); box-shadow: 0 8px 32px rgba(14,165,233,0.30), inset 0 1px 0 rgba(255,255,255,0.60); }
+
+  .step-connector::before {
+    content: '';
+    display: none;
+    position: absolute;
+    top: 38px;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(125,216,252,0.30), rgba(134,239,172,0.30), transparent);
+    z-index: 0;
+  }
+
+  .divider-aero {
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.60), transparent);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #d0ecf8; }
+  ::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.25); border-radius: 4px; border: 2px solid #d0ecf8; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(14,165,233,0.40); }
+
+  /* ─── DESKTOP (min-width: 768px) ─── */
+  @media (min-width: 768px) {
+    .header { padding: 12px 24px; }
+    .nav-list { display: flex; }
+    .header-cta { display: inline-flex; }
+    .hamburger { display: none; }
+    .phone-wrap { width: 280px; }
+    .phone-container { min-height: 500px; }
+    .phone-screen { border-radius: 24px; padding: 28px 10px 12px; }
+    .phone-link-aero { max-width: 190px; padding: 7px 11px; font-size: 10.5px; }
+    .phone-badge-aero { max-width: 200px; font-size: 9px; }
+    .mobile-menu { display: none !important; }
+    .step-connector::before { display: block; }
+    .intro-glow-outer { margin-left: 380px; }
+    .intro-glow-mid    { margin-left: 380px; }
+    .intro-glow-core   { margin-left: 380px; }
+    .intro-glass-shine { margin-left: 380px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── PAGE INTRO OVERLAY ─── -->
+<div id="pageIntro" class="page-intro">
+  <div class="intro-vignette"></div>
+  <div class="intro-glow-outer"></div>
+  <div class="intro-glow-mid"></div>
+  <div class="intro-glow-core"></div>
+  <div class="intro-glass-shine"></div>
+</div>
+
+<div class="aero-bg"></div>
+
+<!-- ─── PREMIUM HEADER ─── -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="." class="header-logo">
+      <img src="./imgs/icon.png" alt="LinkWave">
+      <span>LinkWave</span>
+    </a>
+
+    <ul class="nav-list">
+      <li><a href="#features" class="nav-link" data-section="features">Funcionalidades</a></li>
+      <li><a href="#how" class="nav-link" data-section="how">Como funciona</a></li>
+      <li><a href="#audience" class="nav-link" data-section="audience">Para quem é</a></li>
+      <li><a href="#diff" class="nav-link" data-section="diff">Diferenciais</a></li>
+    </ul>
+
+    <a href="https://linkwave-topaz.vercel.app" target="_blank" rel="noopener noreferrer" class="header-cta">
+      <i class="fa-solid fa-wave"></i> Criar página
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ─── MOBILE MENU ─── -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" class="mobile-link" data-section="features">Funcionalidades</a>
+  <a href="#how" class="mobile-link" data-section="how">Como funciona</a>
+  <a href="#audience" class="mobile-link" data-section="audience">Para quem é</a>
+  <a href="#diff" class="mobile-link" data-section="diff">Diferenciais</a>
+  <div class="mobile-divider"></div>
+  <a href="https://linkwave-topaz.vercel.app" target="_blank" rel="noopener noreferrer" class="mobile-link btn-aero btn-aero-green" style="font-size:18px;padding:14px 40px;margin-top:8px;">
+    <i class="fa-solid fa-user-plus"></i> Criar página
+  </a>
+</div>
+
+<div class="relative z-10">
+
+<!-- ─── HERO ─── -->
+<section class="min-h-screen flex items-center px-4 pt-32 pb-20">
+  <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="tag-aero inline-flex items-center gap-2 mb-6 reveal visible">
+        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+        LinkWave v2.0 — Crie sua onda
+      </div>
+      <h1 class="font-black text-5xl md:text-6xl lg:text-7xl leading-[1.08] mb-5 text-ocean heading-shadow reveal visible" style="transition-delay:0.05s">
+        Links para criadores,<br/>
+        <span class="text-sky-700">do seu jeito.</span>
+      </h1>
+      <p class="text-base md:text-lg text-muted leading-relaxed mb-8 max-w-md reveal visible" style="transition-delay:0.1s">
+        Centralize todos os seus links em uma página única. Crie sem limites. Compartilhe sem fronteiras.
+      </p>
+      <div class="flex flex-wrap gap-4 reveal visible" style="transition-delay:0.15s">
+        <a href="https://linkwave-topaz.vercel.app" target="_blank" rel="noopener noreferrer" class="btn-aero btn-aero-green px-7 py-3.5 text-base">
+          <i class="fa-solid fa-user-plus"></i> Começar grátis
+        </a>
+        <a href="#how" class="btn-aero btn-aero-ghost px-6 py-3.5 text-base">
+          <i class="fa-regular fa-compass"></i> Como funciona
+        </a>
+      </div>
+      <div class="flex gap-5 mt-12 pt-6 border-t border-white/50 reveal visible" style="transition-delay:0.2s">
+        <div class="glass-stat"><div class="font-black text-2xl text-sky-500">100%</div><div class="text-xs text-muted mt-0.5">Grátis</div></div>
+        <div class="glass-stat"><div class="font-black text-2xl text-sky-500">100%</div><div class="text-xs text-muted mt-0.5">Personalizável</div></div>
+        <div class="glass-stat"><div class="font-black text-2xl text-sky-500">100%</div><div class="text-xs text-muted mt-0.5">Sem código</div></div>
+      </div>
+    </div>
+
+    <!-- ─── PHONE ─── -->
+    <div class="flex justify-center md:justify-end">
+      <div class="phone-container" id="phoneContainer">
+        <div class="phone-bg-glow"></div>
+        <div class="phone-tilt" id="phoneTilt">
+          <div class="phone-wrap" id="phoneWrap">
+            <div class="phone-light-sweep"></div>
+            <img src="./imgs/essentials/frame.png" alt="" class="frame">
+            <div class="phone-screen">
+            <div class="relative w-11 h-11 mx-auto mb-2 z-[2]">
+              <div class="absolute inset-0 rounded-full ring-2 ring-sky-400/60 ring-offset-2 ring-offset-white/20 shadow-[0_0_10px_rgba(56,189,248,0.35)]"></div>
+              <div class="w-full h-full rounded-full overflow-hidden">
+                <img src="./imgs/essentials/profile.jpg" alt="" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <div class="text-center font-bold text-xs text-ocean mb-0.5 z-[2]">Seu Nome</div>
+            <div class="text-center text-[10px] text-muted mb-2 z-[2]">Criando o futuro ✨</div>
+            <div class="phone-link-aero"><img class="w-3.5 h-3.5 opacity-60" src="./imgs/icons/Google Chrome.png" alt=""> Meu Site <span class="ml-auto opacity-40 text-[10px]">›</span></div>
+            <div class="phone-link-aero"><img class="w-3.5 h-3.5 opacity-60" src="./imgs/icons/Google Playstore.png" alt=""> Minha Loja <span class="ml-auto opacity-40 text-[10px]">›</span></div>
+            <div class="phone-link-aero"><img class="w-3.5 h-3.5 opacity-60" src="./imgs/icons/Youtube.png" alt=""> YouTube <span class="ml-auto opacity-40 text-[10px]">›</span></div>
+            <div class="phone-link-aero"><img class="w-3.5 h-3.5 opacity-60" src="./imgs/icons/Whatsapp.png" alt=""> Fale Comigo <span class="ml-auto opacity-40 text-[10px]">›</span></div>
+            <div class="phone-badge-aero">🔗 linkwave.app/u/seu-nome</div>
+          </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="divider-aero"></div></div>
+
+<!-- ─── PROBLEM ─── -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 items-center">
+    <div class="reveal">
+      <span class="tag-aero mb-4 inline-flex items-center gap-1.5"><i class="fa-regular fa-circle-xmark text-sky-500"></i> O problema</span>
+      <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow leading-tight mb-4">Seus links estão<br/>espalhados por aí</h2>
+      <p class="text-muted leading-relaxed">Cada plataforma, um link diferente. Cada cliente, uma busca diferente. O LinkWave reúne tudo em um único endereço fácil de lembrar e compartilhar.</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3 reveal">
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(229,57,53,0.08);"><img src="./imgs/icons/Instagram.png" alt="" class="w-4 h-4"></span> Instagram
+      </div>
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(255,0,0,0.06);"><img src="./imgs/icons/Youtube.png" alt="" class="w-4 h-4"></span> YouTube
+      </div>
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(0,0,0,0.06);"><img src="./imgs/icons/TikTok.png" alt="" class="w-4 h-4"></span> TikTok
+      </div>
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(36,41,47,0.06);"><img src="./imgs/icons/github.png" alt="" class="w-4 h-4"></span> GitHub
+      </div>
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(90,212,144,0.06);"><img src="./imgs/icons/Google Chrome.png" alt="" class="w-4 h-4"></span> Loja Online
+      </div>
+      <div class="sl-aero">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(37,211,102,0.06);"><img src="./imgs/icons/Whatsapp.png" alt="" class="w-4 h-4"></span> WhatsApp
+      </div>
+      <div class="col-span-2 flex items-center justify-center gap-3 py-2 text-sm text-muted font-bold">
+        <span>Tudo isso</span> <span class="text-sky-400 text-lg">↓</span> <span>em um só lugar</span>
+      </div>
+      <div class="lw-aero">
+        <div class="lw-icon-aero"><img src="./imgs/icon.png" alt="" class="w-6 h-6"></div>
+        <div><strong class="text-ocean text-sm">linkwave.app/voce</strong><p class="text-muted text-xs mt-0.5">Uma página. Todos os seus links.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="divider-aero"></div></div>
+
+<!-- ─── FEATURES ─── -->
+<section class="py-20 px-4" id="features">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="tag-aero inline-flex items-center gap-1.5"><i class="fa-regular fa-star text-sky-500"></i> Funcionalidades</span>
+      <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow mt-4">Tudo que você precisa</h2>
+      <p class="text-muted mt-2">Ferramentas poderosas, interface intuitiva.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="glass-card p-7 reveal">
+        <div class="feat-icon-aero"><img src="./imgs/icons/pallete-removebg-preview.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Totalmente personalizável</div>
+        <div class="text-sm text-muted leading-relaxed">Temas, layouts, fontes e cores. Cada detalhe com a cara da sua marca — sem programar.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.08s">
+        <div class="feat-icon-aero"><img src="./imgs/icons/lupa-removebg-preview.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Analytics integrado</div>
+        <div class="text-sm text-muted leading-relaxed">Acompanhe cliques, tráfego e entenda seu público em tempo real.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.16s">
+        <div class="feat-icon-aero"><img src="./imgs/icons/raio.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Rápido e confiável</div>
+        <div class="text-sm text-muted leading-relaxed">Performance de alto nível com 99,9% de uptime. Sempre disponível.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.24s">
+        <div class="feat-icon-aero"><img src="./imgs/icons/Instagram Old.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Links ilimitados</div>
+        <div class="text-sm text-muted leading-relaxed">Crie, edite, reordene e exclua links. Organize sem limites.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.32s">
+        <div class="feat-icon-aero"><img src="./imgs/icons/profile.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Perfil público único</div>
+        <div class="text-sm text-muted leading-relaxed">Seu endereço exclusivo <span class="text-sky-500 font-bold">linkwave.app/seu-nome</span>.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.4s">
+        <div class="feat-icon-aero"><img src="./imgs/icons/Google.png" alt="" class="w-7 h-7"></div>
+        <div class="font-bold text-ocean text-lg mb-2">Redes sociais integradas</div>
+        <div class="text-sm text-muted leading-relaxed">Instagram, TikTok, YouTube, GitHub e muito mais em um perfil.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="divider-aero"></div></div>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="py-20 px-4" id="how">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="tag-aero inline-flex items-center gap-1.5"><i class="fa-regular fa-compass text-sky-500"></i> Como funciona</span>
+      <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow mt-4">Em 5 passos, sua página no ar</h2>
+      <p class="text-muted mt-2">Simples como deve ser. Sem complicação.</p>
+    </div>
+    <div class="relative step-connector">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="flow-step text-center reveal">
+          <div class="step-aero mx-auto">1</div>
+          <div class="font-bold text-ocean text-sm mb-1">Cadastro</div>
+          <div class="text-xs text-muted">Crie sua conta</div>
+        </div>
+        <div class="flow-step text-center reveal" style="transition-delay:0.08s">
+          <div class="step-aero mx-auto">2</div>
+          <div class="font-bold text-ocean text-sm mb-1">Login</div>
+          <div class="text-xs text-muted">Acesse o dashboard</div>
+        </div>
+        <div class="flow-step text-center reveal" style="transition-delay:0.16s">
+          <div class="step-aero mx-auto">3</div>
+          <div class="font-bold text-ocean text-sm mb-1">Crie links</div>
+          <div class="text-xs text-muted">Adicione seus links</div>
+        </div>
+        <div class="flow-step text-center reveal" style="transition-delay:0.24s">
+          <div class="step-aero mx-auto">4</div>
+          <div class="font-bold text-ocean text-sm mb-1">Personalize</div>
+          <div class="text-xs text-muted">Temas e cores</div>
+        </div>
+        <div class="flow-step text-center reveal" style="transition-delay:0.32s">
+          <div class="step-aero mx-auto">5</div>
+          <div class="font-bold text-ocean text-sm mb-1">Publique</div>
+          <div class="text-xs text-muted">Compartilhe com o mundo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="divider-aero"></div></div>
+
+<!-- ─── AUDIENCE ─── -->
+<section class="py-20 px-4" id="audience">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="tag-aero inline-flex items-center gap-1.5"><i class="fa-regular fa-users text-sky-500"></i> Para quem é</span>
+      <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow mt-4">Para quem cria, vende e inspira</h2>
+      <p class="text-muted mt-2">Se você tem algo a compartilhar, o LinkWave é para você.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+      <div class="glass-card p-5 text-center reveal">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Instagram.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Influenciadores</div>
+        <div class="text-xs text-muted mt-1">Centralize seu conteúdo</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.06s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Twitch.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Streamers</div>
+        <div class="text-xs text-muted mt-1">Todas as plataformas</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.12s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Google.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Empresas</div>
+        <div class="text-xs text-muted mt-1">Presença unificada</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.18s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Google Authentificator Old.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Devs</div>
+        <div class="text-xs text-muted mt-1">Portfolio + contato</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.24s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Google Photos.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Designers</div>
+        <div class="text-xs text-muted mt-1">Mostre seu estilo</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.3s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Zoom.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Fotógrafos</div>
+        <div class="text-xs text-muted mt-1">Portfolio à mão</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.36s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Google TalkBack.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Editores</div>
+        <div class="text-xs text-muted mt-1">Trabalhos em destaque</div>
+      </div>
+      <div class="glass-card p-5 text-center reveal" style="transition-delay:0.42s">
+        <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center"><img src="./imgs/icons/Google Playstore.png" alt="" class="w-8 h-8"></div>
+        <div class="font-bold text-ocean text-sm">Empreendedores</div>
+        <div class="text-xs text-muted mt-1">Venda de qualquer lugar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="divider-aero"></div></div>
+
+<!-- ─── DIFFERENTIALS ─── -->
+<section class="py-20 px-4" id="diff">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="tag-aero inline-flex items-center gap-1.5"><i class="fa-regular fa-gem text-sky-500"></i> Diferenciais</span>
+      <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow mt-4">Por que o LinkWave?</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+      <div class="glass-card p-7 reveal">
+        <div class="tag-aero mb-3 bg-white/60">Personalização</div>
+        <div class="font-bold text-ocean text-xl mb-2">Liberdade visual total</div>
+        <div class="text-sm text-muted leading-relaxed">Customize cores, tipografia, layouts e muito mais.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.1s">
+        <div class="tag-aero mb-3 bg-white/60">Interface</div>
+        <div class="font-bold text-ocean text-xl mb-2">Design Frutiger Aero</div>
+        <div class="text-sm text-muted leading-relaxed">Vidro, natureza, luz e tecnologia em harmonia.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.2s">
+        <div class="tag-aero mb-3 bg-white/60">Simplicidade</div>
+        <div class="font-bold text-ocean text-xl mb-2">Zero programação</div>
+        <div class="text-sm text-muted leading-relaxed">Editor visual drag-and-drop. Configure em minutos.</div>
+      </div>
+      <div class="glass-card p-7 reveal" style="transition-delay:0.3s">
+        <div class="tag-aero mb-3 bg-white/60">Analytics</div>
+        <div class="font-bold text-ocean text-xl mb-2">Dados em tempo real</div>
+        <div class="text-sm text-muted leading-relaxed">Métricas detalhadas de cliques e visitantes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="py-24 px-4" id="cta">
+  <div class="max-w-2xl mx-auto glass-strong rounded-[32px] p-12 md:p-16 text-center reveal">
+    <img src="./imgs/icon.png" alt="" class="w-20 h-20 mx-auto mb-6" style="filter:drop-shadow(0 4px 12px rgba(14,165,233,0.15));animation:float 4s ease-in-out infinite;">
+    <h2 class="font-black text-4xl md:text-5xl text-ocean heading-shadow mb-4">
+      Vamos surfar<br/>
+      <span class="text-sky-700">juntos?</span>
+    </h2>
+    <p class="text-muted mb-8 text-lg leading-relaxed">Crie sua página LinkWave hoje e centralize sua presença digital em um único endereço.</p>
+    <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/50 border border-white/70 text-sm font-bold text-ocean-light mb-8 font-mono shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+      <span class="text-muted">linkwave.app/u/</span>seu-nome
+    </div>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://linkwave-topaz.vercel.app" target="_blank" rel="noopener noreferrer" class="btn-aero btn-aero-green px-8 py-4 text-lg"><i class="fa-solid fa-user-plus"></i> Criar página grátis</a>
+      <a href="#features" class="btn-aero btn-aero-ghost px-7 py-4 text-lg"><i class="fa-regular fa-eye"></i> Ver funcionalidades</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="px-4 pb-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="glass-card rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center text-muted text-sm gap-4">
+      <div class="flex items-center gap-2">
+        <img src="./imgs/icon.png" alt="" class="w-5 h-5 opacity-50">
+        <span class="font-bold text-ocean">LinkWave</span>
+      </div>
+      <div>© 2026 LinkWave — Todos os direitos reservados</div>
+      <div class="text-muted">Feito por <span class="text-sky-600 font-bold">Gabriel Sabino</span>, <span class="text-sky-600 font-bold">Emelly Giovanini</span> & <span class="text-sky-600 font-bold">Lucas Castilho</span></div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+  // ─── BUBBLES ───
+  (function() {
+    const data = [
+      { s:18, l:5, d:20, dl:0 }, { s:28, l:15, d:26, dl:3 }, { s:12, l:28, d:16, dl:6 },
+      { s:22, l:50, d:30, dl:1 }, { s:10, l:68, d:18, dl:9 }, { s:32, l:80, d:34, dl:4 },
+      { s:14, l:90, d:22, dl:12 }, { s:20, l:40, d:24, dl:7 },
+    ];
+    data.forEach(b => {
+      const el = document.createElement('div');
+      el.className = 'aero-bubble';
+      el.style.cssText = `width:${b.s}px;height:${b.s}px;left:${b.l}%;animation-duration:${b.d}s;animation-delay:${b.dl}s;`;
+      document.body.appendChild(el);
+    });
+  })();
+
+  // ─── HAMBURGER ───
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  function toggleMenu(open) {
+    hamburger.classList.toggle('active', open);
+    mobileMenu.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  hamburger.addEventListener('click', () => {
+    toggleMenu(!mobileMenu.classList.contains('open'));
+  });
+
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => toggleMenu(false));
+  });
+
+  // ─── HEADER SCROLL ───
+  const header = document.getElementById('header');
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    header.classList.toggle('scrolled', y > 40);
+
+    // Hide/show header on scroll direction
+    if (y > 200) {
+      header.style.transform = y > lastScroll ? 'translateY(-100%)' : 'translateY(0)';
+    } else {
+      header.style.transform = 'translateY(0)';
+    }
+    lastScroll = y;
+
+    // Active nav link
+    let current = '';
+    document.querySelectorAll('section[id]').forEach(s => {
+      if (y >= s.offsetTop - 150) current = s.id;
+    });
+    document.querySelectorAll('.nav-link, .mobile-link').forEach(a => {
+      const isActive = a.getAttribute('data-section') === current;
+      a.classList.toggle('active', isActive);
+      if (a.classList.contains('mobile-link') && isActive) {
+        a.style.color = '#0ea5e9';
+      } else if (a.classList.contains('mobile-link')) {
+        a.style.color = '';
+      }
+    });
+  });
+
+  // ─── SCROLL REVEAL ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ─── CINEMATIC PHONE REVEAL ───
+  (function() {
+    const phone = document.getElementById('phoneWrap');
+    const glow = document.querySelector('.phone-bg-glow');
+    const intro = document.getElementById('pageIntro');
+    let settled = false;
+
+    function settle() {
+      if (settled) return;
+      settled = true;
+      phone.classList.remove('phone-entrance');
+      phone.classList.add('phone-float');
+      if (glow) glow.classList.remove('glow-intro');
+    }
+
+    // Start entrance after a tiny delay for DOM ready
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        phone.classList.add('phone-entrance');
+        if (glow) glow.classList.add('glow-intro');
+      });
+    });
+
+    // On entrance animation end, settle into float
+    phone.addEventListener('animationend', (e) => {
+      if (e.animationName === 'phoneEntrance') settle();
+    });
+
+    // Dismiss everything on scroll — even during intro
+    window.addEventListener('scroll', () => {
+      if (intro && !intro.classList.contains('intro-scrolled')) {
+        intro.classList.add('intro-scrolled');
+        intro.classList.add('intro-hidden');
+      }
+      if (!settled) settle();
+    }, { passive: true });
+
+    // Page-intro fade — start shortly after entrance begins
+    setTimeout(() => {
+      if (intro) intro.classList.add('intro-hidden');
+    }, 1400); // fade overlay while phone is mid-flight
+
+    // Re-trigger if page restored from bfcache (back/forward navigation)
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        settled = false;
+        phone.classList.remove('phone-entrance', 'phone-float');
+        if (glow) glow.classList.remove('glow-intro');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            phone.classList.add('phone-entrance');
+            if (glow) glow.classList.add('glow-intro');
+          });
+        });
+        if (intro) {
+          intro.classList.remove('intro-hidden', 'intro-scrolled');
+          setTimeout(() => { intro.classList.add('intro-hidden'); }, 1400);
+        }
+      }
+    });
+
+    // ─── SPARKLE PARTICLES ───
+    setTimeout(() => {
+      const container = document.querySelector('.hero-section') || document.body;
+      for (let i = 0; i < 18; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'sparkle sparkle-loop';
+        const size = 2 + Math.random() * 4;
+        dot.style.width = size + 'px';
+        dot.style.height = size + 'px';
+        dot.style.setProperty('--dur', (1.2 + Math.random() * 1.6) + 's');
+        dot.style.setProperty('--delay', (Math.random() * 3) + 's');
+        dot.style.left = (5 + Math.random() * 90) + '%';
+        dot.style.top = (8 + Math.random() * 84) + '%';
+        const colors = ['rgba(255,255,255,0.9)', 'rgba(186,232,253,0.9)', 'rgba(134,239,172,0.9)'];
+        dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+        container.appendChild(dot);
+      }
+    }, 100);
+  })();
+
+  // ─── 3D TILT ON HOVER (desktop only) ───
+  (function() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const container = document.getElementById('phoneContainer');
+    const tilt = document.getElementById('phoneTilt');
+    if (!container || !tilt) return;
+
+    let isHovering = false;
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+    let rafId = null;
+    let isLeaving = false;
+    const MAX_TILT = 18;
+
+    function applyTilt() {
+      if (isLeaving) { rafId = null; return; }
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+      tilt.style.transform = `perspective(800px) rotateX(${currentX}deg) rotateY(${currentY}deg) scale3d(1.02,1.02,1.02)`;
+      if (Math.abs(currentX - targetX) > 0.01 || Math.abs(currentY - targetY) > 0.01 || isHovering) {
+        rafId = requestAnimationFrame(applyTilt);
+      } else {
+        rafId = null;
+      }
+    }
+
+    container.addEventListener('mouseenter', () => {
+      isHovering = true;
+      isLeaving = false;
+      tilt.classList.add('phone-hover');
+    });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isHovering) return;
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      targetY = (x - 0.5) * MAX_TILT * 1.4;
+      targetX = (y - 0.5) * -MAX_TILT;
+      if (!rafId) rafId = requestAnimationFrame(applyTilt);
+    });
+
+    container.addEventListener('mouseleave', () => {
+      isHovering = false;
+      isLeaving = true;
+      targetX = 0;
+      targetY = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      tilt.classList.remove('phone-hover');
+      tilt.style.transition = 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+      tilt.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+      setTimeout(() => {
+        tilt.style.transition = '';
+        isLeaving = false;
+      }, 1000);
+    });
+  })();
+</script>
+</body>
+</html>

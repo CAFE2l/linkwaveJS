@@ -19,43 +19,42 @@ export function CountryChart({ data }: { data: CountryCount[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="glass-card-strong p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Globe size={20} className="text-fg-secondary" />
-          <div>
-            <h2 className="text-lg font-black text-foreground">Distribuição geográfica</h2>
-            <p className="text-sm text-fg-secondary">Nenhum dado de localização disponível.</p>
-          </div>
-        </div>
+      <div className="admin-card p-5">
+        <h2 className="text-base font-semibold text-white mb-1">Distribuição geográfica</h2>
+        <p className="text-xs text-slate-400">Nenhum dado de localização disponível.</p>
       </div>
     );
   }
 
   return (
-    <div className="glass-card-strong p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <Globe size={20} className="text-fg-secondary" />
+    <div className="admin-card p-5">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-black text-foreground">Distribuição geográfica</h2>
-          <p className="text-sm text-fg-secondary">{total} cliques de {data.length} países</p>
+          <h2 className="text-base font-semibold text-white">Distribuição geográfica</h2>
+          <p className="text-xs text-slate-400 mt-0.5">Países de origem dos cliques</p>
+        </div>
+        <div className="flex size-10 items-center justify-center rounded-xl bg-slate-800">
+          <Globe size={18} className="text-cyan-400" />
         </div>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {data.slice(0, 10).map((item) => {
           const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : "0";
           return (
             <div key={item.country}>
-              <div className="flex items-center justify-between text-sm mb-1">
-                <span className="font-medium text-foreground">
-                  {FLAG_EMOJI[item.country] ?? "🌍"} {item.country}
+              <div className="flex items-center justify-between mb-1">
+                <span className="flex items-center gap-2 text-sm text-slate-300">
+                  <span className="text-base">{FLAG_EMOJI[item.country] || "🌍"}</span>
+                  {item.country}
                 </span>
-                <span className="font-semibold text-fg-secondary">
-                  {item.count} <span className="font-normal text-xs">({pct}%)</span>
+                <span className="text-sm font-medium text-slate-400">
+                  {item.count.toLocaleString("pt-BR")}
+                  <span className="text-slate-600 ml-1">({pct}%)</span>
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-surface-hover overflow-hidden">
+              <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-brand transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all"
                   style={{ width: `${pct}%` }}
                 />
               </div>

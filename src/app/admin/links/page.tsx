@@ -7,13 +7,13 @@ export default async function AdminLinksPage() {
   const links = await getAdminLinks();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 admin-fade-in">
       <div>
-        <h1 className="text-3xl font-black text-ocean">Gerenciamento de links</h1>
-        <p className="mt-1 text-sm font-semibold text-ocean/60">{links.length} link(s) mais recentes na plataforma.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Links</h1>
+        <p className="mt-1 text-sm text-slate-400">{links.length} link(s) mais recentes na plataforma.</p>
       </div>
 
-      <div className="glass-card-strong overflow-hidden">
+      <div className="admin-card overflow-hidden">
         <AdminLinksTable links={links} />
       </div>
     </div>

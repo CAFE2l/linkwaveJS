@@ -232,6 +232,7 @@ export type UserThemeConfig = {
   avatar_ring_style: "gradient" | "solid" | "none";
   banner_led_color: string;
   icon_style: "8bit" | "clay";
+  banner_position: "center" | "top" | "bottom";
 };
 
 export const DEFAULT_USER_THEME: UserThemeConfig = {
@@ -269,4 +270,5 @@ export const DEFAULT_USER_THEME: UserThemeConfig = {
   avatar_ring_style: "gradient",
   banner_led_color: "#ffffff",
   icon_style: "8bit",
+  banner_position: "center",
 };

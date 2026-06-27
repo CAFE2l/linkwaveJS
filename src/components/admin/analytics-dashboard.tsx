@@ -11,10 +11,10 @@ import type { AnalyticsData } from "@/lib/actions/analytics";
 
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 admin-fade-in">
       <div>
-        <h1 className="text-3xl font-black text-ocean">Visão geral</h1>
-        <p className="mt-1 text-sm font-semibold text-ocean/60">Métricas operacionais e atividade da plataforma LinkWave.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Visão geral</h1>
+        <p className="mt-1 text-sm text-slate-400">Acompanhe métricas, usuários e atividades da plataforma LinkWave.</p>
       </div>
 
       <OverviewCards
@@ -27,17 +27,17 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         totalClicksDelta={data.totalClicksDelta}
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <UserGrowthChart data={data.userGrowth} />
         <ClickActivityChart data={data.clickActivity} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <TopLinksChart data={data.topLinks} />
         <CountryChart data={data.countryDistribution} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <HourlyActivityChart data={data.hourlyActivity} />
         <EngagementChart data={data.engagement} />
       </div>

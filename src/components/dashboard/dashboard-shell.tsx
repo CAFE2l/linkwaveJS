@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, LayoutDashboard, LogOut, Palette, Sliders, User } from "lucide-react";
+import { ExternalLink, LayoutDashboard, LogOut, Palette, ShieldCheck, Sliders, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import { ToastProvider } from "@/components/dashboard/toast";
 import { BlobBackground } from "@/components/landing/blob-background";
@@ -53,6 +53,15 @@ export function DashboardShell({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {user.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/60 bg-amber-100/50 px-3 py-1.5 text-xs font-bold text-amber-700 backdrop-blur-sm transition hover:bg-amber-100/80 hover:shadow-sm"
+                    >
+                      <ShieldCheck size={13} />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Link>
+                  )}
                   <Link
                     href={`/u/${user.username}`}
                     className="glass-button-outline text-xs !py-1.5 !px-3"
@@ -92,6 +101,15 @@ export function DashboardShell({
                   </Link>
                 );
               })}
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold transition-all text-amber-600/70 hover:text-amber-600 hover:bg-amber-100/30 border border-transparent"
+                >
+                  <ShieldCheck size={15} />
+                  Admin
+                </Link>
+              )}
             </nav>
 
             <main className="mx-auto w-[min(100%-2rem,1120px)] px-4 py-6">

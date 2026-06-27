@@ -14,23 +14,23 @@ type ThemeRow = {
 
 export function AdminThemesTable({ themes }: { themes: ThemeRow[] }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto admin-scrollbar">
+      <table className="admin-table min-w-[600px]">
         <thead>
-          <tr className="border-b border-border">
-            <th className="px-6 py-4 text-left font-semibold text-fg-secondary">Usuário</th>
-            <th className="px-6 py-4 text-left font-semibold text-fg-secondary">Email</th>
-            <th className="px-6 py-4 text-left font-semibold text-fg-secondary">Tema</th>
-            <th className="px-6 py-4 text-right font-semibold text-fg-secondary">Ações</th>
+          <tr>
+            <th>Usuário</th>
+            <th>Email</th>
+            <th>Tema</th>
+            <th className="text-right">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody>
           {themes.map((item) => (
             <ThemeRow key={item.id} item={item} />
           ))}
           {themes.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-6 py-12 text-center text-sm text-fg-secondary">
+              <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-500">
                 Nenhum tema personalizado encontrado.
               </td>
             </tr>
@@ -54,28 +54,28 @@ function ThemeRow({ item }: { item: ThemeRow }) {
   const themeStr = JSON.stringify(item.theme_json, null, 1);
 
   return (
-    <tr className="transition hover:bg-surface-hover/50">
-      <td className="px-6 py-4">
-        <span className="font-semibold text-foreground">@{item.username}</span>
+    <tr>
+      <td>
+        <span className="font-medium text-slate-200">@{item.username}</span>
       </td>
-      <td className="px-6 py-4 text-fg-secondary">{item.email}</td>
-      <td className="px-6 py-4">
+      <td className="text-slate-400">{item.email}</td>
+      <td>
         <details className="group">
-          <summary className="cursor-pointer text-xs font-semibold text-fg-secondary transition hover:text-foreground">
+          <summary className="cursor-pointer text-xs font-medium text-slate-400 transition hover:text-slate-200">
             Ver configuração
           </summary>
-          <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-surface-hover p-2 text-[10px] text-fg-secondary">
+          <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-slate-800/50 p-2 text-[10px] text-slate-400 admin-scrollbar">
             {themeStr}
           </pre>
         </details>
       </td>
-      <td className="px-6 py-4 text-right">
+      <td className="text-right">
         <button
           onClick={handleReset}
           disabled={pending}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-fg-secondary transition hover:bg-surface-hover hover:text-foreground disabled:opacity-50"
+          className="admin-btn admin-btn-ghost !px-3 !py-1.5 text-xs"
         >
-          <RotateCcw size={14} />
+          <RotateCcw size={13} />
           Resetar
         </button>
       </td>

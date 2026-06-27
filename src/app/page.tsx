@@ -11,7 +11,7 @@ import { NewHowItWorksSection } from "@/components/landing/new-how-it-works-sect
 import { NewFeaturesSection } from "@/components/landing/new-features-section";
 import { NewCTASection } from "@/components/landing/new-cta-section";
 import { NewFooter } from "@/components/landing/new-footer";
-import { Showcase } from "@/components/landing/showcase";
+import { Showcase } from "@/components/landing/cosmic-profile-preview";
 
 import { FAQ } from "@/components/landing/faq";
 

@@ -20,21 +20,12 @@ const profileLinks: LinkItem[] = [
   { title: "Discord", icon: "/imgs/icons/Discord.png", url: "https://discord.com/invite/gW2tShPFxf" },
 ];
 
-const allIconFiles = [
-  "AirBnB.png","Air_Europa.png","Amazon.png","Amazon_Prime.png","Amazon_Shopping.png","ArtStation.png","ARZone.png","Authy.png","Battle.png","Booking.png",
-  "CityMapper.png","Cuenta_DNI.png","Deliveroo.png","Deviantart.png","Discord.png","Duolingo.png","Evernote.png","Express_VPN.png","Facebook_Messenger.png","Facebook.png",
-  "Firefox.png","FitBod.png","folder.png","Galaxy_Store.png","github.png","Glovo.png","Gmail.png","Google_Authentificator_Old.png","Google_Authentificator.png","Google_Calendar.png",
-  "Google_Chrome.png","Google_Currents.png","Google_Docs.png","Google_Drive.png","Google_Files.png","Google_Fit.png","Google_Forms.png","Google_Hangouts.png","Google_Keep.png","Google_Launcher.png",
-  "Google_Maps_Old.png","Google_Maps.png","Google_Photos.png","Google_Playstore.png","Google.png","Google_Podcasts.png","Google_Sheets.png","Google_Slides.png","Google_TalkBack.png","Google_Text_to_Speech.png",
-  "Google_Translate.png","Google_TV.png","Google_Wallet.png","icon(1).png","Idealista.png","Instagram_Old.png","Instagram.png","Itch_io.png","Ko_Fi.png","Letterboxd.png",
-  "LinkedIn.png","linkwave.png","Lloyds_Bank.png","London_Guide.png","London_Offline_Map.png","London_Tube_Map.png","Mercadolibre.png","Mercadopago.png","Mi_Argentina.png","Microsoft_Access.png",
-  "Microsoft_Authentificator.png","Microsoft_Edge.png","Microsoft_Excel.png","Microsoft_Launcher.png","Microsoft_Link_to_Windows.png","Microsoft_Office.png","Microsoft_OneDrive.png","Microsoft_OneNote.png","Microsoft_PowerPoint.png","Microsoft_Publisher.png",
-  "Microsoft_To_Do.png","Microsoft_Word.png","Miro.png","Moj.png","My_Fitness_Pal.png","Netflix.png","Netflix_v2.png","Notion.png","Nova_Launcher.png","Nuffield_Health.png",
-  "Opera.png","Outlook.png","Patreon.png","PayPal.png","PedidosYa.png","Pikmin.png","Pinterest.png","Reddit.png","Rubiks_Cube.png","Safari.png",
-  "Samsung_Free.png","Santander.png","Skype.png","Slack.png","Slack_v2.png","Snapchat.png","SocioPlus.png","SoundCloud.png","Spareroom.png","Spotify.png",
-  "Steam.png","store.png","Tarjeta_Transporte_Madrid.png","Telegram.png","Terraria.png","Tfl_Go.png","Tfl_Oyster.png","TickTick.png","TikTok.png","Tinder.png",
-  "Todoist.png","Toggl_Blue_Icon.png","Toggl_Hire.png","Toggl_Plan.png","Toggl.png","Toggl_Track.png","Trello.png","Trello_v2.png","Tumblr.png","Twitch.png",
-  "Twitter.png","Uber_Eats.png","Uber.png","Vitality_GP.png","Vitality.png","Vivaldi.png","Vodafone.png","Whatsapp.png","Wikipedia.png","WinRAR.png","Youtube.png","Zoom.png",
+const pinnedSocials = [
+  { name: "Instagram", icon: "/imgs/icons/Instagram.png" },
+  { name: "YouTube", icon: "/imgs/icons/Youtube.png" },
+  { name: "TikTok", icon: "/imgs/icons/TikTok.png" },
+  { name: "GitHub", icon: "/imgs/icons/github.png" },
+  { name: "WhatsApp", icon: "/imgs/icons/Whatsapp.png" },
 ];
 
 function CosmicProfileDesktop() {
@@ -66,6 +57,14 @@ function CosmicProfileDesktop() {
 
       <h3 className="cosmic-preview-name">Gabriel Felipe</h3>
       <p className="cosmic-preview-bio">Full-Stack Developer · Digital Influencer · Web 3 Enthusiast</p>
+
+      <div className="cosmic-preview-pinned">
+        {pinnedSocials.map((s) => (
+          <div key={s.name} className="cosmic-preview-pinned-item">
+            <Image src={s.icon} alt={s.name} width={18} height={18} />
+          </div>
+        ))}
+      </div>
 
       <div className="cosmic-preview-links">
         {profileLinks.map((link) => (
@@ -119,6 +118,14 @@ function CosmicProfileMobile() {
 
       <div className="cosmic-mobile-name">Gabriel Felipe</div>
       <div className="cosmic-mobile-bio">Full-Stack Developer</div>
+
+      <div className="cosmic-mobile-pinned">
+        {pinnedSocials.map((s) => (
+          <div key={s.name} className="cosmic-mobile-pinned-item">
+            <Image src={s.icon} alt={s.name} width={12} height={12} />
+          </div>
+        ))}
+      </div>
 
       <div className="cosmic-mobile-links">
         {profileLinks.map((link) => (
@@ -213,33 +220,6 @@ export function Showcase() {
         </div>
       </div>
 
-      {/* Full Icon Library */}
-      <div className="mt-16">
-        <div className="glass-card-strong p-5 md:p-7">
-          <div className="text-center mb-8">
-            <h3 className="text-xl font-black text-ocean tracking-tight">
-              Biblioteca de ícones
-            </h3>
-            <p className="text-sm text-muted mt-1">
-              Todos os {allIconFiles.length} ícones disponíveis no LinkWave
-            </p>
-          </div>
-          <div className="icon-grid">
-            {allIconFiles.map((file) => (
-              <div key={file} className="icon-grid-item">
-                <Image
-                  src={`/imgs/icons/${file}`}
-                  alt={file.replace(".png", "")}
-                  width={32}
-                  height={32}
-                  className="icon-grid-img"
-                />
-                <span className="icon-grid-label">{file.replace(".png", "")}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

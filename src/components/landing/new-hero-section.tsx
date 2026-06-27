@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { MotionReveal } from "@/components/shared/motion-reveal";
-import { ArrowRight, CheckCircle2, UserPlus, Eye, MousePointerClick, LayoutGrid } from "lucide-react";
+import { ArrowRight, CheckCircle2, UserPlus } from "lucide-react";
 import type { LandingStats } from "@/types/database";
 
 function formatNumber(n: number): string {
@@ -18,6 +18,14 @@ const phoneLinks = [
   { name: "Meu Site", icon: "/imgs/icons/links/Google Chrome.png" },
   { name: "WhatsApp", icon: "/imgs/icons/links/Whatsapp.png" },
   { name: "Portfólio", icon: "/imgs/icons/links/Discord.png" },
+];
+
+const pinnedSocials = [
+  { name: "Instagram", icon: "/imgs/icons/Instagram.png" },
+  { name: "YouTube", icon: "/imgs/icons/Youtube.png" },
+  { name: "TikTok", icon: "/imgs/icons/TikTok.png" },
+  { name: "GitHub", icon: "/imgs/icons/github.png" },
+  { name: "WhatsApp", icon: "/imgs/icons/Whatsapp.png" },
 ];
 
 export function NewHeroSection({ isLoggedIn, stats }: { isLoggedIn: boolean; stats: LandingStats }) {
@@ -154,6 +162,14 @@ export function NewHeroSection({ isLoggedIn, stats }: { isLoggedIn: boolean; sta
                     <p className="cosmic-title">itsluca.s</p>
                     <p className="cosmic-bio">criador digital · compartilhando ideias e código</p>
 
+                    <div className="cosmic-pinned">
+                      {pinnedSocials.map((s) => (
+                        <div key={s.name} className="cosmic-pinned-item">
+                          <Image src={s.icon} alt={s.name} width={14} height={14} />
+                        </div>
+                      ))}
+                    </div>
+
                     <div className="cosmic-links">
                       {phoneLinks.map((link) => (
                         <div key={link.name} className="cosmic-link">
@@ -161,31 +177,6 @@ export function NewHeroSection({ isLoggedIn, stats }: { isLoggedIn: boolean; sta
                           <span>{link.name}</span>
                         </div>
                       ))}
-                    </div>
-
-                    <div className="cosmic-analytics">
-                      <div className="cosmic-analytics-header">
-                        <span className="cosmic-analytics-title">Visitas (últimos 7 dias)</span>
-                      </div>
-                      <div className="cosmic-mini-chart">
-                        {[40, 65, 35, 80, 55, 90, 70].map((h, i) => (
-                          <div key={i} className="cosmic-bar" style={{ height: `${h}%` }} />
-                        ))}
-                      </div>
-                      <div className="cosmic-stats-row">
-                        <div className="cosmic-stat">
-                          <Eye size={10} />
-                          <span>2.4k</span>
-                        </div>
-                        <div className="cosmic-stat">
-                          <MousePointerClick size={10} />
-                          <span>890</span>
-                        </div>
-                        <div className="cosmic-stat">
-                          <LayoutGrid size={10} />
-                          <span>5</span>
-                        </div>
-                      </div>
                     </div>
 
                     <div className="cosmic-footer">LinkWave — sua página de links</div>

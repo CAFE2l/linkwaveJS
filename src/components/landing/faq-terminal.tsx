@@ -113,7 +113,7 @@ function AnswerBlock({ answer }: { answer: string }) {
 
   return (
     <div ref={ref} className="terminal-answer">
-      <span className="terminal-prompt">></span>
+      <span className="terminal-prompt">{'>'}</span>
       <span className="terminal-answer-text">{displayed}</span>
       {show && displayed.length < answer.length && (
         <span className="terminal-cursor" />

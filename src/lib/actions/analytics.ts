@@ -13,8 +13,12 @@ export type EngagementItem = { links: number; users: number };
 export type AnalyticsData = {
   totalUsers: number;
   totalUsersDelta: number;
+  activeUsers: number;
+  inactiveUsers: number;
   totalLinks: number;
   totalClicks: number;
+  clicksToday: number;
+  clicksLast30Days: number;
   totalClicksDelta: number;
   userGrowth: DailyCount[];
   clickActivity: DailyCount[];
@@ -53,18 +57,23 @@ function fillDateGaps(data: DailyCount[], days: number): DailyCount[] {
 }
 
 export async function getAnalyticsOverview(): Promise<AnalyticsData> {
-  const { supabase, admin } = await requireAdmin();
+  const { admin } = await requireAdmin();
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const sixtyDaysAgo = new Date(now);
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
 
   const [
     { count: totalUsers },
+    { count: activeUsers },
+    { count: inactiveUsers },
     { count: totalLinks },
     { count: totalClicks },
+    { count: clicksToday },
     { data: recentClicks },
     { data: recentUsers },
     { count: prevPeriodClicks },
@@ -73,8 +82,11 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     { data: allClickData },
   ] = await Promise.all([
     admin.from("users").select("*", { count: "exact", head: true }),
+    admin.from("users").select("*", { count: "exact", head: true }).eq("active", true),
+    admin.from("users").select("*", { count: "exact", head: true }).eq("active", false),
     admin.from("links").select("*", { count: "exact", head: true }),
     admin.from("clicks").select("*", { count: "exact", head: true }),
+    admin.from("clicks").select("*", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
     admin
       .from("clicks")
       .select("created_at")
@@ -96,17 +108,17 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   ]);
 
   const prevCount = prevPeriodClicks ?? 0;
-  const currCount = totalClicks ?? 0;
+  const currCount = recentClicks?.length ?? 0;
   const diff = currCount - prevCount;
   const totalClicksDelta = prevCount > 0 ? Math.round((diff / prevCount) * 100) : 0;
 
-  const { count: prevUsers } = await supabase
+  const { count: prevUsers } = await admin
     .from("users")
     .select("*", { count: "exact", head: true })
     .gte("created_at", sixtyDaysAgo)
     .lt("created_at", thirtyDaysAgo);
   const totalUsersDelta = prevUsers
-    ? Math.round((((totalUsers ?? 0) - prevUsers) / prevUsers) * 100)
+    ? Math.round((((recentUsers?.length ?? 0) - prevUsers) / prevUsers) * 100)
     : 0;
 
   const userGrowth = fillDateGaps(
@@ -183,8 +195,12 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   return {
     totalUsers: totalUsers ?? 0,
     totalUsersDelta,
+    activeUsers: activeUsers ?? 0,
+    inactiveUsers: inactiveUsers ?? 0,
     totalLinks: totalLinks ?? 0,
     totalClicks: totalClicks ?? 0,
+    clicksToday: clicksToday ?? 0,
+    clicksLast30Days: currCount,
     totalClicksDelta,
     userGrowth,
     clickActivity,

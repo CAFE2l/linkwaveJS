@@ -36,8 +36,9 @@ export function BannerUpload({
     const res = await uploadBannerAction(fd);
     setPending(false);
 
-    if (res.ok) {
-      onUpdate(user.banner_url ?? "");
+    if (res.ok && res.url) {
+      setPreview(null);
+      onUpdate(res.url);
     } else {
       setError(res.message);
     }

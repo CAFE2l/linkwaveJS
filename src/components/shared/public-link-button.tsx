@@ -3,6 +3,7 @@
 import { ArrowUpRight, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
 import { useThemeContext } from "@/hooks/use-theme-context";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { Link } from "@/types/database";
 
 function isLightColor(hex: string): boolean {
@@ -34,32 +35,45 @@ export function PublicLinkButton({ link }: { link: Link }) {
 
   const iconName = link.icone || link.icon;
   const hoverEffect = ctx?.link_hover_effect ?? "lift";
+  const linkStyle = ctx?.link_style ?? "glass";
   const isShake = hoverEffect === "shake";
   const textColor = ctx?.text_color_primary ?? "#0b1829";
   const isLight = isLightColor(textColor);
 
-  const glowShadow = ctx?.button_glow
-    ? `0 0 16px ${ctx.link_glow_color}40`
+  const glowEnabled = ctx?.enable_led_glow ?? ctx?.button_glow;
+  const glowShadow = glowEnabled
+    ? `0 0 16px ${ctx?.link_glow_color ?? "#38bdf8"}40`
     : "none";
+  const borderRadius =
+    linkStyle === "pill"
+      ? "999px"
+      : linkStyle === "rounded"
+        ? "16px"
+        : "calc(var(--ut-card-radius, 1rem) - 4px)";
+  const linkBackground =
+    linkStyle === "rounded"
+      ? "color-mix(in srgb, var(--ut-btn-bg, #0ea5e9) 18%, rgba(255,255,255,0.72))"
+      : "var(--ut-link-bg, rgba(255,255,255,0.1))";
+  const styleGlow =
+    linkStyle === "led" && glowEnabled
+      ? `0 0 24px ${ctx?.link_glow_color ?? "#38bdf8"}73, 0 4px 12px rgba(0,0,0,0.08)`
+      : `0 4px 12px rgba(0,0,0,0.06), ${glowShadow}`;
 
   function renderIcon() {
     if (link.is_custom_icon && link.icon_blob) {
       return (
-        <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl backdrop-blur-md transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
-          style={{
-            background: isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.1)",
-          }}
-        >
-          <img src={link.icon_blob} alt="" className="h-5 w-5 object-contain" />
-        </span>
+        <CustomLinkIcon
+          src={link.icon_blob}
+          alt={`Ícone de ${link.title}`}
+          className="size-9 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
+        />
       );
     }
 
     if (iconName && iconName !== "link") {
       return (
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl backdrop-blur-md transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105"
           style={{
             background: isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.1)",
           }}
@@ -78,7 +92,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
 
     return (
       <span
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl backdrop-blur-md transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105"
         style={{
           background: isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.1)",
         }}
@@ -116,16 +130,16 @@ export function PublicLinkButton({ link }: { link: Link }) {
         el.style.boxShadow = "";
         el.style.borderColor = "var(--ut-card-glass-border, rgba(255,255,255,0.2))";
       }}
-      className={`group relative flex items-center gap-3 px-4 py-3.5 transition-all duration-300 ${
+      className={`group relative flex items-center gap-3 px-4 py-3 transition-all duration-300 ${
         isShake ? "hover:animate-ut-shake" : ""
       }`}
       style={{
-        background: "var(--ut-link-bg, rgba(255,255,255,0.1))",
-        backdropFilter: "blur(14px) saturate(160%)",
-        WebkitBackdropFilter: "blur(14px) saturate(160%)",
-        borderRadius: "calc(var(--ut-card-radius, 1rem) - 4px)",
+        background: linkBackground,
+        backdropFilter: "blur(10px) saturate(145%)",
+        WebkitBackdropFilter: "blur(10px) saturate(145%)",
+        borderRadius,
         border: "1px solid var(--ut-card-glass-border, rgba(255,255,255,0.2))",
-        boxShadow: `0 4px 12px rgba(0,0,0,0.06), ${glowShadow}`,
+        boxShadow: styleGlow,
         color: "var(--ut-text-primary, #0b1829)",
       }}
     >

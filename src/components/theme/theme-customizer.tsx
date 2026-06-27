@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Loader2, Save } from "lucide-react";
 import { updateThemeAction } from "@/lib/actions/theme";
 import { type UserThemeConfig, DEFAULT_USER_THEME } from "@/types/database";
+import { mergeUserTheme } from "@/lib/profile-theme-presets";
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -45,7 +46,7 @@ function ToggleBtn({ selected, label, onClick }: ToggleBtnProps) {
 }
 
 export function ThemeCustomizer({ initial }: { initial: UserThemeConfig | null }) {
-  const [cfg, setCfg] = useState<UserThemeConfig>(initial ?? DEFAULT_USER_THEME);
+  const [cfg, setCfg] = useState<UserThemeConfig>(mergeUserTheme(initial));
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
 

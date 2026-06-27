@@ -1,13 +1,7 @@
 "use client";
 
 import { ThemeContext } from "@/hooks/use-theme-context";
-import { DEFAULT_USER_THEME, type UserThemeConfig } from "@/types/database";
-
-function hexToRgb(hex: string) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return { r: 255, g: 255, b: 255 };
-  return { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) };
-}
+import type { UserThemeConfig } from "@/types/database";
 
 const glassStyles: Record<string, { bg: string; border: string; shadow: string }> = {
   dark:    { bg: "rgba(4,12,30,0.5)",     border: "rgba(50,100,220,0.25)",  shadow: "0 8px 32px rgba(0,0,0,0.6)" },
@@ -26,20 +20,25 @@ const galaxyBg: Record<string, string> = {
 export function ThemeProviderShell({
   theme,
   children,
+  compact = false,
 }: {
   theme: UserThemeConfig | null;
   children: React.ReactNode;
+  compact?: boolean;
 }) {
   const t = theme;
   if (!t) {
     return <>{children}</>;
   }
 
-  const glass = glassStyles[t.card_glass_style] ?? glassStyles.dark;
+  const profileGlassStyle =
+    t.profile_card_style === "aero"
+      ? "frosted"
+      : t.profile_card_style === "neon"
+        ? "neon"
+        : t.profile_card_style;
+  const glass = glassStyles[profileGlassStyle] ?? glassStyles.light;
   const cardRgb = hexToRgb(t.card_color);
-  const bgRgb = hexToRgb(t.background_color);
-
-  const cardBg = `rgba(${cardRgb.r}, ${cardRgb.g}, ${cardRgb.b}, ${t.card_opacity / 100})`;
 
   let backgroundStyle: string;
   if (t.background_type === "galaxy") {
@@ -49,10 +48,6 @@ export function ThemeProviderShell({
   } else {
     backgroundStyle = t.background_color;
   }
-
-  const shadowStyle = t.card_shadow
-    ? `0 8px 32px rgba(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b}, 0.15)`
-    : "none";
 
   const linkBg = `rgba(${cardRgb.r}, ${cardRgb.g}, ${cardRgb.b}, ${Math.min(t.card_opacity + 30, 95) / 100})`;
 
@@ -82,12 +77,29 @@ export function ThemeProviderShell({
 
   return (
     <ThemeContext.Provider value={t}>
-      <div style={{ ...cssVars, background: "var(--ut-bg)", backgroundSize: "var(--ut-bg-size, 100%)", minHeight: "100vh" }}>
+      <div
+        style={{
+          ...cssVars,
+          background: "var(--ut-bg)",
+          backgroundSize: "var(--ut-bg-size, 100%)",
+          minHeight: compact ? undefined : "100vh",
+        }}
+      >
         {children}
         <style>{generateKeyframes(t)}</style>
       </div>
     </ThemeContext.Provider>
   );
+}
+
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return { r: 255, g: 255, b: 255 };
+  return {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16),
+  };
 }
 
 function getFontFamily(style: string): string {

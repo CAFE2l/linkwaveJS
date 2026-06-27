@@ -37,6 +37,7 @@ export async function updateThemeAction(
   }
 
   revalidatePath("/theme");
+  revalidatePath("/dashboard/customize");
   revalidatePath("/u/*");
   return { ok: true, message: "Tema salvo." };
 }

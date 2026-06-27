@@ -129,6 +129,12 @@ export async function uploadAvatarAction(
   const { supabase, userId } = await getCurrentUserId();
   const file = formData.get("file") as File;
   if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+    return { ok: false, message: "Use uma imagem PNG, JPEG ou WebP." };
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    return { ok: false, message: "O avatar deve ter no máximo 2MB." };
+  }
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
   const fileName = `avatars/${userId}.${ext}`;
@@ -156,8 +162,18 @@ export async function uploadAvatarAction(
     return { ok: false, message: "Erro ao salvar avatar." };
   }
 
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl })
+    .eq("user_id", userId);
+
+  if (profileError) {
+    return { ok: false, message: "Avatar enviado, mas não foi possível sincronizar o perfil." };
+  }
+
   revalidatePath("/profile");
   revalidatePath("/dashboard/customize");
+  revalidatePath("/u/*");
   return { ok: true, message: "Avatar atualizado.", url: avatarUrl ?? undefined };
 }
 
@@ -167,6 +183,12 @@ export async function uploadBannerAction(
   const { supabase, userId } = await getCurrentUserId();
   const file = formData.get("file") as File;
   if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+    return { ok: false, message: "Use uma imagem PNG, JPEG ou WebP." };
+  }
+  if (file.size > 4 * 1024 * 1024) {
+    return { ok: false, message: "O banner deve ter no máximo 4MB." };
+  }
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
   const fileName = `banners/${userId}.${ext}`;

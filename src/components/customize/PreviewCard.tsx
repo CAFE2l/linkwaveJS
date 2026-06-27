@@ -2,11 +2,18 @@
 
 import React from "react";
 import { Link2, User } from "lucide-react";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { AppUser, Link as DbLink } from "@/types/database";
 
 function PreviewLinkIcon({ link }: { link: Partial<DbLink> }) {
   if (link.is_custom_icon && link.icon_blob) {
-    return <img src={link.icon_blob} className="w-5 h-5 object-contain" alt="" />;
+    return (
+      <CustomLinkIcon
+        src={link.icon_blob}
+        alt={link.title ? `Ícone de ${link.title}` : "Ícone personalizado"}
+        className="size-5"
+      />
+    );
   }
   const name = link.icon || link.icone;
   if (name && name !== "link") {

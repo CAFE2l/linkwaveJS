@@ -8,7 +8,7 @@ export function ClickActivityChart({ data }: { data: DailyCount[] }) {
   const avg = data.length > 0 ? Math.round(total / data.length) : 0;
 
   return (
-    <div className="card p-6">
+    <div className="glass-card-strong p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-black text-foreground">Atividade de cliques</h2>

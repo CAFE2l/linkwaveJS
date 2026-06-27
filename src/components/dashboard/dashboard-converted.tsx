@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Avatar } from "@/components/ui/avatar";
 import { StatsCards } from "./stats-cards";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { AppUser, Link as DbLink } from "@/types/database";
 
 export default function DashboardConverted({ user, links: initialLinks, totalClicks: initialClicks }: {
@@ -864,7 +865,11 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                     }} />
                     {customIconDataUrl && (
                       <div className="mt-3 p-3 bg-green-50 border border-green-300 rounded-lg flex items-center gap-3">
-                        <img src={customIconDataUrl} className="w-16 h-16 object-cover rounded" />
+                        <CustomLinkIcon
+                          src={customIconDataUrl}
+                          className="size-16"
+                          alt="Prévia do ícone personalizado"
+                        />
                         <div className="flex-1">
                           <div className="text-xs font-bold">Imagem carregada</div>
                           <button onClick={(ev) => { ev.preventDefault(); setCustomIconDataUrl(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-xs text-red-600">Remover</button>
@@ -900,7 +905,13 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
                     <div className="drag-handle cursor-grab pr-2">☰</div>
                     <div className="icon-bubble">
                       {link.is_custom_icon ? (
-                        <img src={link.icon_blob || ''} alt={link.title || ''} />
+                        link.icon_blob ? (
+                          <CustomLinkIcon
+                            src={link.icon_blob}
+                            className="size-10"
+                            alt={`Ícone de ${link.title || "link"}`}
+                          />
+                        ) : null
                       ) : link.icone ? (
                         <IconImg name={String(link.icone)} className="w-8 h-8" alt={link.title || ''} />
                       ) : (

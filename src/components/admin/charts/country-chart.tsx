@@ -19,7 +19,7 @@ export function CountryChart({ data }: { data: CountryCount[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="card p-6">
+      <div className="glass-card-strong p-6">
         <div className="flex items-center gap-3 mb-4">
           <Globe size={20} className="text-fg-secondary" />
           <div>
@@ -32,7 +32,7 @@ export function CountryChart({ data }: { data: CountryCount[] }) {
   }
 
   return (
-    <div className="card p-6">
+    <div className="glass-card-strong p-6">
       <div className="flex items-center gap-3 mb-4">
         <Globe size={20} className="text-fg-secondary" />
         <div>

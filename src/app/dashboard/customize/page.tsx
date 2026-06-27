@@ -9,19 +9,24 @@ export default async function CustomizePage() {
   const { data: { user: authUser } } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
+  const [userResult, profileResult, linksResult] = await Promise.all([
+    supabase.from("users").select("*").eq("id", authUser.id).single(),
+    supabase.from("profiles").select("bio").eq("user_id", authUser.id).maybeSingle(),
+    supabase
+      .from("links")
+      .select("*")
+      .eq("user_id", authUser.id)
+      .order("order_position"),
+  ]);
 
+  const user = userResult.data;
   if (!user) redirect("/register");
 
-  const { data: links } = await supabase
-    .from("links")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .order("order_position");
-
-  return <CustomizePanel user={user} links={links ?? []} />;
+  return (
+    <CustomizePanel
+      user={user}
+      links={linksResult.data ?? []}
+      initialBio={profileResult.data?.bio ?? ""}
+    />
+  );
 }

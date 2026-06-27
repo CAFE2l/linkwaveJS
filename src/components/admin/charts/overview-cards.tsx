@@ -1,6 +1,6 @@
 "use client";
 
-import { Link2, MousePointerClick, TrendingDown, TrendingUp, Users } from "lucide-react";
+import { Activity, CalendarDays, Link2, MousePointerClick, TrendingDown, TrendingUp, Users } from "lucide-react";
 
 function DeltaBadge({ value }: { value: number }) {
   if (value === 0) return null;
@@ -17,27 +17,36 @@ function DeltaBadge({ value }: { value: number }) {
 
 export function OverviewCards({
   totalUsers,
+  activeUsers,
   totalLinks,
   totalClicks,
+  clicksToday,
+  clicksLast30Days,
   totalClicksDelta,
 }: {
   totalUsers: number;
+  activeUsers: number;
   totalLinks: number;
   totalClicks: number;
+  clicksToday: number;
+  clicksLast30Days: number;
   totalClicksDelta: number;
 }) {
   const stats = [
     { label: "Usuários", value: totalUsers, icon: Users, delta: 0, color: "text-blue-600 dark:text-blue-400" },
+    { label: "Usuários ativos", value: activeUsers, icon: Activity, delta: 0, color: "text-cyan-600 dark:text-cyan-400" },
     { label: "Links", value: totalLinks, icon: Link2, delta: 0, color: "text-emerald-600 dark:text-emerald-400" },
-    { label: "Cliques (30d)", value: totalClicks, icon: MousePointerClick, delta: totalClicksDelta, color: "text-violet-600 dark:text-violet-400" },
+    { label: "Acessos hoje", value: clicksToday, icon: CalendarDays, delta: 0, color: "text-amber-600 dark:text-amber-400" },
+    { label: "Acessos (30d)", value: clicksLast30Days, icon: MousePointerClick, delta: totalClicksDelta, color: "text-violet-600 dark:text-violet-400" },
+    { label: "Acessos totais", value: totalClicks, icon: MousePointerClick, delta: 0, color: "text-fuchsia-600 dark:text-fuchsia-400" },
   ];
 
   return (
-    <div className="grid gap-5 sm:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <div key={stat.label} className="card p-6">
+          <div key={stat.label} className="glass-card-strong p-5">
             <div className="flex items-start justify-between">
               <div className={`rounded-xl bg-surface-hover p-2.5 ${stat.color}`}>
                 <Icon size={22} />

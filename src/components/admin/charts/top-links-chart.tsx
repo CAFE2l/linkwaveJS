@@ -6,7 +6,7 @@ import type { TopLink } from "@/lib/actions/analytics";
 export function TopLinksChart({ data }: { data: TopLink[] }) {
   if (data.length === 0) {
     return (
-      <div className="card p-6">
+      <div className="glass-card-strong p-6">
         <h2 className="text-lg font-black text-foreground mb-1">Links mais clicados</h2>
         <p className="text-sm text-fg-secondary">Nenhum dado de clique disponível.</p>
       </div>
@@ -22,7 +22,7 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
   }));
 
   return (
-    <div className="card p-6">
+    <div className="glass-card-strong p-6">
       <h2 className="text-lg font-black text-foreground mb-1">Links mais clicados</h2>
       <p className="text-sm text-fg-secondary mb-4">Top 10 links por número de cliques</p>
       <div className="h-72">

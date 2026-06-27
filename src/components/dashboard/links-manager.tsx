@@ -22,6 +22,7 @@ import { LinkForm } from "@/components/dashboard/link-form";
 import { EditLinkModal, DeleteLinkModal } from "@/components/dashboard/edit-modal";
 import { useToast } from "@/components/dashboard/toast";
 import { IconImage } from "@/components/dashboard/icon-image";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { Link } from "@/types/database";
 
 const FALLBACK_STYLES: Record<string, string> = {
@@ -46,7 +47,17 @@ function getFallbackStyle(icon: string | null): string {
   return FALLBACK_STYLES[key] ?? "linear-gradient(135deg, #38bdf8, #0284c7)";
 }
 
-function IconDisplay({ icon }: { icon: string | null }) {
+function IconDisplay({ link }: { link: Link }) {
+  if (link.is_custom_icon && link.icon_blob) {
+    return (
+      <CustomLinkIcon
+        src={link.icon_blob}
+        alt={`Ícone de ${link.title}`}
+        className="size-10"
+      />
+    );
+  }
+  const icon = link.icon || link.icone;
   if (!icon || icon === "link") {
     return (
       <div
@@ -259,7 +270,7 @@ function SortableLink({
           <GripVertical size={18} />
         </button>
 
-        <IconDisplay icon={link.icon} />
+        <IconDisplay link={link} />
 
         <div className="min-w-0 flex-1">
           <div className="truncate font-black text-ocean">{link.title}</div>

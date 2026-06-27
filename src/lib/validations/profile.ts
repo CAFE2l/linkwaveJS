@@ -3,8 +3,14 @@ import { usernameSchema } from "./auth";
 
 export const profileSchema = z.object({
   username: usernameSchema,
+  name: z
+    .string()
+    .trim()
+    .min(2, "Informe um nome com pelo menos 2 caracteres.")
+    .max(60, "O nome deve ter no máximo 60 caracteres."),
   bio: z.string().max(180, "A bio deve ter no máximo 180 caracteres.").optional(),
   avatarUrl: z.string().url("Informe uma URL válida.").optional().or(z.literal("")),
+  bannerUrl: z.string().url("Informe uma URL válida.").optional().or(z.literal("")),
   theme: z.enum(["wave", "midnight", "minimal", "aurora"]),
 });
 
@@ -22,6 +28,18 @@ export const reorderLinksSchema = z.object({
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Cor inválida");
 
 export const userThemeSchema = z.object({
+  theme_id: z.enum([
+    "default_aero",
+    "galaxy_led",
+    "ocean_glass",
+    "mint_aero",
+    "dark_neon",
+    "default",
+    "ocean",
+    "mint",
+    "purple",
+    "dark",
+  ]),
   background_type: z.enum(["solid", "gradient", "galaxy"]),
   background_color: hexColor,
   background_gradient_start: hexColor,
@@ -35,6 +53,8 @@ export const userThemeSchema = z.object({
   card_border_radius: z.number().min(0).max(48),
   card_shadow: z.boolean(),
   card_glass_style: z.enum(["dark", "light", "frosted", "neon"]),
+  banner_style: z.enum(["glass", "dimensional", "minimal", "led"]),
+  profile_card_style: z.enum(["light", "dark", "aero", "neon"]),
   text_color_primary: hexColor,
   text_color_secondary: hexColor,
   button_color: hexColor,
@@ -42,7 +62,12 @@ export const userThemeSchema = z.object({
   border_color: hexColor,
   link_glow_color: hexColor,
   link_hover_effect: z.enum(["lift", "glow", "scale", "shake", "none"]),
+  link_style: z.enum(["rounded", "pill", "glass", "led"]),
   transition_effect: z.enum(["none", "fade", "slide", "zoom", "float"]),
+  enable_animations: z.boolean(),
+  enable_background_bubbles: z.boolean(),
+  enable_led_glow: z.boolean(),
+  enable_particles: z.boolean(),
   font_style: z.enum(["space", "nunito", "mono", "serif"]),
   avatar_led_color: hexColor,
   avatar_ring_style: z.enum(["gradient", "solid", "none"]),

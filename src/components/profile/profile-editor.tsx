@@ -20,7 +20,14 @@ export function ProfileEditor({ user, initialBio = "" }: { user: AppUser; initia
 
   function handleSave() {
     startSave(async () => {
-      const result = await updateProfileAction({ username, bio, avatarUrl: avatarPreview ?? "" });
+      const result = await updateProfileAction({
+        username,
+        name: user.name || username,
+        bio,
+        avatarUrl: avatarPreview ?? "",
+        bannerUrl: bannerPreview ?? user.banner_url ?? "",
+        theme: "wave",
+      });
       setMsg(result.message);
     });
   }

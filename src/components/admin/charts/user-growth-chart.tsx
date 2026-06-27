@@ -7,7 +7,7 @@ export function UserGrowthChart({ data }: { data: DailyCount[] }) {
   const total = data.reduce((s, d) => s + d.count, 0);
 
   return (
-    <div className="card p-6">
+    <div className="glass-card-strong p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-black text-foreground">Crescimento de usuários</h2>

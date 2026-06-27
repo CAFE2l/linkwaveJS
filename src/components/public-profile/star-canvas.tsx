@@ -17,6 +17,7 @@ export function StarCanvas() {
     let shooters: Shooter[] = [];
     let t = 0;
     let rafId: number;
+    let shooterTimeout: ReturnType<typeof setTimeout>;
 
     type Star = { x: number; y: number; r: number; base: number; spd: number; ph: number; blue: boolean };
     type Shooter = { x: number; y: number; len: number; spd: number; alpha: number; ang: number };
@@ -53,7 +54,7 @@ export function StarCanvas() {
     }
 
     function scheduleShooter() {
-      setTimeout(() => {
+      shooterTimeout = setTimeout(() => {
         spawnShooter();
         scheduleShooter();
       }, 2000 + Math.random() * 5000);
@@ -102,6 +103,7 @@ export function StarCanvas() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      clearTimeout(shooterTimeout);
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -109,7 +111,7 @@ export function StarCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none decoration-canvas absolute inset-0 z-[-1]"
+      className="pointer-events-none absolute inset-0 z-[1]"
     />
   );
 }

@@ -8,6 +8,13 @@ import { profileSchema } from "@/lib/validations/profile";
 type ActionState = {
   ok: boolean;
   message: string;
+  profile?: {
+    name: string;
+    username: string;
+    bio: string;
+    avatarUrl: string;
+    bannerUrl: string;
+  };
 };
 
 export async function updateProfileAction(
@@ -27,7 +34,7 @@ export async function updateProfileAction(
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { username, avatarUrl, bio } = parsed.data;
+  const { username, name, avatarUrl, bannerUrl, bio, theme } = parsed.data;
 
   const { data: existing } = await supabase
     .from("users")
@@ -42,8 +49,9 @@ export async function updateProfileAction(
 
   const { error: userError } = await supabase.from("users").update({
     username,
-    name: username,
+    name,
     avatar_url: avatarUrl || null,
+    banner_url: bannerUrl || null,
   }).eq("id", authUser.id);
 
   if (userError) {
@@ -52,13 +60,13 @@ export async function updateProfileAction(
 
   const { error: profileError } = await supabase.from("profiles").upsert({
     user_id: authUser.id,
-    name: username,
+    name,
     username,
     email: authUser.email ?? "",
     avatar_url: avatarUrl || null,
     active: true,
     bio: bio || null,
-    theme: "wave",
+    theme,
     custom_colors: {},
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id", ignoreDuplicates: false });
@@ -68,6 +76,17 @@ export async function updateProfileAction(
   }
 
   revalidatePath("/profile");
+  revalidatePath("/dashboard/customize");
   revalidatePath(`/u/${username}`);
-  return { ok: true, message: "Perfil atualizado." };
+  return {
+    ok: true,
+    message: "Perfil atualizado.",
+    profile: {
+      name,
+      username,
+      bio: bio ?? "",
+      avatarUrl: avatarUrl ?? "",
+      bannerUrl: bannerUrl ?? "",
+    },
+  };
 }

@@ -3,11 +3,18 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { GripVertical, Link2, Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { Reorder, motion } from "framer-motion";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { Link as DbLink } from "@/types/database";
 
 function LinkIcon({ link }: { link: DbLink }) {
   if (link.is_custom_icon && link.icon_blob) {
-    return <img src={link.icon_blob} className="w-7 h-7 object-contain" alt="" />;
+    return (
+      <CustomLinkIcon
+        src={link.icon_blob}
+        alt={`Ícone de ${link.title}`}
+        className="size-7"
+      />
+    );
   }
   const name = link.icon || link.icone;
   if (name && name !== "link") {

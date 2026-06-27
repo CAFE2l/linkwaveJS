@@ -36,8 +36,9 @@ export function AvatarUpload({
     const res = await uploadAvatarAction(fd);
     setPending(false);
 
-    if (res.ok) {
-      onUpdate(user.avatar_url ?? "");
+    if (res.ok && res.url) {
+      setPreview(null);
+      onUpdate(res.url);
     } else {
       setError(res.message);
     }

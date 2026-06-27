@@ -188,6 +188,17 @@ export type LandingStats = {
 };
 
 export type UserThemeConfig = {
+  theme_id:
+    | "default_aero"
+    | "galaxy_led"
+    | "ocean_glass"
+    | "mint_aero"
+    | "dark_neon"
+    | "default"
+    | "ocean"
+    | "mint"
+    | "purple"
+    | "dark";
   background_type: "solid" | "gradient" | "galaxy";
   background_color: string;
   background_gradient_start: string;
@@ -201,6 +212,8 @@ export type UserThemeConfig = {
   card_border_radius: number;
   card_shadow: boolean;
   card_glass_style: "dark" | "light" | "frosted" | "neon";
+  banner_style: "glass" | "dimensional" | "minimal" | "led";
+  profile_card_style: "light" | "dark" | "aero" | "neon";
   text_color_primary: string;
   text_color_secondary: string;
   button_color: string;
@@ -208,7 +221,12 @@ export type UserThemeConfig = {
   border_color: string;
   link_glow_color: string;
   link_hover_effect: "lift" | "glow" | "scale" | "shake" | "none";
+  link_style: "rounded" | "pill" | "glass" | "led";
   transition_effect: "none" | "fade" | "slide" | "zoom" | "float";
+  enable_animations: boolean;
+  enable_background_bubbles: boolean;
+  enable_led_glow: boolean;
+  enable_particles: boolean;
   font_style: "space" | "nunito" | "mono" | "serif";
   avatar_led_color: string;
   avatar_ring_style: "gradient" | "solid" | "none";
@@ -217,10 +235,11 @@ export type UserThemeConfig = {
 };
 
 export const DEFAULT_USER_THEME: UserThemeConfig = {
+  theme_id: "default_aero",
   background_type: "gradient",
-  background_color: "#0b1a30",
-  background_gradient_start: "#1a2a6c",
-  background_gradient_end: "#0f1a3a",
+  background_color: "#8ee8d8",
+  background_gradient_start: "#a7f3d0",
+  background_gradient_end: "#38bdf8",
   background_effect: "none",
   galaxy_theme: "milkyway",
   enable_stars: true,
@@ -229,16 +248,23 @@ export const DEFAULT_USER_THEME: UserThemeConfig = {
   card_blur: 14,
   card_border_radius: 28,
   card_shadow: false,
-  card_glass_style: "dark",
-  text_color_primary: "#ffffff",
-  text_color_secondary: "#94a3b8",
+  card_glass_style: "light",
+  banner_style: "glass",
+  profile_card_style: "aero",
+  text_color_primary: "#0b4770",
+  text_color_secondary: "#31769a",
   button_color: "#0ea5e9",
   button_glow: true,
   border_color: "#ffffff",
   link_glow_color: "#00B4D8",
   link_hover_effect: "lift",
-  transition_effect: "float",
-  font_style: "space",
+  link_style: "glass",
+  transition_effect: "fade",
+  enable_animations: true,
+  enable_background_bubbles: true,
+  enable_led_glow: true,
+  enable_particles: false,
+  font_style: "nunito",
   avatar_led_color: "#4CAF50",
   avatar_ring_style: "gradient",
   banner_led_color: "#ffffff",

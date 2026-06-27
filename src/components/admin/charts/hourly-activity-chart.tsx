@@ -10,7 +10,7 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
   const peak = [...data].sort((a, b) => b.count - a.count)[0];
 
   return (
-    <div className="card p-6">
+    <div className="glass-card-strong p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-black text-foreground">Atividade por hora</h2>

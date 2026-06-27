@@ -13,14 +13,17 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-black text-foreground">Visão geral</h1>
-        <p className="mt-1 text-sm text-fg-secondary">Métricas e análises da plataforma LinkWave.</p>
+        <h1 className="text-3xl font-black text-ocean">Visão geral</h1>
+        <p className="mt-1 text-sm font-semibold text-ocean/60">Métricas operacionais e atividade da plataforma LinkWave.</p>
       </div>
 
       <OverviewCards
         totalUsers={data.totalUsers}
+        activeUsers={data.activeUsers}
         totalLinks={data.totalLinks}
         totalClicks={data.totalClicks}
+        clicksToday={data.clicksToday}
+        clicksLast30Days={data.clicksLast30Days}
         totalClicksDelta={data.totalClicksDelta}
       />
 

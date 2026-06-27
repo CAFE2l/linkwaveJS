@@ -9,11 +9,11 @@ export default async function AdminThemesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-foreground">Temas</h1>
-        <p className="mt-1 text-sm text-muted">{themes.length} usuário(s) com tema personalizado.</p>
+        <h1 className="text-3xl font-black text-ocean">Temas personalizados</h1>
+        <p className="mt-1 text-sm font-semibold text-ocean/60">{themes.length} usuário(s) com personalização ativa.</p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-[rgba(0,180,255,0.06)] dark:bg-[rgba(3,10,25,0.5)]">
+      <div className="glass-card-strong overflow-hidden">
         <AdminThemesTable themes={themes} />
       </div>
     </div>

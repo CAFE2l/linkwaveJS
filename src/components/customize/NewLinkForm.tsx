@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link2, Upload, X } from "lucide-react";
 import IconGrid from "./IconGrid";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { Link as DbLink } from "@/types/database";
 
 export default function NewLinkForm({
@@ -125,7 +126,11 @@ export default function NewLinkForm({
             <div>
               {customDataUrl ? (
                 <div className="flex items-center gap-3 p-3 rounded-xl border border-white/60 bg-white/30 backdrop-blur-sm">
-                  <img src={customDataUrl} className="w-10 h-10 rounded-lg object-contain" alt="icon preview" />
+                  <CustomLinkIcon
+                    src={customDataUrl}
+                    className="size-10"
+                    alt="Prévia do ícone personalizado"
+                  />
                   <span className="text-sm text-ocean flex-1">Ícone selecionado</span>
                   <button
                     type="button"
@@ -149,7 +154,13 @@ export default function NewLinkForm({
         {(title || iconSrc) && (
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white/30 backdrop-blur-sm border border-white/60">
             <div className="w-9 h-9 rounded-lg bg-white/40 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {iconSrc ? (
+              {iconMode === "custom" && customDataUrl ? (
+                <CustomLinkIcon
+                  src={customDataUrl}
+                  className="size-9"
+                  alt={title ? `Ícone de ${title}` : "Ícone personalizado"}
+                />
+              ) : iconSrc ? (
                 <img src={iconSrc} className="w-7 h-7 object-contain" alt="" />
               ) : (
                 <Link2 size={16} className="text-ocean/60" />

@@ -12,7 +12,7 @@ import { NewFeaturesSection } from "@/components/landing/new-features-section";
 import { NewCTASection } from "@/components/landing/new-cta-section";
 import { NewFooter } from "@/components/landing/new-footer";
 import { Showcase } from "@/components/landing/showcase";
-import { Testimonials } from "@/components/landing/testimonials";
+
 import { FAQ } from "@/components/landing/faq";
 
 import { BlobBackground } from "@/components/landing/blob-background";
@@ -63,7 +63,7 @@ export default async function Home() {
         <BlobBackground />
         <div className="relative z-10">
           <NewNavbar isLoggedIn={isLoggedIn} />
-          <NewHeroSection isLoggedIn={isLoggedIn} stats={stats} />
+          <NewHeroSection isLoggedIn={isLoggedIn} />
           <div className="mx-auto max-w-5xl px-5">
             <div className="glass-divider" />
           </div>
@@ -79,10 +79,7 @@ export default async function Home() {
           <div className="mx-auto max-w-5xl px-5">
             <div className="glass-divider" />
           </div>
-          <Testimonials />
-          <div className="mx-auto max-w-5xl px-5">
-            <div className="glass-divider" />
-          </div>
+
           <FAQ />
           <div className="mx-auto max-w-5xl px-5">
             <div className="glass-divider" />

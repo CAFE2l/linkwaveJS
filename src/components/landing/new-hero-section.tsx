@@ -3,29 +3,24 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { MotionReveal } from "@/components/shared/motion-reveal";
-import { ArrowRight, CheckCircle2, UserPlus } from "lucide-react";
-import type { LandingStats } from "@/types/database";
+import { ArrowRight, CheckCircle2, UserPlus, Eye, MousePointerClick, LayoutGrid } from "lucide-react";
 
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M+`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(".0", "")}k+`;
-  return `${n}+`;
-}
+const demoStats = [
+  { label: "Usuários", value: "12.5k" },
+  { label: "Cliques", value: "4.8k" },
+  { label: "Satisfação", value: "98%" },
+  { label: "Personalizável", value: "100%" },
+];
 
-export function NewHeroSection({
-  isLoggedIn,
-  stats,
-}: {
-  isLoggedIn: boolean;
-  stats: LandingStats;
-}) {
-  const statEntries = [
-    { label: "Usuários", value: formatNumber(stats.totalUsers) },
-    { label: "Cliques", value: formatNumber(stats.totalClicks) },
-    { label: "Satisfação", value: `${stats.satisfaction}%` },
-    { label: "Personalizável", value: "100%" },
-  ];
+const phoneLinks = [
+  { name: "Instagram", icon: "/imgs/icons/links/Instagram.png" },
+  { name: "YouTube", icon: "/imgs/icons/links/Youtube.png" },
+  { name: "Meu Site", icon: "/imgs/icons/links/Google Chrome.png" },
+  { name: "WhatsApp", icon: "/imgs/icons/links/Whatsapp.png" },
+  { name: "Portfólio", icon: "/imgs/icons/links/Discord.png" },
+];
 
+export function NewHeroSection({ isLoggedIn }: { isLoggedIn: boolean; stats?: unknown }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
 
@@ -33,41 +28,54 @@ export function NewHeroSection({
     const container = containerRef.current;
     const tilt = tiltRef.current;
     if (!container || !tilt) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     let rafId: number;
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
+    let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+    let isHovering = false, isLeaving = false;
+    const MAX_TILT = 18;
+
+    const applyTilt = () => {
+      if (isLeaving) { rafId = 0; return; }
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+      tilt.style.transform = `perspective(800px) rotateX(${currentX}deg) rotateY(${currentY}deg) scale3d(1.02,1.02,1.02)`;
+      if (Math.abs(currentX - targetX) > 0.01 || Math.abs(currentY - targetY) > 0.01 || isHovering) {
+        rafId = requestAnimationFrame(applyTilt);
+      } else {
+        rafId = 0;
+      }
+    };
 
     const onMouseMove = (e: MouseEvent) => {
+      if (!isHovering) return;
       const rect = container.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = (e.clientY - rect.top) / rect.height;
-      targetX = (y - 0.5) * -14;
-      targetY = (x - 0.5) * 14;
+      targetY = (x - 0.5) * MAX_TILT * 1.4;
+      targetX = (y - 0.5) * -MAX_TILT;
+      if (!rafId) rafId = requestAnimationFrame(applyTilt);
     };
 
+    const onMouseEnter = () => { isHovering = true; isLeaving = false; };
     const onMouseLeave = () => {
-      targetX = 0;
-      targetY = 0;
+      isHovering = false; isLeaving = true;
+      targetX = 0; targetY = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      tilt.style.transition = "transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)";
+      tilt.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+      setTimeout(() => { tilt.style.transition = ""; isLeaving = false; }, 1000);
     };
 
-    const animate = () => {
-      currentX += (targetX - currentX) * 0.08;
-      currentY += (targetY - currentY) * 0.08;
-      tilt.style.transform = `perspective(1000px) rotateX(${currentX}deg) rotateY(${currentY}deg)`;
-      rafId = requestAnimationFrame(animate);
-    };
-
+    container.addEventListener("mouseenter", onMouseEnter);
     container.addEventListener("mousemove", onMouseMove);
     container.addEventListener("mouseleave", onMouseLeave);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
+      container.removeEventListener("mouseenter", onMouseEnter);
       container.removeEventListener("mousemove", onMouseMove);
       container.removeEventListener("mouseleave", onMouseLeave);
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -133,35 +141,54 @@ export function NewHeroSection({
                     height={938}
                     priority
                   />
-                  <div className="phone-screen">
-                    <div className="relative w-11 h-11 mx-auto mb-2 z-[2]">
-                      <div className="absolute inset-0 rounded-full ring-2 ring-cyan-400/60 ring-offset-2 ring-offset-white/20 shadow-[0_0_10px_rgba(56,189,248,0.35)]" />
-                      <div className="w-full h-full rounded-full overflow-hidden">
-                        <Image
-                          src="/imgs/essentials/profile.jpg"
-                          alt="Avatar"
-                          className="w-full h-full object-cover"
-                          width={44}
-                          height={44}
-                        />
-                      </div>
+                  <div className="phone-screen cosmic-page">
+                    <div className="cosmic-banner">
+                      <Image src="/imgs/banners/linkwave.png" alt="Banner" width={300} height={120} className="w-full h-full object-cover" />
+                      <span />
                     </div>
-                    <p className="phone-name">itsluca.s</p>
-                    <p className="phone-bio">criador digital</p>
-                    <div className="phone-links">
-                      {[
-                        { label: "Instagram", color: "from-pink-400 to-purple-500" },
-                        { label: "YouTube", color: "from-red-500 to-red-600" },
-                        { label: "Meu Site", color: "from-blue-500 to-cyan-500" },
-                        { label: "Portfólio", color: "from-green-400 to-emerald-500" },
-                      ].map((l) => (
-                        <div key={l.label} className="phone-link-item">
-                          <div className="phone-link-dot" style={{ background: `linear-gradient(135deg, ${l.color.replace("from-", "").replace(" to-", ",")})` }} />
-                          {l.label}
+
+                    <div className="cosmic-profile">
+                      <Image src="/imgs/essentials/profile.jpg" alt="Avatar" width={56} height={56} />
+                    </div>
+
+                    <p className="cosmic-title">itsluca.s</p>
+                    <p className="cosmic-bio">criador digital · compartilhando ideias e código</p>
+
+                    <div className="cosmic-links">
+                      {phoneLinks.map((link) => (
+                        <div key={link.name} className="cosmic-link">
+                          <Image src={link.icon} alt="" width={18} height={18} />
+                          <span>{link.name}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="phone-badge">LinkWave — sua página de links</div>
+
+                    <div className="cosmic-analytics">
+                      <div className="cosmic-analytics-header">
+                        <span className="cosmic-analytics-title">Visitas (últimos 7 dias)</span>
+                      </div>
+                      <div className="cosmic-mini-chart">
+                        {[40, 65, 35, 80, 55, 90, 70].map((h, i) => (
+                          <div key={i} className="cosmic-bar" style={{ height: `${h}%` }} />
+                        ))}
+                      </div>
+                      <div className="cosmic-stats-row">
+                        <div className="cosmic-stat">
+                          <Eye size={10} />
+                          <span>2.4k</span>
+                        </div>
+                        <div className="cosmic-stat">
+                          <MousePointerClick size={10} />
+                          <span>890</span>
+                        </div>
+                        <div className="cosmic-stat">
+                          <LayoutGrid size={10} />
+                          <span>5</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="cosmic-footer">LinkWave — sua página de links</div>
                   </div>
                 </div>
               </div>
@@ -171,7 +198,7 @@ export function NewHeroSection({
 
         <MotionReveal delay={0.4} className="mt-20">
           <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-            {statEntries.map((s) => (
+            {demoStats.map((s) => (
               <div key={s.label} className="glass-stat">
                 <p className="text-2xl font-black text-ocean-light">{s.value}</p>
                 <p className="mt-0.5 text-xs font-bold text-muted uppercase tracking-wider">{s.label}</p>

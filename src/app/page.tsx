@@ -13,7 +13,7 @@ import { NewCTASection } from "@/components/landing/new-cta-section";
 import { NewFooter } from "@/components/landing/new-footer";
 import { Showcase } from "@/components/landing/cosmic-profile-preview";
 
-import { FAQ } from "@/components/landing/faq";
+import { FAQ } from "@/components/landing/faq-terminal";
 
 import { BlobBackground } from "@/components/landing/blob-background";
 import { ThemeProvider } from "@/components/landing/theme-provider";

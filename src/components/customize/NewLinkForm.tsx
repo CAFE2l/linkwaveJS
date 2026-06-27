@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link2, Upload, X } from "lucide-react";
 import IconGrid from "./IconGrid";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
+import { getIconFromUrl } from "@/lib/utils/url-to-icon";
 import type { Link as DbLink } from "@/types/database";
 
 export default function NewLinkForm({
@@ -34,6 +35,17 @@ export default function NewLinkForm({
       icon_blob: customDataUrl || undefined,
     });
   }, [title, url, selectedIcon, customDataUrl]);
+
+  const userSetIcon = useRef(false);
+
+  useEffect(() => {
+    if (userSetIcon.current) return;
+    if (!url || url.trim().length < 4) return;
+    const detected = getIconFromUrl(url);
+    if (detected && detected !== selectedIcon && iconMode === "predefined") {
+      setSelectedIcon(detected);
+    }
+  }, [url, selectedIcon, iconMode]);
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -121,7 +133,7 @@ export default function NewLinkForm({
           </div>
 
           {iconMode === "predefined" ? (
-            <IconGrid icons={icons} onSelect={setSelectedIcon} selectedKey={selectedIcon} />
+            <IconGrid icons={icons} onSelect={(v) => { userSetIcon.current = true; setSelectedIcon(v); }} selectedKey={selectedIcon} />
           ) : (
             <div>
               {customDataUrl ? (

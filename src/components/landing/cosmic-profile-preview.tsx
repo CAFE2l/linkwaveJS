@@ -154,40 +154,57 @@ export function Showcase() {
       </div>
 
       <div className="grid md:grid-cols-7 gap-8 items-start">
+        {/* Desktop Preview */}
         <div className="md:col-span-4">
           <div className="glass-card-strong p-4 md:p-5">
             <div className="flex items-center gap-2 mb-3">
               <Monitor size={15} className="text-ocean-light" />
               <span className="text-xs font-bold text-ocean-light uppercase tracking-wider">Desktop</span>
             </div>
-            <div className="cosmic-preview-wrapper">
-              <CosmicProfileDesktop />
+            <div className="flex justify-center py-4">
+              <div className="monitor-container">
+                <div className="monitor-glow-bg" />
+                <div className="monitor-tilt">
+                  <div className="monitor-body">
+                    <div className="monitor-screen">
+                      <CosmicProfileDesktop />
+                    </div>
+                    <Image
+                      src="/imgs/essentials/monitor.png"
+                      alt="Monitor"
+                      width={358}
+                      height={296}
+                      className="monitor-frame"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Mobile Preview */}
         <div className="md:col-span-3 flex justify-center md:justify-start">
           <div className="glass-card-strong p-4 md:p-5 w-full">
             <div className="flex items-center gap-2 mb-3">
               <Smartphone size={15} className="text-ocean-light" />
               <span className="text-xs font-bold text-ocean-light uppercase tracking-wider">Mobile</span>
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center py-4">
               <div className="phone-container-sm">
-                <div className="phone-glow-sm" />
+                <div className="phone-glow-bg-sm" />
                 <div className="phone-tilt-sm">
-                  <div className="phone-wrap-sm">
-                    <div className="phone-light-sweep-sm" />
-                    <Image
-                      src="/imgs/essentials/frame.png"
-                      alt="Phone frame"
-                      className="phone-frame-sm"
-                      width={500}
-                      height={938}
-                    />
+                  <div className="phone-body-sm">
                     <div className="phone-screen-sm">
                       <CosmicProfileMobile />
                     </div>
+                    <Image
+                      src="/imgs/essentials/frame.png"
+                      alt="Phone"
+                      width={500}
+                      height={938}
+                      className="phone-frame-sm"
+                    />
                   </div>
                 </div>
               </div>
@@ -196,6 +213,7 @@ export function Showcase() {
         </div>
       </div>
 
+      {/* Full Icon Library */}
       <div className="mt-16">
         <div className="glass-card-strong p-5 md:p-7">
           <div className="text-center mb-8">

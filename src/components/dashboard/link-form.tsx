@@ -1,12 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { Loader2, Link2, Plus, Save } from "lucide-react";
 import { upsertLinkAction } from "@/lib/actions/dashboard";
 import { linkSchema, type LinkInput } from "@/lib/validations/profile";
 import { IconPicker } from "@/components/dashboard/icon-picker";
+import { getIconFromUrl } from "@/lib/utils/url-to-icon";
 import type { Link } from "@/types/database";
 
 export function LinkForm({
@@ -29,11 +30,32 @@ export function LinkForm({
     },
   });
 
+  const urlValue = useWatch({ control: form.control, name: "url" });
+  const iconValue = useWatch({ control: form.control, name: "icon" });
+  const userSetIcon = useRef(Boolean(link?.icon && link.icon !== "link"));
+
+  useEffect(() => {
+    if (userSetIcon.current) return;
+    if (!urlValue || urlValue.trim().length < 4) return;
+    const detected = getIconFromUrl(urlValue);
+    if (detected && detected !== iconValue) {
+      form.setValue("icon", detected, { shouldValidate: true });
+    }
+  }, [urlValue, iconValue, form]);
+
+  function onIconChange(val: string) {
+    userSetIcon.current = true;
+    form.setValue("icon", val, { shouldValidate: true });
+  }
+
   function onSubmit(values: LinkInput) {
     startTransition(async () => {
       const result = await upsertLinkAction(values);
       if (result.ok) {
-        if (!link) form.reset({ title: "", url: "", icon: "link" });
+        if (!link) {
+        form.reset({ title: "", url: "", icon: "link" });
+        userSetIcon.current = false;
+      }
         // prefer returning the created/updated record when available
         if (result.link) {
           onSaved?.(result.link);
@@ -81,7 +103,7 @@ export function LinkForm({
       </div>
       <IconPicker
         value={form.watch("icon") ?? "link"}
-        onChange={(val) => form.setValue("icon", val, { shouldValidate: true })}
+        onChange={onIconChange}
       />
       <button
         type="submit"

@@ -1294,7 +1294,9 @@ button, a, input, textarea {
 }
 
 
-/* ─── Mobile Phone Container (Showcase) ─── */
+/* ─── Device Mockups ─── */
+
+/* ── Phone Mockup ── */
 .phone-container-sm {
   position: relative;
   width: 200px;
@@ -1302,26 +1304,49 @@ button, a, input, textarea {
   margin: 0 auto;
 }
 
+.phone-glow-bg-sm {
+  position: absolute;
+  inset: -8px;
+  border-radius: 40px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.08), transparent 70%);
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(-1px);
+}
+
 .phone-tilt-sm {
   position: relative;
   width: 100%;
   height: 100%;
   perspective: 600px;
+  z-index: 1;
 }
 
-.phone-wrap-sm {
+.phone-body-sm {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 32px;
-  overflow: hidden;
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-.phone-tilt-sm:hover .phone-wrap-sm {
+.phone-tilt-sm:hover .phone-body-sm {
   transform: rotateY(-6deg) rotateX(4deg);
+}
+
+.phone-screen-sm {
+  position: absolute;
+  /* precise screen bounds from pixel analysis:
+     frame: 500x938, screen: x=71-428, y=131-806 */
+  top: 14%;
+  left: 14.2%;
+  width: 71.4%;
+  height: 72%;
+  overflow: hidden;
+  border-radius: 6% / 5%;
+  z-index: 1;
 }
 
 .phone-frame-sm {
@@ -1334,34 +1359,66 @@ button, a, input, textarea {
   pointer-events: none;
 }
 
-.phone-screen-sm {
-  position: absolute;
-  top: 8.5%;
-  left: 10.5%;
-  width: 79%;
-  height: 82%;
-  overflow: hidden;
-  border-radius: 4px;
-  z-index: 1;
+/* ── Desktop Monitor Mockup ── */
+.monitor-container {
+  position: relative;
+  width: 280px;
+  height: 232px;
+  margin: 0 auto;
 }
 
-.phone-glow-sm {
+.monitor-glow-bg {
   position: absolute;
-  inset: -4px;
-  border-radius: 36px;
-  background: linear-gradient(135deg, rgba(56,189,248,0.15), transparent, rgba(129,140,248,0.1));
-  filter: blur(4px);
+  inset: -8px;
+  border-radius: 20px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.07), transparent 70%);
+  filter: blur(10px);
   pointer-events: none;
   z-index: 0;
 }
 
-.phone-light-sweep-sm {
+.monitor-tilt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 800px;
+  z-index: 1;
+}
+
+.monitor-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.monitor-tilt:hover .monitor-body {
+  transform: rotateY(-4deg) rotateX(3deg);
+}
+
+.monitor-screen {
+  position: absolute;
+  /* precise screen bounds from pixel analysis:
+     frame: 358x296, screen: x=26-330, y=26-194 */
+  top: 8.8%;
+  left: 7.3%;
+  width: 85.2%;
+  height: 57.1%;
+  overflow: hidden;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.monitor-frame {
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 10;
   pointer-events: none;
-  z-index: 11;
-  animation: light-sweep 4s ease-in-out infinite;
 }
 
 /* ─── Cosmic Preview Mobile (inside phone) ─── */
@@ -1465,6 +1522,10 @@ button, a, input, textarea {
     width: 230px;
     height: 438px;
   }
+  .monitor-container {
+    width: 340px;
+    height: 282px;
+  }
   .cosmic-preview-wrapper {
     height: 480px;
   }
@@ -1473,6 +1534,16 @@ button, a, input, textarea {
   }
   .cosmic-preview-bio {
     font-size: 11px;
+  }
+  .cosmic-preview-desktop {
+    border-radius: 2px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .monitor-container {
+    width: 358px;
+    height: 296px;
   }
 }
 
@@ -1610,19 +1681,183 @@ button, a, input, textarea {
   color: #8ad0f8;
 }
 
-/* Accordion */
-.faq-answer {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.faq-answer.open {
-  grid-template-rows: 1fr;
-}
-
-.faq-answer > div {
+/* ─── Terminal FAQ ─── */
+.terminal-container {
+  background: #0d1117;
+  border: 1px solid rgba(48, 54, 61, 0.8);
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(56, 139, 253, 0.08) inset;
+  font-family: "SF Mono", "Fira Code", "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
+}
+
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #161b22;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+  user-select: none;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+}
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(139, 148, 158, 0.85);
+  letter-spacing: -0.01em;
+}
+
+.terminal-title-spacer {
+  width: 58px;
+  flex-shrink: 0;
+}
+
+.terminal-body {
+  padding: 20px 22px;
+  min-height: 320px;
+}
+
+.terminal-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 2px;
+  min-height: 22px;
+}
+
+.terminal-prompt {
+  color: #3fb950;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.terminal-text {
+  color: rgba(201, 209, 217, 0.9);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #3fb950;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: terminal-blink 1s step-end infinite;
+}
+
+.terminal-cursor.blink {
+  animation: terminal-blink 1s step-end infinite;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 139, 253, 0.2), transparent);
+  margin: 12px 0 14px;
+}
+
+.terminal-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.terminal-q-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.terminal-question {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(139, 148, 158, 0.85);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.terminal-question:hover {
+  background: rgba(56, 139, 253, 0.06);
+  border-color: rgba(56, 139, 253, 0.15);
+  color: rgba(201, 209, 217, 0.9);
+}
+
+.terminal-question.active {
+  background: rgba(56, 139, 253, 0.08);
+  border-color: rgba(56, 139, 253, 0.2);
+  color: #58a6ff;
+}
+
+.terminal-q-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  color: rgba(139, 148, 158, 0.5);
+}
+
+.terminal-question.active .terminal-q-icon {
+  color: #58a6ff;
+}
+
+.terminal-answer-wrap {
+  padding: 0 12px 8px 36px;
+}
+
+.terminal-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 22px;
+}
+
+.terminal-answer-text {
+  color: rgba(139, 148, 158, 0.85);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.terminal-bottom-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 /* Glass reflection overlay */

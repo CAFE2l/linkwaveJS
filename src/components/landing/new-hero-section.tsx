@@ -4,13 +4,13 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { MotionReveal } from "@/components/shared/motion-reveal";
 import { ArrowRight, CheckCircle2, UserPlus, Eye, MousePointerClick, LayoutGrid } from "lucide-react";
+import type { LandingStats } from "@/types/database";
 
-const demoStats = [
-  { label: "Usuários", value: "12.5k" },
-  { label: "Cliques", value: "4.8k" },
-  { label: "Satisfação", value: "98%" },
-  { label: "Personalizável", value: "100%" },
-];
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(".0", "")}k`;
+  return `${n}`;
+}
 
 const phoneLinks = [
   { name: "Instagram", icon: "/imgs/icons/links/Instagram.png" },
@@ -20,7 +20,7 @@ const phoneLinks = [
   { name: "Portfólio", icon: "/imgs/icons/links/Discord.png" },
 ];
 
-export function NewHeroSection({ isLoggedIn }: { isLoggedIn: boolean; stats?: unknown }) {
+export function NewHeroSection({ isLoggedIn, stats }: { isLoggedIn: boolean; stats: LandingStats }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
 
@@ -198,12 +198,18 @@ export function NewHeroSection({ isLoggedIn }: { isLoggedIn: boolean; stats?: un
 
         <MotionReveal delay={0.4} className="mt-20">
           <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-            {demoStats.map((s) => (
-              <div key={s.label} className="glass-stat">
-                <p className="text-2xl font-black text-ocean-light">{s.value}</p>
-                <p className="mt-0.5 text-xs font-bold text-muted uppercase tracking-wider">{s.label}</p>
-              </div>
-            ))}
+            <div className="glass-stat">
+              <p className="text-2xl font-black text-ocean-light">{formatNumber(stats.totalUsers)}</p>
+              <p className="mt-0.5 text-xs font-bold text-muted uppercase tracking-wider">Usuários</p>
+            </div>
+            <div className="glass-stat">
+              <p className="text-2xl font-black text-ocean-light">100%</p>
+              <p className="mt-0.5 text-xs font-bold text-muted uppercase tracking-wider">Grátis</p>
+            </div>
+            <div className="glass-stat">
+              <p className="text-2xl font-black text-ocean-light">100%</p>
+              <p className="mt-0.5 text-xs font-bold text-muted uppercase tracking-wider">Personalizável</p>
+            </div>
           </div>
         </MotionReveal>
       </div>

@@ -63,7 +63,7 @@ export default async function Home() {
         <BlobBackground />
         <div className="relative z-10">
           <NewNavbar isLoggedIn={isLoggedIn} />
-          <NewHeroSection isLoggedIn={isLoggedIn} />
+          <NewHeroSection isLoggedIn={isLoggedIn} stats={stats} />
           <div className="mx-auto max-w-5xl px-5">
             <div className="glass-divider" />
           </div>

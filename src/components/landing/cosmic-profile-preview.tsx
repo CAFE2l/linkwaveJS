@@ -6,17 +6,26 @@ import { Monitor, Smartphone } from "lucide-react";
 interface LinkItem {
   title: string;
   icon: string;
+  url: string;
 }
 
 const profileLinks: LinkItem[] = [
-  { title: "Portfólio", icon: "/imgs/icons/Google Chrome.png" },
-  { title: "Twitter", icon: "/imgs/icons/Twitter.png" },
-  { title: "LinkedIn", icon: "/imgs/icons/LinkedIn.png" },
-  { title: "GitHub", icon: "/imgs/icons/github.png" },
-  { title: "YouTube", icon: "/imgs/icons/Youtube.png" },
-  { title: "Pinterest", icon: "/imgs/icons/Pinterest.png" },
-  { title: "Telegram", icon: "/imgs/icons/Telegram.png" },
-  { title: "Discord", icon: "/imgs/icons/Discord.png" },
+  { title: "Portfólio", icon: "/imgs/icons/Google Chrome.png", url: "https://linkwave.ai" },
+  { title: "Twitter", icon: "/imgs/icons/Twitter.png", url: "https://twitter.com" },
+  { title: "LinkedIn", icon: "/imgs/icons/LinkedIn.png", url: "https://linkedin.com" },
+  { title: "GitHub", icon: "/imgs/icons/github.png", url: "https://github.com" },
+  { title: "YouTube", icon: "/imgs/icons/Youtube.png", url: "https://youtube.com" },
+  { title: "Pinterest", icon: "/imgs/icons/Pinterest.png", url: "https://pinterest.com" },
+  { title: "Telegram", icon: "/imgs/icons/Telegram.png", url: "https://telegram.org" },
+  { title: "Discord", icon: "/imgs/icons/Discord.png", url: "https://discord.com" },
+  { title: "Instagram", icon: "/imgs/icons/Instagram.png", url: "https://instagram.com" },
+  { title: "TikTok", icon: "/imgs/icons/TikTok.png", url: "https://tiktok.com" },
+  { title: "WhatsApp", icon: "/imgs/icons/Whatsapp.png", url: "https://whatsapp.com" },
+  { title: "Spotify", icon: "/imgs/icons/Spotify.png", url: "https://spotify.com" },
+  { title: "Twitch", icon: "/imgs/icons/Twitch.png", url: "https://twitch.tv" },
+  { title: "Facebook", icon: "/imgs/icons/Facebook.png", url: "https://facebook.com" },
+  { title: "Reddit", icon: "/imgs/icons/Reddit.png", url: "https://reddit.com" },
+  { title: "Snapchat", icon: "/imgs/icons/Snapchat.png", url: "https://snapchat.com" },
 ];
 
 function CosmicProfileDesktop() {
@@ -36,7 +45,7 @@ function CosmicProfileDesktop() {
         <div className="banner-overlay" />
       </div>
 
-      <div className="cosmic-avatar-ring">
+      <div className="cosmic-avatar-border">
         <Image
           src="/imgs/essentials/profile.jpg"
           alt="Avatar"
@@ -51,10 +60,16 @@ function CosmicProfileDesktop() {
 
       <div className="cosmic-preview-links">
         {profileLinks.map((link) => (
-          <div key={link.title} className="quantum-link-item">
+          <a
+            key={link.title}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="quantum-link-item"
+          >
             <Image src={link.icon} alt="" width={20} height={20} className="link-icon" />
             <span>{link.title}</span>
-          </div>
+          </a>
         ))}
       </div>
 
@@ -67,7 +82,7 @@ function CosmicProfileDesktop() {
 }
 
 function CosmicProfileMobile() {
-  const mobileLinks = profileLinks.slice(0, 6);
+  const mobileLinks = profileLinks.slice(0, 8);
 
   return (
     <div className="cosmic-preview-mobile">
@@ -85,7 +100,7 @@ function CosmicProfileMobile() {
         <div className="banner-overlay" />
       </div>
 
-      <div className="cosmic-mobile-avatar-ring">
+      <div className="cosmic-mobile-avatar-border">
         <Image
           src="/imgs/essentials/profile.jpg"
           alt="Avatar"
@@ -100,11 +115,16 @@ function CosmicProfileMobile() {
 
       <div className="cosmic-mobile-links">
         {mobileLinks.map((link) => (
-          <div key={link.title} className="quantum-link-item-mobile">
+          <a
+            key={link.title}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="quantum-link-item-mobile"
+          >
             <Image src={link.icon} alt="" width={14} height={14} className="link-icon" />
             <span>{link.title}</span>
-            <span className="ml-auto opacity-30 text-[9px]">›</span>
-          </div>
+          </a>
         ))}
       </div>
 

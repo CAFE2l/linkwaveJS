@@ -9,14 +9,14 @@ interface LinkItem {
 }
 
 const profileLinks: LinkItem[] = [
-  { title: "Portfólio", icon: "/imgs/icons/links/Google Chrome.png" },
-  { title: "Twitter", icon: "/imgs/icons/links/Twitter.png" },
-  { title: "LinkedIn", icon: "/imgs/icons/links/LinkedIn.png" },
-  { title: "GitHub", icon: "/imgs/icons/links/Google Chrome.png" },
-  { title: "YouTube", icon: "/imgs/icons/links/Youtube.png" },
-  { title: "Pinterest", icon: "/imgs/icons/links/Pinterest.png" },
-  { title: "Telegram", icon: "/imgs/icons/links/Telegram.png" },
-  { title: "Discord", icon: "/imgs/icons/links/Discord.png" },
+  { title: "Portfólio", icon: "/imgs/icons/Google Chrome.png" },
+  { title: "Twitter", icon: "/imgs/icons/Twitter.png" },
+  { title: "LinkedIn", icon: "/imgs/icons/LinkedIn.png" },
+  { title: "GitHub", icon: "/imgs/icons/github.png" },
+  { title: "YouTube", icon: "/imgs/icons/Youtube.png" },
+  { title: "Pinterest", icon: "/imgs/icons/Pinterest.png" },
+  { title: "Telegram", icon: "/imgs/icons/Telegram.png" },
+  { title: "Discord", icon: "/imgs/icons/Discord.png" },
 ];
 
 function CosmicProfileDesktop() {

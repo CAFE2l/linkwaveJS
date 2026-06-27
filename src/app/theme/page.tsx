@@ -1,27 +1,20 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ThemeCustomizer } from "@/components/theme/theme-customizer";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
+import { prisma } from "@/lib/db/prisma";
 import { type UserThemeConfig } from "@/types/database";
 
 export const metadata = { title: "Tema" };
 
 export default async function ThemePage() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
-
+  const user = await prisma.user.findUnique({ where: { id: authUser.uid } });
   if (!user) redirect("/register");
 
-  const userTheme = (user.theme_json ?? null) as UserThemeConfig | null;
+  const userTheme = (user.themeJson ?? null) as UserThemeConfig | null;
 
   return (
     <DashboardShell user={user}>

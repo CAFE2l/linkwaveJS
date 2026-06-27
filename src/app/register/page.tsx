@@ -3,23 +3,22 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Shield, Sparkles, Zap } from "lucide-react";
 import { RegisterForm } from "@/components/auth/register-form";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { PublicPageLayout } from "@/components/shared/public-page-layout";
 
 export const metadata: Metadata = {
   title: "Criar conta",
-  description: "Crie sua conta LinkWave com cadastro seguro usando Supabase Auth.",
+  description: "Crie sua conta LinkWave com cadastro seguro usando Firebase Auth.",
 };
 
 const benefits = [
   { icon: Shield, text: "Proteção RLS e validação no servidor" },
-  { icon: Zap, text: "Cadastro instantâneo com Supabase Auth" },
+  { icon: Zap, text: "Cadastro instantâneo com Firebase Auth" },
   { icon: Sparkles, text: "Perfil público grátis para seus links" },
 ];
 
 export default async function RegisterPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) redirect("/dashboard");
 

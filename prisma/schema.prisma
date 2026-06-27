@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  username  String
+  name      String   @default("")
+  avatarUrl String?  @map("avatar_url")
+  bannerUrl String?  @map("banner_url")
+  themeJson Json     @default("{}") @map("theme_json")
+  role      String   @default("user")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profiles Profile[]
+  links    Link[]
+  clicks   Click[]
+
+  @@map("users")
+}
+
+model Profile {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  name         String
+  username     String
+  email        String
+  avatarUrl    String?  @map("avatar_url")
+  active       Boolean  @default(true)
+  bio          String?
+  theme        String   @default("wave")
+  customColors Json     @default("{}") @map("custom_colors")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Link {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  title         String
+  url           String
+  icon          String?
+  icone         String?
+  iconBlob      String?  @map("icon_blob")
+  isCustomIcon  Boolean  @default(false) @map("is_custom_icon")
+  orderPosition Int      @default(0) @map("order_position")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clicks Click[]
+
+  @@map("links")
+}
+
+model Click {
+  id        String   @id @default(uuid()) @db.Uuid
+  linkId    String   @map("link_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  ipAddress String?  @map("ip_address")
+  country   String?
+  city      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  link Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("clicks")
+}
+
+model RegistrationRateLimit {
+  id        String   @id @default(uuid()) @db.Uuid
+  ipKey     String   @map("ip_key")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("registration_rate_limits")
+}

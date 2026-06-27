@@ -1,7 +1,25 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/firebase/auth-server';
+import { prisma } from '@/lib/db/prisma';
 import { normalizeUrl } from '@/lib/utils/url';
-import type { Database } from '@/types/database';
+
+export async function GET() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
+
+    const links = await prisma.link.findMany({
+      where: { userId: user.uid },
+      orderBy: { orderPosition: 'asc' },
+      take: 200,
+    });
+
+    return NextResponse.json(links);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -12,34 +30,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: 'Título e URL são obrigatórios' }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
-    // compute order_position
-    const { count } = await supabase.from('links').select('id', { head: true, count: 'exact' }).eq('user_id', user.id);
-    const order_position = (count ?? 0);
+    // compute orderPosition
+    const count = await prisma.link.count({ where: { userId: user.uid } });
+    const orderPosition = count;
 
-    const insertPayload: Database["public"]["Tables"]["links"]["Insert"] = {
-      user_id: user.id,
-      title,
-      url: normalizeUrl(url),
-      icon: icon || null,
-      is_custom_icon: is_custom_icon ?? false,
-      icon_blob: icon_blob || null,
-      order_position,
-    };
-
-    const { data, error } = await supabase.from('links').insert(insertPayload).select().single();
-    if (error) {
-      console.error('insert link err', error);
-      return NextResponse.json({ ok: false, message: 'Erro ao salvar link' }, { status: 500 });
-    }
+    const link = await prisma.link.create({
+      data: {
+        userId: user.uid,
+        title,
+        url: normalizeUrl(url),
+        icon: icon || null,
+        isCustomIcon: is_custom_icon ?? false,
+        iconBlob: icon_blob || null,
+        orderPosition,
+      },
+    });
 
     // revalidate dashboard path
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
 
-    return NextResponse.json({ ok: true, message: 'Link criado', link: data });
+    return NextResponse.json({ ok: true, message: 'Link criado', link });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
@@ -55,33 +68,30 @@ export async function PUT(req: Request) {
       return NextResponse.json({ ok: false, message: 'ID é obrigatório' }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
-    const updatePayload: Database["public"]["Tables"]["links"]["Update"] = {};
-    if (title !== undefined) updatePayload.title = title;
-    if (url !== undefined) updatePayload.url = normalizeUrl(url);
-    if (icon !== undefined) updatePayload.icon = icon || null;
-    if (is_custom_icon !== undefined) updatePayload.is_custom_icon = is_custom_icon;
-    if (icon_blob !== undefined) updatePayload.icon_blob = icon_blob || null;
+    const updateData: Record<string, unknown> = {};
+    if (title !== undefined) updateData.title = title;
+    if (url !== undefined) updateData.url = normalizeUrl(url);
+    if (icon !== undefined) updateData.icon = icon || null;
+    if (is_custom_icon !== undefined) updateData.isCustomIcon = is_custom_icon;
+    if (icon_blob !== undefined) updateData.iconBlob = icon_blob || null;
 
-    const { data, error } = await supabase
-      .from('links')
-      .update(updatePayload)
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single();
+    const link = await prisma.link.updateMany({
+      where: { id, userId: user.uid },
+      data: updateData,
+    });
 
-    if (error) {
-      console.error('update link err', error);
-      return NextResponse.json({ ok: false, message: 'Erro ao atualizar link' }, { status: 500 });
+    if (link.count === 0) {
+      return NextResponse.json({ ok: false, message: 'Link não encontrado' }, { status: 404 });
     }
+
+    const updated = await prisma.link.findUnique({ where: { id } });
 
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
 
-    return NextResponse.json({ ok: true, message: 'Link atualizado', link: data });
+    return NextResponse.json({ ok: true, message: 'Link atualizado', link: updated });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
@@ -95,19 +105,15 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ ok: false, message: 'ID é obrigatório' }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
-    const { error } = await supabase
-      .from('links')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id);
+    const result = await prisma.link.deleteMany({
+      where: { id, userId: user.uid },
+    });
 
-    if (error) {
-      console.error('delete link err', error);
-      return NextResponse.json({ ok: false, message: 'Erro ao excluir link' }, { status: 500 });
+    if (result.count === 0) {
+      return NextResponse.json({ ok: false, message: 'Link não encontrado' }, { status: 404 });
     }
 
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}

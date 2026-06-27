@@ -1,32 +1,53 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
+import { prisma } from "@/lib/db/prisma";
 import { CustomizePanel } from "@/components/customize/customize-panel";
 
 export const metadata = { title: "Customizar | LinkWave" };
 
 export default async function CustomizePage() {
-  const supabase = await createClient();
-  const { data: { user: authUser } } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const [userResult, profileResult, linksResult] = await Promise.all([
-    supabase.from("users").select("*").eq("id", authUser.id).single(),
-    supabase.from("profiles").select("bio").eq("user_id", authUser.id).maybeSingle(),
-    supabase
-      .from("links")
-      .select("*")
-      .eq("user_id", authUser.id)
-      .order("order_position"),
+  const [record, profile, rawLinks] = await Promise.all([
+    prisma.user.findUnique({ where: { id: authUser.uid } }),
+    prisma.profile.findFirst({ where: { userId: authUser.uid }, select: { bio: true } }),
+    prisma.link.findMany({ where: { userId: authUser.uid }, orderBy: { orderPosition: "asc" } }),
   ]);
 
-  const user = userResult.data;
-  if (!user) redirect("/register");
+  if (!record) redirect("/register");
+
+  const user = {
+    id: record.id,
+    email: record.email,
+    username: record.username,
+    name: record.name,
+    avatar_url: record.avatarUrl,
+    banner_url: record.bannerUrl,
+    theme_json: record.themeJson,
+    role: record.role,
+    active: record.active,
+    created_at: record.createdAt.toISOString(),
+  };
+
+  const links = rawLinks.map((l) => ({
+    id: l.id,
+    user_id: l.userId,
+    title: l.title,
+    url: l.url,
+    icon: l.icon,
+    icone: l.icone,
+    icon_blob: l.iconBlob,
+    is_custom_icon: l.isCustomIcon,
+    order_position: l.orderPosition,
+    created_at: l.createdAt.toISOString(),
+  }));
 
   return (
     <CustomizePanel
       user={user}
-      links={linksResult.data ?? []}
-      initialBio={profileResult.data?.bio ?? ""}
+      links={links}
+      initialBio={profile?.bio ?? ""}
     />
   );
 }

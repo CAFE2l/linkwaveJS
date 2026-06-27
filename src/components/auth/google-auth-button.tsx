@@ -4,23 +4,18 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import googleIcon from "/public/imgs/icons/links/Google.png";
 
 export function GoogleAuthButton() {
   const [loading, setLoading] = useState(false);
+  const { signInWithGoogle } = useAuth();
 
   async function handleGoogleAuth() {
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
-      },
-    });
-
-    if (error) {
+    try {
+      await signInWithGoogle();
+    } catch {
       setLoading(false);
     }
   }

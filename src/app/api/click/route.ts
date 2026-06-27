@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 
 const schema = z.object({
   linkId: z.string().uuid(),
@@ -15,20 +15,19 @@ export async function POST(request: Request) {
   }
 
   const headerStore = await headers();
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("clicks")
-    .insert({
-      link_id: parsed.data.linkId,
-      user_id: parsed.data.userId,
-      ip_address:
-        headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        headerStore.get("x-real-ip"),
-      country: headerStore.get("x-vercel-ip-country"),
-      city: headerStore.get("x-vercel-ip-city"),
-    } as never);
-
-  if (error) {
+  try {
+    await prisma.click.create({
+      data: {
+        linkId: parsed.data.linkId,
+        userId: parsed.data.userId,
+        ipAddress:
+          headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+          headerStore.get("x-real-ip"),
+        country: headerStore.get("x-vercel-ip-country"),
+        city: headerStore.get("x-vercel-ip-city"),
+      },
+    });
+  } catch {
     return NextResponse.json({ error: "Click not recorded" }, { status: 500 });
   }
 

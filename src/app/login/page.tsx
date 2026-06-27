@@ -4,7 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Lock, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { LoginForm } from "@/components/shared/login-form";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { PublicPageLayout } from "@/components/shared/public-page-layout";
 
 export const metadata: Metadata = {
@@ -13,14 +13,13 @@ export const metadata: Metadata = {
 };
 
 const benefits = [
-  { icon: ShieldCheck, text: "Autenticação segura com Supabase Auth" },
+  { icon: ShieldCheck, text: "Autenticação segura com Firebase Auth" },
   { icon: Zap, text: "Acesso instantâneo ao seu painel" },
   { icon: Lock, text: "Seus links protegidos com RLS" },
 ];
 
 export default async function LoginPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) redirect("/dashboard");
 

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { userThemeSchema } from "@/lib/validations/profile";
 
 type ActionState = {
@@ -21,18 +22,15 @@ export async function updateThemeAction(
     };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { error } = await supabase
-    .from("users")
-    .update({ theme_json: parsed.data as never })
-    .eq("id", authUser.id);
-
-  if (error) {
+  try {
+    await prisma.user.update({
+      where: { id: authUser.uid },
+      data: { themeJson: parsed.data as never },
+    });
+  } catch {
     return { ok: false, message: "Não foi possível salvar o tema." };
   }
 

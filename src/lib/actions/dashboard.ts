@@ -1,9 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db/prisma";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { normalizeUrl } from "@/lib/utils/url";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { linkSchema, reorderLinksSchema } from "@/lib/validations/profile";
+import type { Link } from "@/types/database";
 
 type ActionState = {
   ok: boolean;
@@ -13,17 +17,36 @@ type ActionState = {
 export type UploadState = ActionState & { url?: string };
 
 async function getCurrentUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
-  return { supabase, userId: user.id, email: user.email ?? "" };
+  return { userId: user.uid, email: user.email ?? "" };
 }
 
-import { redirect } from "next/navigation";
-import type { Link } from "@/types/database";
+function mapLink(row: {
+  id: string;
+  userId: string;
+  title: string;
+  url: string;
+  icon: string | null;
+  icone: string | null;
+  iconBlob: string | null;
+  isCustomIcon: boolean;
+  orderPosition: number;
+  createdAt: Date;
+}): Link {
+  return {
+    id: row.id,
+    user_id: row.userId,
+    title: row.title,
+    url: row.url,
+    icon: row.icon,
+    icone: row.icone ?? null,
+    icon_blob: row.iconBlob ?? null,
+    is_custom_icon: row.isCustomIcon,
+    order_position: row.orderPosition,
+    created_at: row.createdAt.toISOString(),
+  };
+}
 
 export async function upsertLinkAction(
   input: unknown,
@@ -36,59 +59,48 @@ export async function upsertLinkAction(
     };
   }
 
-  const { supabase, userId } = await getCurrentUserId();
+  const { userId } = await getCurrentUserId();
   const { id, title, url, icon } = parsed.data;
 
-  let orderPosition = 0;
-  if (!id) {
-    const { count } = await supabase
-      .from("links")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    orderPosition = count ?? 0;
-  }
+  try {
+    if (id) {
+      const updated = await prisma.link.update({
+        where: { id },
+        data: {
+          title,
+          url: normalizeUrl(url),
+          icon: icon || "link",
+        },
+      });
+      revalidatePath("/dashboard");
+      return { ok: true, message: "Link atualizado.", link: mapLink(updated) };
+    }
 
-  const { data, error } = id
-    ? await supabase.from("links").update({
+    const count = await prisma.link.count({ where: { userId } });
+    const created = await prisma.link.create({
+      data: {
+        userId,
         title,
         url: normalizeUrl(url),
         icon: icon || "link",
-      } satisfies Partial<{
-        title: string;
-        url: string;
-        icon: string;
-      }>).eq("id", id).eq("user_id", userId).select().single()
-    : await supabase.from("links").insert({
-        user_id: userId,
-        title,
-        url: normalizeUrl(url),
-        icon: icon || "link",
-        order_position: orderPosition,
-      } satisfies {
-        user_id: string;
-        title: string;
-        url: string;
-        icon: string;
-        order_position: number;
-      }).select().single();
+        orderPosition: count,
+      },
+    });
 
-  if (error) {
+    revalidatePath("/dashboard");
+    return { ok: true, message: "Link criado.", link: mapLink(created) };
+  } catch {
     return { ok: false, message: "Não foi possível salvar o link." };
   }
-
-  revalidatePath("/dashboard");
-  return { ok: true, message: id ? "Link atualizado." : "Link criado.", link: data ?? undefined };
 }
 
 export async function deleteLinkAction(id: string): Promise<ActionState> {
-  const { supabase, userId } = await getCurrentUserId();
-  const { error } = await supabase
-    .from("links")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userId);
-
-  if (error) {
+  const { userId } = await getCurrentUserId();
+  try {
+    await prisma.link.deleteMany({
+      where: { id, userId },
+    });
+  } catch {
     return { ok: false, message: "Não foi possível excluir o link." };
   }
 
@@ -104,18 +116,18 @@ export async function reorderLinksAction(
     return { ok: false, message: "Ordem inválida." };
   }
 
-  const { supabase, userId } = await getCurrentUserId();
+  const { userId } = await getCurrentUserId();
 
-  const updates = parsed.data.ids.map((id, index) =>
-    supabase
-      .from("links")
-      .update({ order_position: index })
-      .eq("id", id)
-      .eq("user_id", userId),
-  );
-
-  const results = await Promise.all(updates);
-  if (results.some(({ error }) => error)) {
+  try {
+    await Promise.all(
+      parsed.data.ids.map((id, index) =>
+        prisma.link.updateMany({
+          where: { id, userId },
+          data: { orderPosition: index },
+        }),
+      ),
+    );
+  } catch {
     return { ok: false, message: "Não foi possível reordenar os links." };
   }
 
@@ -126,7 +138,7 @@ export async function reorderLinksAction(
 export async function uploadAvatarAction(
   formData: FormData,
 ): Promise<UploadState> {
-  const { supabase, userId } = await getCurrentUserId();
+  const { userId } = await getCurrentUserId();
   const file = formData.get("file") as File;
   if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
   if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
@@ -136,51 +148,35 @@ export async function uploadAvatarAction(
     return { ok: false, message: "O avatar deve ter no máximo 2MB." };
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-  const fileName = `avatars/${userId}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("user-content")
-    .upload(fileName, file, { upsert: true });
-
-  if (uploadError) {
+  const avatarUrl = await uploadToCloudinary(file, "avatars");
+  if (!avatarUrl) {
     return { ok: false, message: "Erro ao fazer upload." };
   }
 
-  const { data: urlData } = supabase.storage
-    .from("user-content")
-    .getPublicUrl(fileName);
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+    });
 
-  const avatarUrl = urlData?.publicUrl ?? null;
-
-  const { error: updateError } = await supabase
-    .from("users")
-    .update({ avatar_url: avatarUrl })
-    .eq("id", userId);
-
-  if (updateError) {
+    await prisma.profile.update({
+      where: { userId },
+      data: { avatarUrl },
+    });
+  } catch {
     return { ok: false, message: "Erro ao salvar avatar." };
-  }
-
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({ avatar_url: avatarUrl })
-    .eq("user_id", userId);
-
-  if (profileError) {
-    return { ok: false, message: "Avatar enviado, mas não foi possível sincronizar o perfil." };
   }
 
   revalidatePath("/profile");
   revalidatePath("/dashboard/customize");
   revalidatePath("/u/*");
-  return { ok: true, message: "Avatar atualizado.", url: avatarUrl ?? undefined };
+  return { ok: true, message: "Avatar atualizado.", url: avatarUrl };
 }
 
 export async function uploadBannerAction(
   formData: FormData,
 ): Promise<UploadState> {
-  const { supabase, userId } = await getCurrentUserId();
+  const { userId } = await getCurrentUserId();
   const file = formData.get("file") as File;
   if (!file) return { ok: false, message: "Nenhum arquivo enviado." };
   if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
@@ -190,33 +186,21 @@ export async function uploadBannerAction(
     return { ok: false, message: "O banner deve ter no máximo 4MB." };
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-  const fileName = `banners/${userId}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("user-content")
-    .upload(fileName, file, { upsert: true });
-
-  if (uploadError) {
+  const bannerUrl = await uploadToCloudinary(file, "banners");
+  if (!bannerUrl) {
     return { ok: false, message: "Erro ao fazer upload." };
   }
 
-  const { data: urlData } = supabase.storage
-    .from("user-content")
-    .getPublicUrl(fileName);
-
-  const bannerUrl = urlData?.publicUrl ?? null;
-
-  const { error: updateError } = await supabase
-    .from("users")
-    .update({ banner_url: bannerUrl })
-    .eq("id", userId);
-
-  if (updateError) {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { bannerUrl },
+    });
+  } catch {
     return { ok: false, message: "Erro ao salvar banner." };
   }
 
   revalidatePath("/profile");
   revalidatePath("/dashboard/customize");
-  return { ok: true, message: "Banner atualizado.", url: bannerUrl ?? undefined };
+  return { ok: true, message: "Banner atualizado.", url: bannerUrl };
 }

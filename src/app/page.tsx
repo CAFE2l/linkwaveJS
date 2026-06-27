@@ -18,15 +18,12 @@ import { FAQ } from "@/components/landing/faq-terminal";
 import { BlobBackground } from "@/components/landing/blob-background";
 import { ThemeProvider } from "@/components/landing/theme-provider";
 import { getLandingStats } from "@/lib/actions/stats";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const [stats, supabase] = await Promise.all([getLandingStats(), createClient()]);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [stats, user] = await Promise.all([getLandingStats(), getCurrentUser()]);
 
   const isLoggedIn = Boolean(user);
 

@@ -1,30 +1,22 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ProfileEditor } from "@/components/profile/profile-editor";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
+import { prisma } from "@/lib/db/prisma";
 
 export const metadata = { title: "Perfil" };
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
-
+  const user = await prisma.user.findUnique({ where: { id: authUser.uid } });
   if (!user) redirect("/register");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("bio")
-    .eq("user_id", authUser.id)
-    .maybeSingle();
+  const profile = await prisma.profile.findFirst({
+    where: { userId: authUser.uid },
+    select: { bio: true },
+  });
 
   return (
     <DashboardShell user={user}>

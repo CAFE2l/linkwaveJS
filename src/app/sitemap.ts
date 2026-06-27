@@ -1,14 +1,13 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 import { getBaseUrl } from "@/lib/utils/url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("users")
-    .select("username, created_at")
-    .eq("active", true);
+  const users = await prisma.user.findMany({
+    where: { active: true },
+    select: { username: true, createdAt: true },
+  });
 
   return [
     {
@@ -17,9 +16,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     },
-    ...(data ?? []).map((user) => ({
+    ...users.map((user) => ({
       url: `${baseUrl}/u/${user.username}`,
-      lastModified: new Date(user.created_at),
+      lastModified: new Date(user.createdAt),
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),

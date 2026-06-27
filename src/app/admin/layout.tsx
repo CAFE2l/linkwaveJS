@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
+import { prisma } from "@/lib/db/prisma";
 import { AdminLayout } from "@/components/admin/admin-layout";
 
 export const metadata = { title: "Admin | LinkWave" };
@@ -9,20 +10,24 @@ export default async function AdminRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
+  const record = await prisma.user.findUnique({ where: { id: authUser.uid } });
+  if (!record || record.role !== "admin") redirect("/dashboard");
 
-  if (!user || user.role !== "admin") redirect("/dashboard");
+  const user = {
+    id: record.id,
+    email: record.email,
+    username: record.username,
+    name: record.name,
+    avatar_url: record.avatarUrl,
+    banner_url: record.bannerUrl,
+    theme_json: record.themeJson,
+    role: record.role,
+    active: record.active,
+    created_at: record.createdAt.toISOString(),
+  };
 
   return <AdminLayout user={user}>{children}</AdminLayout>;
 }

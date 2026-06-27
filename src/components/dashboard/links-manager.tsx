@@ -158,14 +158,12 @@ export function LinksManager({ links, onLinksChange }: { links: Link[]; onLinksC
               addToast('Link criado.', 'success');
             } else {
               try {
-                const clientModule = await import("@/lib/supabaseClient");
-                const client = clientModule.supabase;
-                const { data } = await client.from("links").select("id, title, url, description, clicks, created_at, icon").order("created_at", { ascending: false }).limit(200);
-                const refreshed = data ?? [];
-                setItems(refreshed as unknown as typeof items);
-                onLinksChange?.(refreshed as unknown as typeof items);
+                const res = await fetch("/api/links");
+                const refreshed = await res.json();
+                setItems(refreshed as typeof items);
+                onLinksChange?.(refreshed as typeof items);
                 addToast('Link criado.', 'success');
-              } catch (e) {
+              } catch {
                 addToast('Link criado, mas não foi possível atualizar a lista local.', 'success');
               }
             }

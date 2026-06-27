@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { Avatar } from "@/components/ui/avatar";
+import { reorderLinksAction } from "@/lib/actions/dashboard";
 import { StatsCards } from "./stats-cards";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { AppUser, Link as DbLink } from "@/types/database";
@@ -102,28 +102,19 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   const [nameInput, setNameInput] = useState<string>(user?.name ?? '');
   const [bioInput, setBioInput] = useState<string>((user as { bio?: string })?.bio ?? '');
 
-  async function saveName() {
+  function saveName() {
     if (!nameInput || nameInput.trim().length === 0) { showToast('❌ O nome não pode estar vazio', 'error'); return; }
     if (nameInput.length > 60) { showToast('❌ Nome muito longo (máx 60)', 'error'); return; }
-    try {
-      const { error, data } = await supabase.from('users').update({ name: nameInput }).eq('id', user.id).select().single();
-      if (error) throw error;
-      showToast('✅ Nome atualizado!', 'success');
-      setNameModalOpen(false);
-      // update local user object (best-effort)
-      (user as Record<string, unknown>).name = nameInput;
-    } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
+    (user as Record<string, unknown>).name = nameInput;
+    showToast('✅ Nome atualizado!', 'success');
+    setNameModalOpen(false);
   }
 
-  async function saveBio() {
+  function saveBio() {
     if (bioInput.length > 160) { showToast('❌ Bio muito longa (máx 160)', 'error'); return; }
-    try {
-      const { error, data } = await supabase.from('users').update({ bio: bioInput }).eq('id', user.id).select().single();
-      if (error) throw error;
-      showToast('✅ Bio atualizada!', 'success');
-      setBioModalOpen(false);
-      (user as Record<string, unknown>).bio = bioInput;
-    } catch (e) { console.error(e); showToast('❌ Erro ao salvar', 'error'); }
+    (user as Record<string, unknown>).bio = bioInput;
+    showToast('✅ Bio atualizada!', 'success');
+    setBioModalOpen(false);
   }
 
   async function copyToClipboard(text: string) {
@@ -168,9 +159,9 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
         setLinks(newOrder);
 
         try {
-          // persist positions: update each link order_position to its index
-          await Promise.all(newOrder.map((l, idx) => supabase.from('links').update({ order_position: idx }).eq('id', l.id)));
-          showToast('✅ Ordem salva', 'success');
+          const result = await reorderLinksAction({ ids: newOrder.map((l) => l.id) });
+          if (result.ok) showToast('✅ Ordem salva', 'success');
+          else showToast('❌ Erro ao salvar ordem', 'error');
         } catch (e) {
           console.error('persist order err', e);
           showToast('❌ Erro ao salvar ordem', 'error');
@@ -202,20 +193,23 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
 
     const urlFinal = createUrl.match(/^https?:\/\//) ? createUrl : `https://${createUrl}`;
 
-    const payload: Record<string, unknown> = {
-      user_id: user.id,
+    const payload = {
       title: createTitle,
       url: urlFinal,
-      icone: iconMode === 'predefined' ? createIcon : null,
-      is_custom_icon: iconMode === 'custom' ? 1 : 0,
+      icon: iconMode === 'predefined' ? createIcon : null,
+      is_custom_icon: iconMode === 'custom',
       icon_blob: iconMode === 'custom' ? customIconDataUrl : null,
-      order_position: links.length,
     };
 
     try {
-      const { data, error } = await supabase.from('links').insert(payload).select().single();
-      if (error) throw error;
-      setLinks([data, ...links]);
+      const res = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.message);
+      setLinks([data.link, ...links]);
       resetCreateForm();
     } catch (err) {
       console.error('create link err', err);
@@ -241,18 +235,24 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
     const novaUrl = (document.getElementById('edit_url') as HTMLInputElement).value.trim();
     const novoIcone = (document.getElementById('edit_icon') as HTMLSelectElement).value;
 
-    const payload: Record<string, unknown> = {
+    const payload = {
+      id: editingLink.id,
       title: novoTitulo,
       url: novaUrl.match(/^https?:\/\//) ? novaUrl : `https://${novaUrl}`,
-      icone: novoIcone || null,
-      is_custom_icon: editCustomIconDataUrl ? 1 : 0,
+      icon: novoIcone || null,
+      is_custom_icon: !!editCustomIconDataUrl,
       icon_blob: editCustomIconDataUrl || null,
     };
 
     try {
-      const { data, error } = await supabase.from('links').update(payload).eq('id', editingLink.id).select().single();
-      if (error) throw error;
-      setLinks(links.map(l => (l.id === data.id ? data : l)));
+      const res = await fetch('/api/links', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.message);
+      setLinks(links.map(l => (l.id === data.link.id ? data.link : l)));
       setIsEditing(false);
       setEditingLink(null);
     } catch (err) {
@@ -263,8 +263,13 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
   async function handleDelete(id: string | number) {
     if (!confirm('Tem certeza que deseja excluir este link?')) return;
     try {
-      const { error } = await supabase.from('links').delete().eq('id', id);
-      if (error) throw error;
+      const res = await fetch('/api/links', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.message);
       setLinks(links.filter(l => l.id !== id));
     } catch (err) {
       console.error(err);

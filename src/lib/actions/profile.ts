@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { profileSchema } from "@/lib/validations/profile";
 
 type ActionState = {
@@ -28,50 +29,56 @@ export async function updateProfileAction(
     };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
   const { username, name, avatarUrl, bannerUrl, bio, theme } = parsed.data;
 
-  const { data: existing } = await supabase
-    .from("users")
-    .select("id")
-    .eq("username", username)
-    .neq("id", authUser.id)
-    .maybeSingle();
+  const existing = await prisma.user.findFirst({
+    where: { username, NOT: { id: authUser.uid } },
+    select: { id: true },
+  });
 
   if (existing) {
     return { ok: false, message: "Este username já está em uso." };
   }
 
-  const { error: userError } = await supabase.from("users").update({
-    username,
-    name,
-    avatar_url: avatarUrl || null,
-    banner_url: bannerUrl || null,
-  }).eq("id", authUser.id);
+  try {
+    await prisma.user.update({
+      where: { id: authUser.uid },
+      data: {
+        username,
+        name,
+        avatarUrl: avatarUrl || null,
+        bannerUrl: bannerUrl || null,
+      },
+    });
 
-  if (userError) {
-    return { ok: false, message: "Erro ao atualizar perfil." };
-  }
-
-  const { error: profileError } = await supabase.from("profiles").upsert({
-    user_id: authUser.id,
-    name,
-    username,
-    email: authUser.email ?? "",
-    avatar_url: avatarUrl || null,
-    active: true,
-    bio: bio || null,
-    theme,
-    custom_colors: {},
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "user_id", ignoreDuplicates: false });
-
-  if (profileError) {
+    await prisma.profile.upsert({
+      where: { userId: authUser.uid },
+      create: {
+        userId: authUser.uid,
+        name,
+        username,
+        email: authUser.email ?? "",
+        avatarUrl: avatarUrl || null,
+        active: true,
+        bio: bio || null,
+        theme,
+        customColors: {},
+      },
+      update: {
+        name,
+        username,
+        email: authUser.email ?? "",
+        avatarUrl: avatarUrl || null,
+        active: true,
+        bio: bio || null,
+        theme,
+        customColors: {},
+      },
+    });
+  } catch {
     return { ok: false, message: "Erro ao atualizar perfil." };
   }
 

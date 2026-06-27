@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { getAdminAuth } from "@/lib/firebase/admin";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { usernameSchema } from "@/lib/validations/auth";
 
 const PRIMARY_ADMIN_EMAIL = "gutiajs@gmail.com";
@@ -27,21 +28,17 @@ const createAdminUserSchema = adminUserSchema.extend({
 });
 
 async function requireAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", authUser.id)
-    .single();
+  const user = await prisma.user.findFirst({
+    where: { id: authUser.uid },
+    select: { role: true },
+  });
 
   if (!user || user.role !== "admin") redirect("/dashboard");
 
-  return { authUser, admin: createAdminClient() };
+  return { authUser };
 }
 
 function refreshAdmin() {
@@ -52,13 +49,31 @@ function refreshAdmin() {
 }
 
 export async function getAdminUsers() {
-  const { admin } = await requireAdmin();
-  const { data: users } = await admin
-    .from("users")
-    .select("id, username, name, email, avatar_url, role, active, created_at")
-    .order("created_at", { ascending: false });
+  await requireAdmin();
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      role: true,
+      active: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
-  return users ?? [];
+  return users.map((u) => ({
+    id: u.id,
+    username: u.username,
+    name: u.name,
+    email: u.email,
+    avatar_url: u.avatarUrl,
+    role: u.role as "user" | "admin",
+    active: u.active,
+    created_at: u.createdAt.toISOString(),
+  }));
 }
 
 export async function createUserAdminAction(input: unknown): Promise<ActionState> {
@@ -67,50 +82,72 @@ export async function createUserAdminAction(input: unknown): Promise<ActionState
     return { ok: false, message: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
-  const { admin } = await requireAdmin();
+  await requireAdmin();
   const { name, username, email, password, role, active } = parsed.data;
 
-  const { data: duplicate } = await admin
-    .from("users")
-    .select("id")
-    .or(`email.eq.${email},username.eq.${username}`)
-    .maybeSingle();
+  const duplicate = await prisma.user.findFirst({
+    where: { OR: [{ email }, { username }] },
+    select: { id: true },
+  });
   if (duplicate) return { ok: false, message: "Email ou username já cadastrado." };
 
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name, username },
-  });
-  if (error || !data.user) {
-    return { ok: false, message: error?.message ?? "Não foi possível criar o usuário." };
+  let userRecord;
+  try {
+    userRecord = await getAdminAuth().createUser({
+      email,
+      password,
+      emailVerified: true,
+      displayName: name,
+    });
+  } catch (error: unknown) {
+    return { ok: false, message: error instanceof Error ? error.message : "Não foi possível criar o usuário." };
   }
 
-  const userId = data.user.id;
+  const userId = userRecord.uid;
   const finalRole = email === PRIMARY_ADMIN_EMAIL ? "admin" : role;
-  const { error: userError } = await admin.from("users").upsert({
-    id: userId,
-    email,
-    username,
-    name,
-    role: finalRole,
-    active: email === PRIMARY_ADMIN_EMAIL ? true : active,
-  }, { onConflict: "id" });
 
-  const { error: profileError } = await admin.from("profiles").upsert({
-    user_id: userId,
-    name,
-    username,
-    email,
-    active: email === PRIMARY_ADMIN_EMAIL ? true : active,
-    theme: "wave",
-    custom_colors: {},
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "user_id" });
+  try {
+    await prisma.user.upsert({
+      where: { id: userId },
+      create: {
+        id: userId,
+        email,
+        username,
+        name,
+        role: finalRole,
+        active: email === PRIMARY_ADMIN_EMAIL ? true : active,
+      },
+      update: {
+        email,
+        username,
+        name,
+        role: finalRole,
+        active: email === PRIMARY_ADMIN_EMAIL ? true : active,
+      },
+    });
 
-  if (userError || profileError) {
-    await admin.auth.admin.deleteUser(userId);
+    await prisma.profile.upsert({
+      where: { userId },
+      create: {
+        userId,
+        name,
+        username,
+        email,
+        active: email === PRIMARY_ADMIN_EMAIL ? true : active,
+        theme: "wave",
+        customColors: {},
+      },
+      update: {
+        name,
+        username,
+        email,
+        active: email === PRIMARY_ADMIN_EMAIL ? true : active,
+        theme: "wave",
+        customColors: {},
+      },
+    });
+  } catch {
+    await getAdminAuth().deleteUser(userId);
     return { ok: false, message: "A conta não pôde ser sincronizada com o perfil." };
   }
 
@@ -127,12 +164,12 @@ export async function updateUserAdminAction(
     return { ok: false, message: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
-  const { admin } = await requireAdmin();
-  const { data: current } = await admin
-    .from("users")
-    .select("email")
-    .eq("id", userId)
-    .maybeSingle();
+  await requireAdmin();
+
+  const current = await prisma.user.findFirst({
+    where: { id: userId },
+    select: { email: true },
+  });
   if (!current) return { ok: false, message: "Usuário não encontrado." };
 
   const isPrimaryAdmin = current.email.toLowerCase() === PRIMARY_ADMIN_EMAIL;
@@ -141,38 +178,41 @@ export async function updateUserAdminAction(
     return { ok: false, message: "O administrador principal deve permanecer ativo e com role admin." };
   }
 
-  const { data: duplicate } = await admin
-    .from("users")
-    .select("id")
-    .or(`email.eq.${values.email},username.eq.${values.username}`)
-    .neq("id", userId)
-    .maybeSingle();
+  const duplicate = await prisma.user.findFirst({
+    where: { OR: [{ email: values.email }, { username: values.username }], NOT: { id: userId } },
+    select: { id: true },
+  });
   if (duplicate) return { ok: false, message: "Email ou username já está em uso." };
 
   if (values.email !== current.email) {
-    const { error: authError } = await admin.auth.admin.updateUserById(userId, {
-      email: values.email,
-      email_confirm: true,
-    });
-    if (authError) return { ok: false, message: "Não foi possível atualizar o email de autenticação." };
+    try {
+      await getAdminAuth().updateUser(userId, { email: values.email, emailVerified: true });
+    } catch {
+      return { ok: false, message: "Não foi possível atualizar o email de autenticação." };
+    }
   }
 
   const finalValues = isPrimaryAdmin
     ? { ...values, email: PRIMARY_ADMIN_EMAIL, username: "gutiajs", role: "admin" as const, active: true }
     : values;
 
-  const [{ error: userError }, { error: profileError }] = await Promise.all([
-    admin.from("users").update(finalValues).eq("id", userId),
-    admin.from("profiles").update({
-      name: finalValues.name,
-      username: finalValues.username,
-      email: finalValues.email,
-      active: finalValues.active,
-      updated_at: new Date().toISOString(),
-    }).eq("user_id", userId),
-  ]);
-
-  if (userError || profileError) {
+  try {
+    await Promise.all([
+      prisma.user.update({
+        where: { id: userId },
+        data: finalValues,
+      }),
+      prisma.profile.update({
+        where: { userId },
+        data: {
+          name: finalValues.name,
+          username: finalValues.username,
+          email: finalValues.email,
+          active: finalValues.active,
+        },
+      }),
+    ]);
+  } catch {
     return { ok: false, message: "Não foi possível atualizar o usuário." };
   }
 
@@ -181,23 +221,25 @@ export async function updateUserAdminAction(
 }
 
 export async function deleteUserAdminAction(userId: string): Promise<ActionState> {
-  const { authUser, admin } = await requireAdmin();
-  if (userId === authUser.id) {
+  const { authUser } = await requireAdmin();
+  if (userId === authUser.uid) {
     return { ok: false, message: "Você não pode excluir a própria conta durante a sessão." };
   }
 
-  const { data: user } = await admin
-    .from("users")
-    .select("email")
-    .eq("id", userId)
-    .maybeSingle();
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+    select: { email: true },
+  });
   if (!user) return { ok: false, message: "Usuário não encontrado." };
   if (user.email.toLowerCase() === PRIMARY_ADMIN_EMAIL) {
     return { ok: false, message: "O administrador principal não pode ser excluído." };
   }
 
-  const { error } = await admin.auth.admin.deleteUser(userId);
-  if (error) return { ok: false, message: "Não foi possível excluir o usuário." };
+  try {
+    await getAdminAuth().deleteUser(userId);
+  } catch {
+    return { ok: false, message: "Não foi possível excluir o usuário." };
+  }
 
   refreshAdmin();
   return { ok: true, message: "Usuário excluído." };
@@ -207,12 +249,11 @@ export async function updateUserRoleAction(
   userId: string,
   role: "user" | "admin",
 ): Promise<ActionState> {
-  const { admin } = await requireAdmin();
-  const { data: user } = await admin
-    .from("users")
-    .select("name, username, email, active")
-    .eq("id", userId)
-    .single();
+  await requireAdmin();
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+    select: { name: true, username: true, email: true, active: true },
+  });
   if (!user) return { ok: false, message: "Usuário não encontrado." };
   return updateUserAdminAction(userId, { ...user, role });
 }
@@ -221,55 +262,79 @@ export async function toggleUserActiveAction(
   userId: string,
   active: boolean,
 ): Promise<ActionState> {
-  const { admin } = await requireAdmin();
-  const { data: user } = await admin
-    .from("users")
-    .select("name, username, email, role")
-    .eq("id", userId)
-    .single();
+  await requireAdmin();
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+    select: { name: true, username: true, email: true, role: true },
+  });
   if (!user) return { ok: false, message: "Usuário não encontrado." };
   return updateUserAdminAction(userId, { ...user, active });
 }
 
 export async function deleteLinkAdminAction(linkId: string): Promise<ActionState> {
-  const { admin } = await requireAdmin();
-  const { error } = await admin.from("links").delete().eq("id", linkId);
-  if (error) return { ok: false, message: "Erro ao excluir link." };
+  await requireAdmin();
+  try {
+    await prisma.link.delete({ where: { id: linkId } });
+  } catch {
+    return { ok: false, message: "Erro ao excluir link." };
+  }
   refreshAdmin();
   return { ok: true, message: "Link excluído." };
 }
 
 export async function getAdminLinks() {
-  const { admin } = await requireAdmin();
-  const { data: links } = await admin
-    .from("links")
-    .select("id, title, url, icon, user_id, created_at")
-    .order("created_at", { ascending: false })
-    .limit(250);
-  return links ?? [];
+  await requireAdmin();
+  const links = await prisma.link.findMany({
+    select: { id: true, title: true, url: true, icon: true, userId: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 250,
+  });
+
+  return links.map((l) => ({
+    id: l.id,
+    title: l.title,
+    url: l.url,
+    icon: l.icon,
+    user_id: l.userId,
+    created_at: l.createdAt.toISOString(),
+  }));
 }
 
 export async function resetUserThemeAction(userId: string): Promise<ActionState> {
-  const { admin } = await requireAdmin();
-  const { error } = await admin.from("users").update({ theme_json: {} }).eq("id", userId);
-  if (error) return { ok: false, message: "Erro ao resetar tema." };
+  await requireAdmin();
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { themeJson: {} },
+    });
+  } catch {
+    return { ok: false, message: "Erro ao resetar tema." };
+  }
   refreshAdmin();
   return { ok: true, message: "Tema resetado para o padrão." };
 }
 
 export async function getAdminThemes() {
-  const { admin } = await requireAdmin();
-  const { data: users } = await admin
-    .from("users")
-    .select("id, username, email, theme_json, created_at")
-    .not("theme_json", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(100);
+  await requireAdmin();
+  const users = await prisma.user.findMany({
+    where: { themeJson: { not: null } },
+    select: { id: true, username: true, email: true, themeJson: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
 
-  return (users ?? []).filter(
-    (user) =>
-      user.theme_json &&
-      typeof user.theme_json === "object" &&
-      Object.keys(user.theme_json as Record<string, unknown>).length > 0,
-  );
+  return users
+    .map((u) => ({
+      id: u.id,
+      username: u.username,
+      email: u.email,
+      theme_json: u.themeJson,
+      created_at: u.createdAt.toISOString(),
+    }))
+    .filter(
+      (user) =>
+        user.theme_json &&
+        typeof user.theme_json === "object" &&
+        Object.keys(user.theme_json as Record<string, unknown>).length > 0,
+    );
 }

@@ -2,8 +2,9 @@
 
 import React, { useRef, useState } from "react";
 import { Camera, ExternalLink, Pencil, User } from "lucide-react";
-import type { AppUser, Database } from "@/types/database";
-import { createClient } from "@/lib/supabase/client";
+import type { AppUser } from "@/types/database";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { uploadAvatarAction, uploadBannerAction } from "@/lib/actions/dashboard";
 
 export default function ProfileCard({
   user,
@@ -21,15 +22,9 @@ export default function ProfileCard({
   const avatarRef = useRef<HTMLInputElement | null>(null);
   const bannerRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
-  const supabaseRef = useRef(createClient());
 
   async function uploadFile(file: File, folder: string) {
-    const filename = `${Date.now()}_${file.name}`;
-    const { error } = await supabaseRef.current.storage
-      .from("user-content")
-      .upload(`${folder}/${filename}`, file, { upsert: true });
-    if (error) return null;
-    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/user-content/${folder}/${filename}`;
+    return await uploadToCloudinary(file, folder);
   }
 
   async function handleUpload(
@@ -43,7 +38,9 @@ export default function ProfileCard({
     const url = await uploadFile(f, folder);
     setUploading(false);
     if (!user || !url) { pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao enviar imagem" }); return; }
-    await supabaseRef.current.from("users").update({ [field]: url } as unknown as Database["public"]["Tables"]["users"]["Update"]).eq("id", user.id);
+    const fd = new FormData();
+    fd.append("file", f);
+    await (field === "avatar_url" ? uploadAvatarAction(fd) : uploadBannerAction(fd));
     setUser({ ...user, [field as keyof AppUser]: url });
     pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
   }

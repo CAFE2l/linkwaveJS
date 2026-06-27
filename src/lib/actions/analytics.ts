@@ -1,8 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db/prisma";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 
 export type DailyCount = { date: string; count: number };
 export type CountryCount = { country: string; count: number };
@@ -29,18 +29,15 @@ export type AnalyticsData = {
 };
 
 async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: { user: authUser } } = await supabase.auth.getUser();
+  const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const { data: user } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", authUser.id)
-    .single();
+  const user = await prisma.user.findFirst({
+    where: { id: authUser.uid },
+    select: { role: true },
+  });
 
   if (!user || user.role !== "admin") redirect("/dashboard");
-  return { supabase, admin: createAdminClient() };
 }
 
 function fillDateGaps(data: DailyCount[], days: number): DailyCount[] {
@@ -57,7 +54,7 @@ function fillDateGaps(data: DailyCount[], days: number): DailyCount[] {
 }
 
 export async function getAnalyticsOverview(): Promise<AnalyticsData> {
-  const { admin } = await requireAdmin();
+  await requireAdmin();
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now);
@@ -68,63 +65,65 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   todayStart.setHours(0, 0, 0, 0);
 
   const [
-    { count: totalUsers },
-    { count: activeUsers },
-    { count: inactiveUsers },
-    { count: totalLinks },
-    { count: totalClicks },
-    { count: clicksToday },
-    { data: recentClicks },
-    { data: recentUsers },
-    { count: prevPeriodClicks },
-    { data: allLinks },
-    { data: allUsers },
-    { data: allClickData },
+    totalUsers,
+    activeUsers,
+    inactiveUsers,
+    totalLinks,
+    totalClicks,
+    clicksToday,
+    recentClicks,
+    recentUsers,
+    prevPeriodClicks,
+    allLinks,
+    allUsers,
+    allClickData,
   ] = await Promise.all([
-    admin.from("users").select("*", { count: "exact", head: true }),
-    admin.from("users").select("*", { count: "exact", head: true }).eq("active", true),
-    admin.from("users").select("*", { count: "exact", head: true }).eq("active", false),
-    admin.from("links").select("*", { count: "exact", head: true }),
-    admin.from("clicks").select("*", { count: "exact", head: true }),
-    admin.from("clicks").select("*", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
-    admin
-      .from("clicks")
-      .select("created_at")
-      .gte("created_at", thirtyDaysAgo.toISOString())
-      .order("created_at"),
-    admin
-      .from("users")
-      .select("created_at")
-      .gte("created_at", thirtyDaysAgo.toISOString())
-      .order("created_at"),
-    admin
-      .from("clicks")
-      .select("*", { count: "exact", head: true })
-      .gte("created_at", sixtyDaysAgo.toISOString())
-      .lt("created_at", thirtyDaysAgo.toISOString()),
-    admin.from("links").select("id, title, url, user_id").limit(200),
-    admin.from("users").select("id, username"),
-    admin.from("clicks").select("link_id, created_at, country"),
+    prisma.user.count(),
+    prisma.user.count({ where: { active: true } }),
+    prisma.user.count({ where: { active: false } }),
+    prisma.link.count(),
+    prisma.click.count(),
+    prisma.click.count({ where: { createdAt: { gte: todayStart } } }),
+    prisma.click.findMany({
+      where: { createdAt: { gte: thirtyDaysAgo } },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.user.findMany({
+      where: { createdAt: { gte: thirtyDaysAgo } },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.click.count({
+      where: {
+        createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+      },
+    }),
+    prisma.link.findMany({
+      select: { id: true, title: true, url: true, userId: true },
+      take: 200,
+    }),
+    prisma.user.findMany({ select: { id: true, username: true } }),
+    prisma.click.findMany({ select: { linkId: true, createdAt: true, country: true } }),
   ]);
 
-  const prevCount = prevPeriodClicks ?? 0;
-  const currCount = recentClicks?.length ?? 0;
-  const diff = currCount - prevCount;
-  const totalClicksDelta = prevCount > 0 ? Math.round((diff / prevCount) * 100) : 0;
+  const currCount = recentClicks.length;
+  const diff = currCount - prevPeriodClicks;
+  const totalClicksDelta = prevPeriodClicks > 0 ? Math.round((diff / prevPeriodClicks) * 100) : 0;
 
-  const { count: prevUsers } = await admin
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", sixtyDaysAgo)
-    .lt("created_at", thirtyDaysAgo);
+  const prevUsers = await prisma.user.count({
+    where: {
+      createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+    },
+  });
   const totalUsersDelta = prevUsers
-    ? Math.round((((recentUsers?.length ?? 0) - prevUsers) / prevUsers) * 100)
+    ? Math.round(((recentUsers.length - prevUsers) / prevUsers) * 100)
     : 0;
 
   const userGrowth = fillDateGaps(
     Array.from(
-      (recentUsers ?? []).reduce<Map<string, number>>((acc, u) => {
-        const key = u.created_at.slice(0, 10);
+      recentUsers.reduce<Map<string, number>>((acc, u) => {
+        const key = u.createdAt.toISOString().slice(0, 10);
         acc.set(key, (acc.get(key) ?? 0) + 1);
         return acc;
       }, new Map()),
@@ -135,8 +134,8 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
 
   const clickActivity = fillDateGaps(
     Array.from(
-      (recentClicks ?? []).reduce<Map<string, number>>((acc, c) => {
-        const key = c.created_at.slice(0, 10);
+      recentClicks.reduce<Map<string, number>>((acc, c) => {
+        const key = c.createdAt.toISOString().slice(0, 10);
         acc.set(key, (acc.get(key) ?? 0) + 1);
         return acc;
       }, new Map()),
@@ -146,25 +145,25 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
   );
 
   const clickCounts = new Map<string, number>();
-  for (const c of allClickData ?? []) {
-    clickCounts.set(c.link_id, (clickCounts.get(c.link_id) ?? 0) + 1);
+  for (const c of allClickData) {
+    clickCounts.set(c.linkId, (clickCounts.get(c.linkId) ?? 0) + 1);
   }
 
-  const usersMap = new Map((allUsers ?? []).map((u) => [u.id, u.username]));
+  const usersMap = new Map(allUsers.map((u) => [u.id, u.username]));
 
-  const sortedLinks = (allLinks ?? [])
+  const sortedLinks = allLinks
     .map((l) => ({
       id: l.id,
       title: l.title,
       url: l.url,
-      username: usersMap.get(l.user_id) ?? l.user_id.slice(0, 8),
+      username: usersMap.get(l.userId) ?? l.userId.slice(0, 8),
       clicks: clickCounts.get(l.id) ?? 0,
     }))
     .sort((a, b) => b.clicks - a.clicks)
     .slice(0, 10);
 
   const countryMap = new Map<string, number>();
-  for (const c of allClickData ?? []) {
+  for (const c of allClickData) {
     if (c.country) {
       countryMap.set(c.country, (countryMap.get(c.country) ?? 0) + 1);
     }
@@ -174,15 +173,15 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     .sort((a, b) => b.count - a.count);
 
   const hourlyCounts = new Array(24).fill(0);
-  for (const c of allClickData ?? []) {
-    const hour = new Date(c.created_at).getHours();
+  for (const c of allClickData) {
+    const hour = c.createdAt.getHours();
     hourlyCounts[hour]++;
   }
   const hourlyActivity = hourlyCounts.map((count, hour) => ({ hour, count }));
 
   const userLinkCounts = new Map<string, number>();
-  for (const l of allLinks ?? []) {
-    userLinkCounts.set(l.user_id, (userLinkCounts.get(l.user_id) ?? 0) + 1);
+  for (const l of allLinks) {
+    userLinkCounts.set(l.userId, (userLinkCounts.get(l.userId) ?? 0) + 1);
   }
   const engagementMap = new Map<number, number>();
   for (const count of userLinkCounts.values()) {
@@ -193,13 +192,13 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     .sort((a, b) => a.links - b.links);
 
   return {
-    totalUsers: totalUsers ?? 0,
+    totalUsers,
     totalUsersDelta,
-    activeUsers: activeUsers ?? 0,
-    inactiveUsers: inactiveUsers ?? 0,
-    totalLinks: totalLinks ?? 0,
-    totalClicks: totalClicks ?? 0,
-    clicksToday: clicksToday ?? 0,
+    activeUsers,
+    inactiveUsers,
+    totalLinks,
+    totalClicks,
+    clicksToday,
     clicksLast30Days: currCount,
     totalClicksDelta,
     userGrowth,

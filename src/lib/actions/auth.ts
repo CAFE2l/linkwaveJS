@@ -2,9 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { headers, cookies } from "next/headers";
+import { prisma } from "@/lib/db/prisma";
+import { getAdminAuth } from "@/lib/firebase/admin";
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { getFirebaseConfig } from "@/lib/firebase/config";
 import { checkRegistrationRateLimit } from "@/lib/security/rate-limit";
 import { normalizeEmail, normalizeUsername, sanitizeText } from "@/lib/security/sanitize";
 import { getBaseUrl } from "@/lib/utils/url";
@@ -14,6 +17,11 @@ import {
   resetPasswordSchema,
   usernameSchema,
 } from "@/lib/validations/auth";
+
+function getServerAuth() {
+  const app = getApps().length === 0 ? initializeApp(getFirebaseConfig()) : getApps()[0];
+  return getAuth(app);
+}
 
 export type ActionState = {
   ok: boolean;
@@ -52,10 +60,26 @@ export async function loginAction(input: unknown): Promise<ActionState> {
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      getServerAuth(),
+      parsed.data.email,
+      parsed.data.password,
+    );
+    const idToken = await userCredential.user.getIdToken();
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+      expiresIn: 60 * 60 * 24 * 14 * 1000,
+    });
 
-  if (error) {
+    const cookieStore = await cookies();
+    cookieStore.set("__session", sessionCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  } catch {
     return { ok: false, message: "Email ou senha inválidos." };
   }
 
@@ -97,29 +121,16 @@ export async function registerUserAction(
     };
   }
 
-  const admin = createAdminClient();
   const name = sanitizeText(parsed.data.name);
   const email = normalizeEmail(parsed.data.email);
   const username = normalizeUsername(parsed.data.username);
   const { password } = parsed.data;
 
-  const [{ data: existingUsername }, { data: existingProfileUsername }, { data: existingEmail }] =
+  const [existingUsername, existingProfileUsername, existingEmail] =
     await Promise.all([
-      admin
-        .from("users")
-        .select("id")
-        .eq("username", username)
-        .maybeSingle(),
-      admin
-        .from("profiles")
-        .select("id")
-        .eq("username", username)
-        .maybeSingle(),
-      admin
-        .from("users")
-        .select("id")
-        .eq("email", email)
-        .maybeSingle(),
+      prisma.user.findFirst({ where: { username }, select: { id: true } }),
+      prisma.profile.findFirst({ where: { username }, select: { id: true } }),
+      prisma.user.findFirst({ where: { email }, select: { id: true } }),
     ]);
 
   if (existingUsername || existingProfileUsername) {
@@ -130,20 +141,17 @@ export async function registerUserAction(
     return { ok: false, message: "Este email já está em uso." };
   }
 
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      name,
-      username,
-    },
-  });
-
-  if (error || !data.user) {
-    const alreadyRegistered = error?.message
-      ?.toLowerCase()
-      .includes("already registered");
+  let userRecord;
+  try {
+    userRecord = await getAdminAuth().createUser({
+      email,
+      password,
+      emailVerified: true,
+      displayName: name,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "";
+    const alreadyRegistered = message.toLowerCase().includes("already exists");
     return {
       ok: false,
       message: alreadyRegistered
@@ -152,34 +160,59 @@ export async function registerUserAction(
     };
   }
 
-  const userId = data.user.id;
+  const userId = userRecord.uid;
 
-  const { error: profileError } = await admin.from("profiles").upsert({
-    user_id: userId,
-    name,
-    username,
-    email,
-    active: true,
-    bio: "Minha onda de links.",
-    theme: "wave",
-    custom_colors: {},
-  });
-
-  if (profileError) {
-    await admin.auth.admin.deleteUser(userId);
+  try {
+    await prisma.profile.upsert({
+      where: { userId },
+      create: {
+        userId,
+        name,
+        username,
+        email,
+        active: true,
+        bio: "Minha onda de links.",
+        theme: "wave",
+        customColors: {},
+      },
+      update: {
+        name,
+        username,
+        email,
+        active: true,
+        bio: "Minha onda de links.",
+        theme: "wave",
+        customColors: {},
+      },
+    });
+  } catch {
+    await getAdminAuth().deleteUser(userId);
     return {
       ok: false,
       message: "Não foi possível finalizar seu cadastro. Tente novamente.",
     };
   }
 
-  const supabase = await createClient();
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      getServerAuth(),
+      email,
+      password,
+    );
+    const idToken = await userCredential.user.getIdToken();
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+      expiresIn: 60 * 60 * 24 * 14 * 1000,
+    });
 
-  if (signInError) {
+    const cookieStore = await cookies();
+    cookieStore.set("__session", sessionCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  } catch {
     return {
       ok: true,
       message: "Conta criada com sucesso.",
@@ -207,19 +240,10 @@ export async function checkUsernameAvailabilityAction(
   }
 
   const username = normalizeUsername(parsed.data);
-  const admin = createAdminClient();
 
-  const [{ data: user }, { data: profile }] = await Promise.all([
-    admin
-      .from("users")
-      .select("id")
-      .eq("username", username)
-      .maybeSingle(),
-    admin
-      .from("profiles")
-      .select("id")
-      .eq("username", username)
-      .maybeSingle(),
+  const [user, profile] = await Promise.all([
+    prisma.user.findFirst({ where: { username }, select: { id: true } }),
+    prisma.profile.findFirst({ where: { username }, select: { id: true } }),
   ]);
 
   if (user || profile) {
@@ -240,15 +264,11 @@ export async function resetPasswordAction(
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(
-    parsed.data.email,
-    {
-      redirectTo: `${getBaseUrl()}/reset-password`,
-    },
-  );
-
-  if (error) {
+  try {
+    await sendPasswordResetEmail(getServerAuth(), parsed.data.email, {
+      url: `${getBaseUrl()}/reset-password`,
+    });
+  } catch {
     return {
       ok: false,
       message: "Não foi possível enviar a recuperação.",
@@ -262,8 +282,8 @@ export async function resetPasswordAction(
 }
 
 export async function logoutAction() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  const cookieStore = await cookies();
+  cookieStore.set("__session", "", { maxAge: 0, path: "/" });
   revalidatePath("/", "layout");
   redirect("/");
 }

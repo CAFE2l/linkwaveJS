@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PublicProfileView } from "@/components/public-profile/public-profile-view";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 import { getBaseUrl } from "@/lib/utils/url";
 import { mergeUserTheme } from "@/lib/profile-theme-presets";
 import type { UserThemeConfig } from "@/types/database";
@@ -11,32 +11,27 @@ type Props = {
 };
 
 async function getPublicProfile(username: string) {
-  const supabase = await createClient();
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("username", username)
-    .eq("active", true)
-    .maybeSingle();
+  const user = await prisma.user.findFirst({
+    where: { username, active: true },
+  });
 
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("bio")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const profile = await prisma.profile.findFirst({
+    where: { userId: user.id },
+    select: { bio: true },
+  });
 
-  const { data: links } = await supabase
-    .from("links")
-    .select("id, title, url, icon, icone, icon_blob, is_custom_icon, order_position, user_id, created_at")
-    .eq("user_id", user.id)
-    .order("order_position");
+  const links = await prisma.link.findMany({
+    where: { userId: user.id },
+    orderBy: { orderPosition: "asc" },
+    select: { id: true, title: true, url: true, icon: true, icone: true, iconBlob: true, isCustomIcon: true, orderPosition: true, userId: true, createdAt: true },
+  });
 
-  const theme = (user.theme_json ?? null) as Partial<UserThemeConfig> | null;
+  const theme = (user.themeJson ?? null) as Partial<UserThemeConfig> | null;
   const mergedTheme = mergeUserTheme(theme);
 
-  return { user, profile, links: links ?? [], theme: mergedTheme };
+  return { user, profile, links, theme: mergedTheme };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -49,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `@${data.user.username}`;
   const description = data.profile?.bio || "Minha página LinkWave.";
-  const image = data.user.avatar_url || "/brand/banner.png";
+  const image = data.user.avatarUrl || "/brand/banner.png";
 
   return {
     title,

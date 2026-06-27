@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Nunito } from "next/font/google";
 import Script from "next/script";
+import AuthProviderWrapper from "@/components/shared/auth-provider-wrapper";
 import "./globals.css";
 
 const inter = Inter({
@@ -82,7 +83,7 @@ export default function RootLayout({
             __html: `if(typeof firebase !== "undefined"){firebase.initializeApp({apiKey:"AIzaSyAnLjNIr5KQ42kZNOKzMG3vEPlJd4_ik-U",authDomain:"linkwave-5bfb1.firebaseapp.com",projectId:"linkwave-5bfb1",storageBucket:"linkwave-5bfb1.firebasestorage.app",messagingSenderId:"462579547054",appId:"1:462579547054:web:b0c9034f0f6d64021ea63f",measurementId:"G-JS525M5ZZK"});firebase.analytics();}`,
           }}
         />
-        {children}
+        <AuthProviderWrapper>{children}</AuthProviderWrapper>
       </body>
     </html>
   );

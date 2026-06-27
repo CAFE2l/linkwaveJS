@@ -1,211 +1,351 @@
-# LinkWave 🌊
+# 🌊 LinkWave
 
-**LinkWave** is a modern link-in-bio platform with a beautiful frutiger aero design, deep theme customization, and a full analytics dashboard. Built with Next.js 15, Supabase, and TypeScript.
+<div align="center">
 
----
+![LinkWave](https://img.shields.io/badge/LinkWave-Frutiger%20Aero-00C8FF?style=for-the-badge)
 
-## Tecnologias
+**Links para criadores, do seu jeito.**
 
-| Camada | Tecnologia |
-|--------|-----------|
-| **Front-end** | Next.js 15 (App Router), React 19, Tailwind CSS v4, Framer Motion, Recharts |
-| **Back-end** | Next.js Server Actions, API Routes (Route Handlers), Supabase SSR |
-| **Banco de dados** | PostgreSQL (via Supabase), Row Level Security, 5 tabelas, 13 índices |
-| **Autenticação** | Supabase Auth (JWT), OAuth (Google/GitHub), sessions via cookies |
-| **Storage** | Supabase Storage (avatars, banners) |
-| **Ícones** | Lucide React + 137 PNG icons em `public/imgs/icons/links/` |
-| **Deploy** | Vercel |
+Uma plataforma moderna de **Link in Bio** desenvolvida para criadores de conteúdo, empreendedores, freelancers e empresas que desejam centralizar toda sua presença digital em uma única página totalmente personalizável.
 
 ---
 
-## Instalação
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38BDF8?logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql)
 
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/linkwave.git
-cd linkwave
+</div>
 
-# Instale as dependências
-npm install
+---
 
-# Configure as variáveis de ambiente
-cp .env.example .env.local
-# Edite .env.local com suas credenciais do Supabase
+# 📖 Sobre o Projeto
 
-# Inicie o banco de dados (aplicar schema + seed)
-# No painel do Supabase, execute o SQL em supabase/schema.sql
-# Opcional: supabase/seed.sql para dados de demonstração
+O **LinkWave** é uma plataforma de **Link in Bio** desenvolvida para reunir todos os links de um usuário em uma única página pública e altamente personalizável.
 
-# Inicie o servidor de desenvolvimento
-npm run dev
+Diferentemente das soluções tradicionais, o projeto prioriza:
+
+* 🎨 Personalização avançada
+* ⚡ Performance
+* 📊 Analytics integrado
+* 🔒 Segurança
+* 📱 Interface moderna inspirada em Frutiger Aero
+* 🌐 Identidade visual própria
+
+O objetivo é permitir que criadores de conteúdo, empresas e profissionais concentrem toda sua presença digital em um único lugar de forma simples, intuitiva e profissional.
+
+---
+
+# 🚀 Funcionalidades
+
+## 👤 Autenticação
+
+* Cadastro
+* Login
+* Recuperação de senha
+* Logout
+* Gerenciamento de sessão
+
+---
+
+## 🌐 Perfil Público
+
+Cada usuário possui uma página exclusiva.
+
+Exemplo:
+
+```text
+linkwave.app/cafe
 ```
 
-### Variáveis de Ambiente
+O perfil pode conter:
 
-```
-NEXT_PUBLIC_SUPABASE_URL=       # URL do projeto Supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=  # Chave anônima (pública)
-SUPABASE_SERVICE_ROLE_KEY=      # Chave de serviço (admin) — nunca exposta no cliente
-ENABLE_TEST_LOGIN=              # Opcional: habilita endpoints de login de teste
-```
-
----
-
-## Estrutura do Projeto
-
-```
-src/
-├── app/                        # Next.js App Router (rotas, API, layouts)
-│   ├── u/[username]/           # Página pública de perfil
-│   ├── dashboard/              # Dashboard do usuário
-│   │   └── customize/          # Página de customização de tema
-│   ├── admin/                  # Painel administrativo
-│   │   ├── overview/           # Dashboard de analytics
-│   │   ├── users/              # Gerenciamento de usuários
-│   │   ├── links/              # Gerenciamento de links
-│   │   └── themes/             # Temas dos usuários
-│   ├── login/                  # Login
-│   ├── register/               # Cadastro
-│   └── api/                    # API routes
-│       ├── links/              # CRUD de links
-│       └── click/              # Registro de cliques
-├── components/
-│   ├── customize/              # Componentes do dashboard (ProfileCard, LinkList, PreviewCard, etc.)
-│   ├── landing/                # Landing page (navbar, hero, footer, CTA)
-│   ├── admin/                  # Componentes administrativos + 7 charts
-│   ├── dashboard/              # Dashboard shell, links manager
-│   ├── public-profile/         # Componentes de perfil público (CosmicAvatar, StarCanvas, etc.)
-│   ├── shared/                 # Componentes compartilhados (ThemeProviderShell, PublicLinkButton)
-│   ├── ui/                     # Componentes base (Card, Button, Input, Avatar)
-│   └── theme/                  # Customizador de tema legado
-├── lib/
-│   ├── actions/                # Server Actions (auth, dashboard, analytics, admin, etc.)
-│   ├── supabase/               # Clientes Supabase (server, client, admin, middleware)
-│   ├── validations/            # Schemas Zod
-│   └── utils/                  # Utilitários (URL, cn)
-├── types/                      # Tipos TypeScript (database, UserThemeConfig)
-└── hooks/                      # React hooks (useThemeContext)
-supabase/
-├── schema.sql                  # Esquema completo do banco
-├── seed.sql                    # Dados de demonstração
-└── migrations/                 # Migrações incrementais
-```
+* Avatar
+* Nome
+* Bio
+* Links
+* Redes sociais
+* Tema personalizado
 
 ---
 
-## Funcionalidades
+## 🔗 Gerenciamento de Links
 
-### Para Usuários
-- **Criação de links** com ícones personalizados (137 disponíveis)
-- **Customização completa de tema**: gradientes, galaxy, estilos de card, efeitos, fontes, LED colors
-- **Preview ao vivo** das alterações
-- **Upload de avatar e banner**
-- **Página pública** (`/u/username`) com tema aplicado em tempo real
-- **Estatísticas básicas**: cliques totais no dashboard
+O usuário pode:
 
-### Para Administradores
-- **Dashboard analítico completo** com 7 gráficos:
-  - Cartões de métricas (usuários, links, cliques + delta)
-  - Crescimento de usuários (gráfico de área, 30 dias)
-  - Atividade de cliques (gráfico de barras, 30 dias)
-  - Top links ranqueados (gráfico de barras horizontal)
-  - Distribuição por país (barras com bandeiras)
-  - Atividade por hora do dia (gráfico de área)
-  - Engajamento (distribuição de links por usuário)
-- **Gerenciamento de usuários**, links e temas
-- Dados **100% reais** do banco (nenhum valor hardcoded)
+* Criar links
+* Editar links
+* Excluir links
+* Reordenar links
+* Definir ícones
+* Personalizar aparência
 
 ---
 
-## Ciência de Dados
+## 📊 Dashboard
 
-### Métricas Calculadas
+O painel administrativo permite visualizar:
 
-| Métrica | Tipo | Cálculo |
-|---------|------|---------|
-| Total de usuários | Contagem | `SELECT count(*) FROM users` |
-| Total de links | Contagem | `SELECT count(*) FROM links` |
-| Total de cliques | Contagem | `SELECT count(*) FROM clicks` |
-| Delta de cliques | Porcentagem | `((cliques_30d - cliques_30d_anterior) / cliques_30d_anterior) * 100` |
-| Delta de usuários | Porcentagem | `((total - periodo_anterior) / periodo_anterior) * 100` |
-| Satisfação (landing) | Porcentagem | `(usuários_com_cliques / total_usuários_ativos) * 100` |
-| Crescimento diário | Série temporal | Agregação de `created_at` por dia (últimos 30 dias) |
-| Atividade horária | Distribuição | Cliques agrupados por hora do dia (0-23) |
-| Distribuição por país | Ranking | Cliques agrupados por país, ordenados |
-| Engajamento | Histograma | Usuários agrupados por quantidade de links criados |
-
-### Insights Disponíveis
-- Qual link tem mais cliques (top 10)
-- Em quais horários os cliques acontecem (pico de atividade)
-- De quais países vêm os cliques
-- Quantos links cada usuário cria em média
-- Tendência de crescimento de usuários e cliques
+* Estatísticas
+* Cliques
+* Links cadastrados
+* Evolução temporal
+* Crescimento da plataforma
 
 ---
 
-## API Routes
+# 🏗 Arquitetura
 
-| Método | Rota | Autenticação | Descrição |
-|--------|------|-------------|-----------|
-| POST | `/api/links` | JWT | Criar link |
-| PUT | `/api/links` | JWT | Atualizar link |
-| DELETE | `/api/links` | JWT | Excluir link |
-| POST | `/api/click` | Pública | Registrar clique (com geolocalização) |
-| GET | `/api/health` | Nenhuma | Health check |
+O projeto segue uma arquitetura moderna baseada em separação de responsabilidades.
 
----
-
-## Arquitetura
-
-```
-Usuário → Navegador → Next.js (App Router)
-                          │
-                    ┌─────┴──────┐
-                    │ Server     │ Client
-                    │ Actions    │ Components
-                    └─────┬──────┘
-                          │
-               ┌──────────┴──────────┐
-               │ Supabase (Postgres) │
-               │   + RLS Policies    │
-               └─────────────────────┘
+```text
+Usuário
+      │
+      ▼
+Interface Web (Next.js)
+      │
+      ▼
+Server Actions / API Routes
+      │
+      ▼
+Validação (Zod)
+      │
+      ▼
+Supabase Auth
+      │
+      ▼
+PostgreSQL
+      │
+      ▼
+Resposta
+      │
+      ▼
+Atualização da Interface
 ```
 
-- **Server Actions**: operações de escrita (CRUD de links, atualização de perfil/tema, upload)
-- **API Routes**: registro de cliques (público) e CRUD de links (via fetch do cliente)
-- **Middleware**: refresh de sessão, proteção de rotas, headers de segurança
-- **RLS**: segurança em nível de banco — cada tabela tem políticas que garantem que usuários só acessem seus próprios dados
+Toda validação crítica é realizada no servidor.
 
 ---
+
+# 🗄 Banco de Dados
+
+Modelo simplificado:
+
+```text
+auth.users
+      │
+      ▼
+public.users
+      │
+      ├────────► public.profiles
+      │
+      ├────────► public.links
+      │               │
+      │               ▼
+      └────────────► public.clicks
+
+registration_rate_limits
+```
+
+Principais tabelas:
+
+### users
+
+Armazena informações dos usuários.
+
+---
+
+### profiles
+
+Responsável pelas configurações públicas.
+
+---
+
+### links
+
+Contém todos os links criados pelos usuários.
+
+---
+
+### clicks
+
+Registra acessos utilizados nas estatísticas.
+
+---
+
+### registration_rate_limits
+
+Proteção contra spam e abuso de cadastro.
+
+---
+
+# 📈 Analytics
+
+O módulo analítico transforma os dados da plataforma em informações úteis.
+
+Métricas disponíveis:
+
+* Total de usuários
+* Total de links
+* Cliques registrados
+* Ranking de links
+* Distribuição geográfica
+* Evolução temporal
+
+Visualização construída utilizando **Recharts**.
+
+---
+
+# 🛡 Segurança
+
+O projeto utiliza diversas camadas de proteção.
+
+* Supabase Auth
+* PostgreSQL
+* Row Level Security (RLS)
+* Validação com Zod
+* Server Actions
+* API Routes
+* Rate Limit
+
+---
+
+# 💻 Tecnologias
+
+## Front-end
+
+* Next.js 15
+* React
+* TypeScript
+* Tailwind CSS
+* Framer Motion
+
+## Back-end
+
+* Server Actions
+* API Routes
 
 ## Banco de Dados
 
-### Tabelas Principais
+* PostgreSQL
+* Supabase
 
-| Tabela | Descrição |
-|--------|-----------|
-| `users` | Usuários registrados (espelha `auth.users`) |
-| `profiles` | Perfis com bio, tema, cores customizadas (1:1 com users) |
-| `links` | Links da bio (com ícone, ordem, suporte a ícone customizado) |
-| `clicks` | Registros de clique (com IP, país, cidade) |
-| `registration_rate_limits` | Rate limiting de registro (hash de IP) |
+## Validação
 
-### Relacionamentos
+* Zod
+* React Hook Form
 
-```
-users 1──1 profiles
-users 1──N links
-users 1──N clicks
-links 1──N clicks
-```
+## Analytics
 
-### Scripts SQL
-- `supabase/schema.sql` — Criação completa do banco (tabelas, índices, RLS, triggers)
-- `supabase/seed.sql` — Dados de demonstração (5 usuários, 14 links, cliques distribuídos)
-- `supabase/migrations/` — Migrações incrementais
+* Recharts
+
+## Testes
+
+* Playwright
 
 ---
 
-## Licença
+# 🎨 Design
 
-MIT
+A identidade visual foi inspirada no movimento **Frutiger Aero**, buscando uma interface moderna, leve e tecnológica.
+
+Características:
+
+* Glassmorphism
+* Gradientes suaves
+* Efeitos de profundidade
+* Animações fluidas
+* UI responsiva
+* Experiência premium
+
+---
+
+# 📂 Estrutura do Projeto
+
+```text
+src/
+├── app/
+├── components/
+├── hooks/
+├── lib/
+├── services/
+├── styles/
+├── types/
+├── utils/
+└── middleware.ts
+
+public/
+├── icons/
+├── images/
+└── videos/
+```
+
+---
+
+# ⚙️ Instalação
+
+Clone o projeto:
+
+```bash
+git clone https://github.com/SEU-USUARIO/linkwave.git
+```
+
+Entre na pasta:
+
+```bash
+cd linkwave
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Configure as variáveis de ambiente:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+Execute o projeto:
+
+```bash
+npm run dev
+```
+
+---
+
+# 🌐 Deploy
+
+O projeto foi desenvolvido para ser hospedado na **Vercel**, utilizando o Supabase como backend.
+
+---
+
+# 👥 Equipe
+
+* Gabriel Felipe Sabino de Souza
+* Lucas Daniel Carvalho de Castilho
+* Emelly de Mello Giovanini
+
+---
+
+# 📄 Licença
+
+Projeto desenvolvido para fins acadêmicos e de aprendizado.
+
+---
+
+<div align="center">
+
+### LinkWave
+
+**Links para criadores, do seu jeito.**
+
+Desenvolvido com ❤️ utilizando Next.js, TypeScript, Tailwind CSS e Supabase.
+
+</div>

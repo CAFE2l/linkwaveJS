@@ -763,7 +763,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
             <div className="glass p-6 flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
               <div className="relative">
                 <Avatar src={user?.avatar_url} alt={user?.username} size="lg" className="avatar-ring" />
-                <a href="/profile" className="absolute -bottom-2 -right-2 w-7 h-7 bg-white rounded-full border-2 border-blue-200 flex items-center justify-center shadow-md"> 
+                <a href="/dashboard" className="absolute -bottom-2 -right-2 w-7 h-7 bg-white rounded-full border-2 border-blue-200 flex items-center justify-center shadow-md"> 
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-ocean" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
                 </a>
               </div>
@@ -783,7 +783,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
 
               <div className="mt-5 w-full flex flex-col gap-2">
                 <button onClick={() => window.open(`/u/${user?.username}`, '_blank')} className="btn-blue">Ver perfil público</button>
-                <a href="/profile" className="btn-ghost text-center py-2 rounded-md">Editar perfil</a>
+                <button type="button" onClick={() => setNameModalOpen(true)} className="btn-ghost text-center py-2 rounded-md">Editar perfil</button>
               </div>
 
               <div className="mt-5 w-full border-t border-white/40 pt-4 text-center">

@@ -169,7 +169,7 @@ export async function uploadAvatarAction(
     return { ok: false, message: "Erro ao salvar avatar." };
   }
 
-  revalidatePath("/profile");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/customize");
   revalidatePath("/u/*");
   return { ok: true, message: "Avatar atualizado.", url: avatarUrl };
@@ -202,7 +202,7 @@ export async function uploadBannerAction(
     return { ok: false, message: "Erro ao salvar banner." };
   }
 
-  revalidatePath("/profile");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/customize");
   return { ok: true, message: "Banner atualizado.", url: bannerUrl };
 }

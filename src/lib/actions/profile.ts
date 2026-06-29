@@ -82,7 +82,7 @@ export async function updateProfileAction(
     return { ok: false, message: "Erro ao atualizar perfil." };
   }
 
-  revalidatePath("/profile");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/customize");
   revalidatePath(`/u/${username}`);
   return {

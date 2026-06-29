@@ -94,7 +94,7 @@ export async function PUT(req: Request) {
 
       if (pinnedCount >= 5) {
         return NextResponse.json(
-          { ok: false, message: 'Você pode fixar no máximo 5 links.' },
+          { ok: false, message: 'Você já tem 5 links fixados. Desafixe um para continuar.' },
           { status: 400 },
         );
       }

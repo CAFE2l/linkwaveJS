@@ -1,5 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+function generateUsername(uid: string): string {
+  return `u_${uid.slice(0, 26)}`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
@@ -8,10 +12,42 @@ export async function POST(request: NextRequest) {
     }
 
     const { getAdminAuth } = await import("@/lib/firebase/admin");
+    const { prisma } = await import("@/lib/db/prisma");
+
+    const decoded = await getAdminAuth().verifyIdToken(idToken);
+    const { uid, email, name: displayName } = decoded;
+    const userEmail = email ?? "";
+
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
     const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
       expiresIn,
+    });
+
+    await prisma.user.upsert({
+      where: { id: uid },
+      create: {
+        id: uid,
+        email: userEmail,
+        username: generateUsername(uid),
+        name: displayName ?? "",
+      },
+      update: {},
+    });
+
+    await prisma.profile.upsert({
+      where: { userId: uid },
+      create: {
+        userId: uid,
+        name: displayName ?? "",
+        username: generateUsername(uid),
+        email: userEmail,
+        active: true,
+        bio: "Minha onda de links.",
+        theme: "wave",
+        customColors: {},
+      },
+      update: {},
     });
 
     const response = NextResponse.json({ success: true });

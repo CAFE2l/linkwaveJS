@@ -5,7 +5,6 @@ import {
   useContext,
   useEffect,
   useState,
-  useCallback,
   type ReactNode,
 } from "react";
 import {
@@ -56,7 +55,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     provider.addScope("profile");
     provider.addScope("email");
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    const idToken = await result.user.getIdToken();
+    await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
   }
 
   async function logout() {

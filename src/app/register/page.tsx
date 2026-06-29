@@ -3,9 +3,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Shield, Sparkles, Zap } from "lucide-react";
 import { RegisterForm } from "@/components/auth/register-form";
-import { CompleteRegistrationForm } from "@/components/auth/complete-registration-form";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
-import { prisma } from "@/lib/db/prisma";
 import { PublicPageLayout } from "@/components/shared/public-page-layout";
 
 export const metadata: Metadata = {
@@ -22,15 +20,10 @@ const benefits = [
 export default async function RegisterPage() {
   const user = await getCurrentUser();
 
-  if (user) {
-    const record = await prisma.user.findUnique({ where: { id: user.uid } });
-    if (record) redirect("/dashboard");
-  }
-
-  const isLoggedIn = !!user;
+  if (user) redirect("/dashboard");
 
   return (
-    <PublicPageLayout isLoggedIn={isLoggedIn}>
+    <PublicPageLayout isLoggedIn={false}>
       <div className="page-container flex flex-1 flex-col justify-center pb-8 pt-6">
         <section className="grid items-center gap-12 lg:grid-cols-[1fr_28rem]">
           <div className="hidden lg:block">
@@ -39,14 +32,11 @@ export default async function RegisterPage() {
               Cadastro seguro com Firebase Auth
             </div>
             <h1 className="max-w-2xl text-5xl font-black leading-tight tracking-tight text-ocean" style={{ textShadow: "0 2px 0 rgba(255,255,255,0.5)" }}>
-              {isLoggedIn
-                ? "Quase lá! Só falta escolher seu username."
-                : "Sua página de links começa com uma conta protegida de verdade."}
+              Sua página de links começa com uma conta protegida de verdade.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-              {isLoggedIn
-                ? "Sua autenticação já foi feita. Defina seu nome e username para ativar seu perfil público."
-                : "Validação no servidor, Auth moderno, perfis públicos e uma base pronta para crescer sem depender de JavaScript no navegador."}
+              Validação no servidor, Auth moderno, perfis públicos e uma base
+              pronta para crescer sem depender de JavaScript no navegador.
             </p>
 
             <div className="mt-10 flex flex-col gap-3">
@@ -66,30 +56,25 @@ export default async function RegisterPage() {
 
           <div className="mx-auto w-full max-w-md">
             <div className="glass-card-strong p-8 sm:p-10">
-              {isLoggedIn ? (
-                <CompleteRegistrationForm />
-              ) : (
-                <>
-                  <div className="mb-8 text-center">
-                    <div className="relative mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-cyan-300/40 to-blue-400/30 p-0 shadow-inner">
-                      <div className="absolute inset-0 rounded-[1.25rem] bg-gradient-to-b from-white/40 to-transparent opacity-60" />
-                      <Image
-                        src="/brand/icon.png"
-                        alt="LinkWave"
-                        width={56}
-                        height={56}
-                        className="relative drop-shadow-xl"
-                        priority
-                      />
-                    </div>
-                    <h2 className="text-3xl font-black text-ocean" style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}>Criar conta</h2>
-                    <p className="mt-2 text-sm text-ocean/70">
-                      Comece a surfar na sua onda de links
-                    </p>
-                  </div>
-                  <RegisterForm />
-                </>
-              )}
+              <div className="mb-8 text-center">
+                <div className="relative mx-auto mb-5 flex size-[4.5rem] items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-cyan-300/40 to-blue-400/30 p-0 shadow-inner">
+                  <div className="absolute inset-0 rounded-[1.25rem] bg-gradient-to-b from-white/40 to-transparent opacity-60" />
+                  <Image
+                    src="/brand/icon.png"
+                    alt="LinkWave"
+                    width={56}
+                    height={56}
+                    className="relative drop-shadow-xl"
+                    priority
+                  />
+                </div>
+                <h2 className="text-3xl font-black text-ocean" style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}>Criar conta</h2>
+                <p className="mt-2 text-sm text-ocean/70">
+                  Comece a surfar na sua onda de links
+                </p>
+              </div>
+
+              <RegisterForm />
             </div>
           </div>
         </section>

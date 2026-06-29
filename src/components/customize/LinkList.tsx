@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { GripVertical, Link2, Pencil, Trash2, Check, X, Loader2, Pin } from "lucide-react";
 import { Reorder, motion } from "framer-motion";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
@@ -96,6 +96,11 @@ export default function LinkList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [pinningId, setPinningId] = useState<string | null>(null);
+  const orderedLinks = useMemo(
+    () => [...links.filter((link) => link.pinned), ...links.filter((link) => !link.pinned)],
+    [links],
+  );
+  const pinnedCount = orderedLinks.filter((link) => link.pinned).length;
 
   const handleSave = useCallback(async (id: string, title: string, url: string) => {
     if (!onEdit) return;
@@ -128,11 +133,25 @@ export default function LinkList({
       <h3 className="text-base font-bold text-ocean mb-4">
         Seus links <span className="text-muted font-normal text-sm">({links.length})</span>
       </h3>
-      <Reorder.Group axis="y" values={links} onReorder={onReorder} className="space-y-2">
-        {links.map((link) => {
+      {pinnedCount > 0 && (
+        <div className="mb-3 flex items-center justify-between rounded-xl border border-cyan-200/70 bg-white/25 px-3 py-2 text-xs font-bold text-ocean shadow-sm">
+          <span className="inline-flex items-center gap-1.5">
+            <Pin size={13} fill="currentColor" className="text-cyan-500" />
+            Links fixados
+          </span>
+          <span className="text-muted">{pinnedCount}/5</span>
+        </div>
+      )}
+      <Reorder.Group axis="y" values={orderedLinks} onReorder={onReorder} className="space-y-2">
+        {orderedLinks.map((link, index) => {
           const isEditing = editingId === link.id;
+          const isLastPinned = link.pinned && index === pinnedCount - 1 && pinnedCount < orderedLinks.length;
           return (
-            <Reorder.Item key={String(link.id)} value={link}>
+            <Reorder.Item
+              key={String(link.id)}
+              value={link}
+              className={isLastPinned ? "mb-4 border-b border-white/45 pb-4" : undefined}
+            >
               <motion.div
                 layout
                 whileDrag={{ scale: 1.02, boxShadow: "0 8px 32px rgba(80,180,220,0.28)" }}
@@ -184,7 +203,7 @@ export default function LinkList({
                         className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
                           link.pinned
                             ? "bg-cyan-500 text-white shadow-sm hover:bg-cyan-600"
-                            : "text-ocean/60 hover:bg-white/30 hover:text-ocean"
+                            : "text-ocean/60 opacity-40 hover:bg-white/30 hover:text-ocean hover:opacity-100"
                         } disabled:cursor-not-allowed disabled:opacity-60`}
                         aria-label={link.pinned ? "Desfixar link" : "Fixar link"}
                         title={link.pinned ? "Desfixar link" : "Fixar link"}

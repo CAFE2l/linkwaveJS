@@ -27,6 +27,7 @@ export default function FullDashboard({
 }) {
   const [user, setUser] = useState<AppUser>(initialUser);
   const [links, setLinks] = useState<DbLink[]>(initialLinks ?? []);
+  const [profileBio, setProfileBio] = useState(initialBio ?? "");
   const [toasts, setToasts] = useState<ToastObj[]>([]);
   const [preview, setPreview] = useState<Partial<DbLink> | null>(null);
 
@@ -107,10 +108,17 @@ export default function FullDashboard({
   }
 
   async function handleTogglePinned(id: string, pinned: boolean): Promise<boolean> {
+    const limitMessage = "Você já tem 5 links fixados. Desafixe um para continuar.";
+
     if (pinned && links.filter((link) => link.pinned && link.id !== id).length >= 5) {
-      pushToast({ id: String(Date.now()), type: "error", msg: "Você pode fixar no máximo 5 links." });
+      pushToast({ id: String(Date.now()), type: "error", msg: limitMessage });
       return false;
     }
+
+    const previousLinks = links;
+    setLinks((currentLinks) =>
+      currentLinks.map((link) => (String(link.id) === id ? { ...link, pinned } : link)),
+    );
 
     try {
       const res = await fetch("/api/links", {
@@ -120,11 +128,11 @@ export default function FullDashboard({
       });
       const data = await res.json();
       if (!data.ok) {
+        setLinks(previousLinks);
         pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao atualizar pin" });
         return false;
       }
 
-      setLinks((s) => s.map((link) => (String(link.id) === id ? { ...link, pinned } : link)));
       pushToast({
         id: String(Date.now()),
         type: "success",
@@ -132,6 +140,7 @@ export default function FullDashboard({
       });
       return true;
     } catch {
+      setLinks(previousLinks);
       pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao atualizar pin" });
       return false;
     }
@@ -192,7 +201,8 @@ export default function FullDashboard({
               setUser={setUser}
               linksCount={links.length}
               clicks={initialClicks ?? 0}
-              bio={initialBio ?? ""}
+              bio={profileBio}
+              setBio={setProfileBio}
               pinnedCount={links.filter((link) => link.pinned).length}
               pushToast={pushToast}
             />

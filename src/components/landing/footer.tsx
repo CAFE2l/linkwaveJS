@@ -16,7 +16,6 @@ export function Footer({ isLoggedIn }: { isLoggedIn?: boolean }) {
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm font-bold text-ocean hover:text-ocean-light transition">Painel</Link>
             <Link href="/dashboard/customize" className="text-sm font-bold text-ocean hover:text-ocean-light transition">Customizar</Link>
-            <Link href="/profile" className="text-sm font-bold text-ocean hover:text-ocean-light transition">Perfil</Link>
           </div>
         ) : (
           <div className="flex gap-4">

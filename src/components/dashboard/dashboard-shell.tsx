@@ -14,7 +14,6 @@ import type { AppUser } from "@/types/database";
 const navItems = [
   { href: "/dashboard", label: "Links", icon: LayoutDashboard },
   { href: "/dashboard/customize", label: "Customizar", icon: Sliders },
-  { href: "/profile", label: "Perfil", icon: User },
 ];
 
 export function DashboardShell({

@@ -49,7 +49,7 @@ export const userThemeSchema = z.object({
   enable_stars: z.boolean(),
   card_color: hexColor,
   card_opacity: z.number().min(0).max(100),
-  card_blur: z.number().min(0).max(30),
+  card_blur: z.number().min(0).max(40),
   card_border_radius: z.number().min(0).max(48),
   card_shadow: z.boolean(),
   card_glass_style: z.enum(["dark", "light", "frosted", "neon"]),
@@ -73,6 +73,7 @@ export const userThemeSchema = z.object({
   avatar_ring_style: z.enum(["gradient", "solid", "none"]),
   banner_led_color: hexColor,
   icon_style: z.enum(["8bit", "clay"]),
+  banner_position: z.enum(["center", "top", "bottom"]),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;

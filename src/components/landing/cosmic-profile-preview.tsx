@@ -181,13 +181,17 @@ export function Showcase() {
                 <div className="monitor-tilt">
                   <div className="monitor-body">
                     <div className="monitor-screen">
-                      <CosmicProfileDesktop />
+                      <div className="cosmic-desktop-scale-wrap">
+                        <div className="cosmic-desktop-scale-content">
+                          <CosmicProfileDesktop />
+                        </div>
+                      </div>
                     </div>
                     <Image
                       src="/imgs/essentials/monitor.png"
                       alt="Monitor"
-                      width={480}
-                      height={400}
+                      width={358}
+                      height={296}
                       className="monitor-frame"
                     />
                   </div>
@@ -215,8 +219,8 @@ export function Showcase() {
                     <Image
                       src="/imgs/essentials/frame.png"
                       alt="Phone"
-                      width={240}
-                      height={500}
+                      width={500}
+                      height={938}
                       className="phone-frame-sm"
                     />
                   </div>

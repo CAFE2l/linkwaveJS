@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { type ReactNode, useState, useTransition } from "react";
 import {
+  ChevronDown,
   Check,
   CheckCircle2,
   ExternalLink,
@@ -21,7 +22,7 @@ import {
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { updateProfileAction } from "@/lib/actions/profile";
 import { updateThemeAction } from "@/lib/actions/theme";
-import { mergeUserTheme, THEME_PRESETS } from "@/lib/profile-theme-presets";
+import { mergeUserTheme } from "@/lib/profile-theme-presets";
 import {
   type AppUser,
   type Link,
@@ -62,7 +63,7 @@ function SectionHeader({
   description: string;
 }) {
   return (
-    <div className="mb-5 flex items-start gap-3">
+    <div className="flex items-start gap-3">
       <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-white/80 bg-white/55 text-ocean shadow-sm backdrop-blur-xl">
         <Icon size={18} />
       </div>
@@ -71,6 +72,38 @@ function SectionHeader({
         <p className="mt-0.5 text-sm font-semibold text-ocean/60">{description}</p>
       </div>
     </div>
+  );
+}
+
+function CollapsibleSection({
+  icon,
+  title,
+  description,
+  delay,
+  children,
+}: {
+  icon: typeof UserRound;
+  title: string;
+  description: string;
+  delay?: string;
+  children: ReactNode;
+}) {
+  return (
+    <details
+      open
+      className="group glass-card-strong animate-fade-in-up overflow-hidden p-0"
+      style={{ animationDelay: delay }}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 marker:hidden sm:px-7 [&::-webkit-details-marker]:hidden">
+        <SectionHeader icon={icon} title={title} description={description} />
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/35 text-ocean shadow-sm backdrop-blur-xl transition group-open:rotate-180">
+          <ChevronDown size={17} />
+        </span>
+      </summary>
+      <div className="border-t border-white/35 px-5 py-5 sm:px-7 sm:py-6">
+        {children}
+      </div>
+    </details>
   );
 }
 
@@ -316,12 +349,11 @@ export function CustomizePanel({
       <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1fr)_390px]">
         <div className="space-y-6">
           {/* ─── 1. Profile ─── */}
-          <section className="glass-card-strong animate-fade-in-up p-5 sm:p-7">
-            <SectionHeader
+          <CollapsibleSection
               icon={UserRound}
-              title="1. Perfil"
+              title="Perfil"
               description="Identidade e apresentação da sua página."
-            />
+            >
 
             <div className="grid gap-5 md:grid-cols-2">
               <AvatarUpload
@@ -410,18 +442,15 @@ export function CustomizePanel({
                 />
               </label>
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 2. Appearance ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "80ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={Palette}
-              title="2. Aparência"
+              title="Aparência"
               description="Fundo, gradiente, efeitos e atmosfera da sua página."
-            />
+              delay="80ms"
+            >
 
             <div className="space-y-5">
               <div>
@@ -465,28 +494,22 @@ export function CustomizePanel({
                 </div>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={theme.enable_stars}
-                  onChange={(e) => updateTheme({ enable_stars: e.target.checked })}
-                  className="size-4 accent-cyan-500"
-                />
-                <span className="text-sm font-bold text-ocean">Estrelas animadas</span>
-              </label>
+              <SettingSwitch
+                checked={theme.enable_stars}
+                label="Estrelas animadas"
+                description="Adiciona pontos de luz sutis ao fundo"
+                onChange={(checked) => updateTheme({ enable_stars: checked })}
+              />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 3. Cards ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "120ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={Square}
-              title="3. Cards"
+              title="Cards"
               description="Estilo, cor e efeitos dos cards de perfil e links."
-            />
+              delay="120ms"
+            >
 
             <div className="space-y-5">
               <div>
@@ -518,28 +541,22 @@ export function CustomizePanel({
 
               <ColorPicker label="Cor da borda" value={theme.border_color} onChange={(v) => updateTheme({ border_color: v })} />
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={theme.card_shadow}
-                  onChange={(e) => updateTheme({ card_shadow: e.target.checked })}
-                  className="size-4 accent-cyan-500"
-                />
-                <span className="text-sm font-bold text-ocean">Sombra extra nos cards</span>
-              </label>
+              <SettingSwitch
+                checked={theme.card_shadow}
+                label="Sombra extra"
+                description="Aumenta a profundidade dos cards"
+                onChange={(checked) => updateTheme({ card_shadow: checked })}
+              />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 4. Buttons ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "160ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={LayoutTemplate}
-              title="4. Botões"
+              title="Botões"
               description="Formato, cor e interação dos links da página."
-            />
+              delay="160ms"
+            >
 
             <div className="space-y-5">
               <div>
@@ -582,28 +599,22 @@ export function CustomizePanel({
                 </div>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={theme.button_glow}
-                  onChange={(e) => updateTheme({ button_glow: e.target.checked })}
-                  className="size-4 accent-cyan-500"
-                />
-                <span className="text-sm font-bold text-ocean">Glow nos botões</span>
-              </label>
+              <SettingSwitch
+                checked={theme.button_glow}
+                label="Glow nos botões"
+                description="Brilho suave ao redor dos links"
+                onChange={(checked) => updateTheme({ button_glow: checked })}
+              />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 5. Typography ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "200ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={Type}
-              title="5. Tipografia"
+              title="Tipografia"
               description="Fonte e cores dos textos da sua página."
-            />
+              delay="200ms"
+            >
 
             <div className="space-y-5">
               <div>
@@ -625,18 +636,15 @@ export function CustomizePanel({
                 <ColorPicker label="Texto secundário" value={theme.text_color_secondary} onChange={(v) => updateTheme({ text_color_secondary: v })} />
               </div>
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 6. Avatar ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "240ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={UserRound}
-              title="6. Avatar"
+              title="Avatar"
               description="Anel decorativo e brilho ao redor da sua foto."
-            />
+              delay="240ms"
+            >
 
             <div className="space-y-4">
               <div>
@@ -650,18 +658,15 @@ export function CustomizePanel({
               <ColorPicker label="Cor do LED do avatar" value={theme.avatar_led_color} onChange={(v) => updateTheme({ avatar_led_color: v })} />
               <ColorPicker label="Cor do LED do banner" value={theme.banner_led_color} onChange={(v) => updateTheme({ banner_led_color: v })} />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── 7. Animations ─── */}
-          <section
-            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
-            style={{ animationDelay: "280ms" }}
-          >
-            <SectionHeader
+          <CollapsibleSection
               icon={Sparkle}
-              title="7. Animações"
+              title="Animações"
               description="Movimento, transições e efeitos visuais."
-            />
+              delay="280ms"
+            >
 
             <div className="space-y-5">
               <div>
@@ -703,7 +708,7 @@ export function CustomizePanel({
                 />
               </div>
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ─── Save ─── */}
           <div className="sticky bottom-4 z-20 rounded-3xl border border-white/80 bg-white/55 p-3 shadow-2xl shadow-cyan-950/15 backdrop-blur-2xl">

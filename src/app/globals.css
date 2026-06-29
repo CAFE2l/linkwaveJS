@@ -1355,7 +1355,7 @@ button, a, input, textarea {
 .phone-container-sm {
   position: relative;
   width: 231px;
-  height: 496px;
+  height: 433px;
   margin: 0 auto;
 }
 
@@ -1393,12 +1393,11 @@ button, a, input, textarea {
 
 .phone-screen-sm {
   position: absolute;
-  /* precise screen bounds from pixel analysis:
-     frame: 500x938, screen: x=71-428, y=131-806 */
-  top: 14%;
+  /* frame: 500x938, screen: x=71-428, y=131-806 */
+  top: 13.96%;
   left: 14.2%;
   width: 71.4%;
-  height: 72%;
+  height: 71.96%;
   overflow: hidden;
   border-radius: 6% / 5%;
   z-index: 1;
@@ -1417,8 +1416,8 @@ button, a, input, textarea {
 /* ── Desktop Monitor Mockup ── */
 .monitor-container {
   position: relative;
-  width: 480px;
-  height: 400px;
+  width: 370px;
+  height: 307px;
   margin: 0 auto;
 }
 
@@ -1455,12 +1454,11 @@ button, a, input, textarea {
 
 .monitor-screen {
   position: absolute;
-  /* precise screen bounds from pixel analysis:
-     frame: 358x296, screen: x=26-330, y=26-194 */
-  top: 8.8%;
-  left: 7.3%;
-  width: 85.2%;
-  height: 57.1%;
+  /* frame: 358x296, screen: x=26-330, y=26-194 */
+  top: 8.78%;
+  left: 7.26%;
+  width: 84.92%;
+  height: 56.76%;
   overflow: hidden;
   border-radius: 2px;
   z-index: 1;
@@ -1474,6 +1472,27 @@ button, a, input, textarea {
   object-fit: contain;
   z-index: 10;
   pointer-events: none;
+}
+
+.cosmic-desktop-scale-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cosmic-desktop-scale-content {
+  width: 315px;
+  flex-shrink: 0;
+  transform: scale(0.578);
+  transform-origin: center center;
+}
+
+.cosmic-desktop-scale-content .cosmic-preview-desktop {
+  height: auto;
+  min-height: 303px;
 }
 
 /* ─── Cosmic Preview Mobile (inside phone) ─── */

@@ -16,8 +16,6 @@
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.108.2",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",

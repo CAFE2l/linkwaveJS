@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db/prisma";
 
 const MAX_REGISTRATIONS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
@@ -9,36 +9,31 @@ export function getIpKey(ip: string) {
 }
 
 export async function checkRegistrationRateLimit(ip: string) {
-  const supabase = createAdminClient();
   const ipKey = getIpKey(ip);
-  const since = new Date(Date.now() - WINDOW_MS).toISOString();
+  const since = new Date(Date.now() - WINDOW_MS);
 
-  const { count, error } = await supabase
-    .from("registration_rate_limits")
-    .select("id", { count: "exact", head: true })
-    .eq("ip_key", ipKey)
-    .gte("created_at", since);
+  try {
+    const count = await prisma.registrationRateLimit.count({
+      where: {
+        ipKey,
+        createdAt: { gte: since },
+      },
+    });
 
-  if (error) {
-    console.error("registration rate limit check failed", error);
+    if (count >= MAX_REGISTRATIONS) {
+      return {
+        allowed: false,
+        message: "Muitas tentativas de cadastro. Tente novamente em 15 minutos.",
+      };
+    }
+
+    await prisma.registrationRateLimit.create({
+      data: { ipKey },
+    });
+
+    return { allowed: true, message: "OK" };
+  } catch (err) {
+    console.error("registration rate limit check failed", err);
     return { allowed: false, message: "Não foi possível validar sua tentativa agora." };
   }
-
-  if ((count ?? 0) >= MAX_REGISTRATIONS) {
-    return {
-      allowed: false,
-      message: "Muitas tentativas de cadastro. Tente novamente em 15 minutos.",
-    };
-  }
-
-  const { error: insertError } = await supabase
-    .from("registration_rate_limits")
-    .insert({ ip_key: ipKey });
-
-  if (insertError) {
-    console.error("registration rate limit insert failed", insertError);
-    return { allowed: false, message: "Não foi possível validar sua tentativa agora." };
-  }
-
-  return { allowed: true, message: "OK" };
 }

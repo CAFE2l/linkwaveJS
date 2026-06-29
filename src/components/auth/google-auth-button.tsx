@@ -3,11 +3,13 @@
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import googleIcon from "/public/imgs/icons/links/Google.png";
 
 export function GoogleAuthButton() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { signInWithGoogle } = useAuth();
 
@@ -15,6 +17,7 @@ export function GoogleAuthButton() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      router.push("/register");
     } catch {
       setLoading(false);
     }

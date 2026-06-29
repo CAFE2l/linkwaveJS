@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 
 const schema = z.object({
   linkId: z.string().uuid(),
-  userId: z.string().uuid(),
+  userId: z.string().min(1),
 });
 
 export async function POST(request: Request) {

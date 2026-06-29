@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { GripVertical, Link2, Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { GripVertical, Link2, Pencil, Trash2, Check, X, Loader2, Pin } from "lucide-react";
 import { Reorder, motion } from "framer-motion";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import type { Link as DbLink } from "@/types/database";
@@ -85,14 +85,17 @@ export default function LinkList({
   onReorder,
   onDelete,
   onEdit,
+  onTogglePinned,
 }: {
   links: DbLink[];
   onReorder: (n: DbLink[]) => void;
   onDelete: (id: string | number) => void;
   onEdit?: (id: string, title: string, url: string) => Promise<boolean>;
+  onTogglePinned?: (id: string, pinned: boolean) => Promise<boolean>;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [pinningId, setPinningId] = useState<string | null>(null);
 
   const handleSave = useCallback(async (id: string, title: string, url: string) => {
     if (!onEdit) return;
@@ -101,6 +104,13 @@ export default function LinkList({
     setSavingId(null);
     if (success) setEditingId(null);
   }, [onEdit]);
+
+  const handleTogglePinned = useCallback(async (id: string, pinned: boolean) => {
+    if (!onTogglePinned) return;
+    setPinningId(id);
+    await onTogglePinned(id, pinned);
+    setPinningId(null);
+  }, [onTogglePinned]);
 
   if (links.length === 0) {
     return (
@@ -126,7 +136,11 @@ export default function LinkList({
               <motion.div
                 layout
                 whileDrag={{ scale: 1.02, boxShadow: "0 8px 32px rgba(80,180,220,0.28)" }}
-                className="rounded-xl border border-white/60 bg-white/30 backdrop-blur-sm transition group"
+                className={`rounded-xl border backdrop-blur-sm transition group ${
+                  link.pinned
+                    ? "border-cyan-200/90 bg-cyan-100/35 shadow-lg shadow-cyan-900/10"
+                    : "border-white/60 bg-white/30"
+                }`}
               >
                 {isEditing ? (
                   <div className="p-3 space-y-2">
@@ -152,10 +166,35 @@ export default function LinkList({
                       <LinkIcon link={link} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ocean truncate">{link.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="min-w-0 truncate text-sm font-semibold text-ocean">{link.title}</p>
+                        {link.pinned && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-cyan-200/80 bg-white/45 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-ocean">
+                            <Pin size={10} fill="currentColor" />
+                            Fixado
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-muted truncate">{link.url}</p>
                     </div>
                     <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleTogglePinned(link.id, !link.pinned)}
+                        disabled={pinningId === link.id}
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
+                          link.pinned
+                            ? "bg-cyan-500 text-white shadow-sm hover:bg-cyan-600"
+                            : "text-ocean/60 hover:bg-white/30 hover:text-ocean"
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
+                        aria-label={link.pinned ? "Desfixar link" : "Fixar link"}
+                        title={link.pinned ? "Desfixar link" : "Fixar link"}
+                      >
+                        {pinningId === link.id ? (
+                          <Loader2 size={15} className="animate-spin" />
+                        ) : (
+                          <Pin size={15} fill={link.pinned ? "currentColor" : "none"} />
+                        )}
+                      </button>
                       <button
                         onClick={() => setEditingId(link.id)}
                         className="flex items-center justify-center w-8 h-8 rounded-lg text-ocean/60 hover:text-ocean hover:bg-white/30 transition"

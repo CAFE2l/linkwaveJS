@@ -9,6 +9,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getFirebaseConfig } from "@/lib/firebase/config";
 import { checkRegistrationRateLimit } from "@/lib/security/rate-limit";
+import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { normalizeEmail, normalizeUsername, sanitizeText } from "@/lib/security/sanitize";
 import { getBaseUrl } from "@/lib/utils/url";
 import {
@@ -222,6 +223,89 @@ export async function registerUserAction(
     message: "Conta criada com sucesso.",
     redirectTo: "/dashboard",
   };
+}
+
+export async function completeOnboardingAction(
+  input: unknown,
+): Promise<ActionState> {
+  const headerStore = await headers();
+  const ip = firstIp(
+    headerStore.get("x-forwarded-for") ||
+      headerStore.get("x-real-ip") ||
+      "anonymous",
+  );
+
+  const rateLimit = await checkRegistrationRateLimit(ip);
+  if (!rateLimit.allowed) {
+    return { ok: false, message: rateLimit.message };
+  }
+
+  const parsed = registerSchema
+    .pick({ name: true, username: true })
+    .safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: parsed.error.issues[0]?.message ?? "Dados inválidos.",
+      fieldErrors: Object.fromEntries(
+        parsed.error.issues.map((i) => [i.path.join("."), [i.message]]),
+      ),
+    };
+  }
+
+  const authUser = await getCurrentUser();
+  if (!authUser) {
+    return { ok: false, message: "Sessão expirada. Faça login novamente." };
+  }
+
+  const userId = authUser.uid;
+  const email = authUser.email ?? "";
+  const name = sanitizeText(parsed.data.name);
+  const username = normalizeUsername(parsed.data.username);
+
+  const [existingUsername, existingProfileUsername] = await Promise.all([
+    prisma.user.findFirst({
+      where: { username },
+      select: { id: true },
+    }),
+    prisma.profile.findFirst({
+      where: { username },
+      select: { id: true },
+    }),
+  ]);
+
+  if (existingUsername || existingProfileUsername) {
+    return { ok: false, message: "Este username já está em uso." };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.user.create({
+        data: { id: userId, email, username, name },
+      });
+
+      await tx.profile.create({
+        data: {
+          userId,
+          name,
+          username,
+          email,
+          active: true,
+          bio: "Minha onda de links.",
+          theme: "wave",
+          customColors: {},
+        },
+      });
+    });
+  } catch {
+    return {
+      ok: false,
+      message: "Não foi possível finalizar seu cadastro. Tente novamente.",
+    };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true, message: "Perfil criado com sucesso.", redirectTo: "/dashboard" };
 }
 
 export async function checkUsernameAvailabilityAction(

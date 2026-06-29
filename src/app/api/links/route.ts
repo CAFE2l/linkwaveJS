@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     });
 
     // revalidate dashboard path
-    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
+    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
     return NextResponse.json({ ok: true, message: 'Link criado', link });
   } catch (e) {
@@ -119,7 +119,7 @@ export async function PUT(req: Request) {
 
     const updated = await prisma.link.findUnique({ where: { id } });
 
-    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
+    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
     return NextResponse.json({ ok: true, message: 'Link atualizado', link: updated });
   } catch (e) {
@@ -146,7 +146,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ ok: false, message: 'Link não encontrado' }, { status: 404 });
     }
 
-    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch(e){}
+    try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
     return NextResponse.json({ ok: true, message: 'Link excluído' });
   } catch (e) {

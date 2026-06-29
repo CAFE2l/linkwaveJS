@@ -22,7 +22,7 @@ export function HeroSection({
       <MotionReveal>
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6">
-            <span className="glass-tag">✦ LinkWave v1.0 — Crie sua onda</span>
+            <span className="glass-tag">✦ LinkWave v2.0 — Crie sua onda</span>
           </div>
 
           <div className="mb-8 flex justify-center">

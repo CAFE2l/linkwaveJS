@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const protectedRoutes = ["/dashboard", "/profile", "/admin", "/onboarding", "/settings"];
-const authRoutes = ["/login", "/register"];
 
 function withSecurityHeaders(response: NextResponse) {
   response.headers.set("X-Frame-Options", "DENY");
@@ -19,18 +18,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isProtected = protectedRoutes.some((path) => pathname.startsWith(path));
-  const isAuthRoute = authRoutes.some((path) => pathname.startsWith(path));
 
   if (isProtected && !hasSession) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
-    return withSecurityHeaders(NextResponse.redirect(url));
-  }
-
-  if (isAuthRoute && hasSession) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
     return withSecurityHeaders(NextResponse.redirect(url));
   }
 

@@ -12,65 +12,59 @@ export function ProfileAvatar({
   theme: UserThemeConfig;
   compact?: boolean;
 }) {
-  const glowEnabled = theme.enable_led_glow;
   const ringStyle = theme.avatar_ring_style;
   const ledColor = theme.avatar_led_color;
-  const isGradient = ringStyle === "gradient";
   const isNone = ringStyle === "none";
-  const size = compact ? 80 : 112;
-
-  const ringBorder = isNone
-    ? "none"
-    : isGradient
-      ? `${compact ? "3px" : "4px"} solid transparent`
-      : `${compact ? "3px" : "4px"} solid ${ledColor}`;
-
-  const ringBgImage = isGradient
-    ? `conic-gradient(from 0deg, ${ledColor}, #6366f1, #06b6d4, ${ledColor})`
-    : undefined;
-
-  const pulseAnimation = glowEnabled && !isNone
-    ? "ut-profilePulse 3s ease-in-out infinite"
-    : undefined;
-
-  const glowShadow = glowEnabled && !isNone
-    ? `0 12px 32px rgba(0,0,0,0.25), 0 0 28px ${ledColor}88, 0 0 60px ${ledColor}40`
-    : "0 12px 32px rgba(0,0,0,0.2)";
+  const size = compact ? 76 : 96;
+  const outerSize = size + (compact ? 10 : 12);
+  const middleSize = size + (compact ? 4 : 6);
+  const accent = ringStyle === "solid" ? ledColor : `var(--ut-avatar-led, ${ledColor})`;
 
   return (
-    <div className="flex justify-center">
+    <div className="flex items-center justify-center">
       <div
-        className="relative overflow-hidden"
+        className="relative flex items-center justify-center"
         style={{
-          width: size + (isNone ? 0 : compact ? 6 : 8),
-          height: size + (isNone ? 0 : compact ? 6 : 8),
-          borderRadius: "9999px",
-          border: ringBorder,
-          backgroundImage: ringBgImage,
-          backgroundClip: "padding-box",
-          boxShadow: glowShadow,
-          animation: pulseAnimation,
+          width: isNone ? size : outerSize,
+          height: isNone ? size : outerSize,
         }}
       >
-        <div
-          className="overflow-hidden rounded-full"
-          style={{
-            width: size,
-            height: size,
-            margin: isNone ? 0 : compact ? 3 : 4,
-          }}
-        >
-          <Image
-            src={avatarUrl || "/brand/icon.png"}
-            alt={name}
-            width={size}
-            height={size}
-            className="h-full w-full object-cover"
-          />
-        </div>
+        {!isNone && (
+          <>
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: outerSize,
+                height: outerSize,
+                background:
+                  ringStyle === "solid"
+                    ? `conic-gradient(from 0deg, ${accent}, ${accent}, ${accent})`
+                    : `conic-gradient(from 0deg, ${accent}, transparent 58%, #38bdf8 76%, ${accent})`,
+                animation: ringStyle === "gradient" ? "ut-avatarSpin 8s linear infinite" : undefined,
+                filter: `drop-shadow(0 0 18px ${ledColor}70)`,
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: middleSize,
+                height: middleSize,
+                background:
+                  "color-mix(in srgb, var(--ut-bg, #0b1829) 82%, rgba(255,255,255,0.18))",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.22)",
+              }}
+            />
+          </>
+        )}
 
-        {/* Glass overlay ring for depth */}
-        <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/60" />
+        <Image
+          src={avatarUrl || "/brand/icon.png"}
+          alt={name}
+          width={size}
+          height={size}
+          className="relative rounded-full object-cover shadow-2xl shadow-black/30 ring-2 ring-white/25"
+          style={{ width: size, height: size }}
+        />
       </div>
     </div>
   );

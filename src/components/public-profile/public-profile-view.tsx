@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
+import { Link2 } from "lucide-react";
 import { AnimatedLinks } from "@/components/public-profile/animated-links";
 import { BackgroundLayer } from "@/components/public-profile/background-layer";
 import { ProfileAvatar } from "@/components/public-profile/profile-avatar";
 import { ProfileBanner } from "@/components/public-profile/profile-banner";
 import { ProfileLinkButton } from "@/components/public-profile/profile-link-button";
 import { StarCanvas } from "@/components/public-profile/star-canvas";
+import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import { ThemeProviderShell } from "@/components/shared/theme-provider-shell";
 import type { AppUser, Link, UserThemeConfig } from "@/types/database";
 
@@ -19,6 +21,60 @@ type PublicProfileViewProps = {
   mode?: "public" | "preview";
 };
 
+function trackPinnedClick(link: Link) {
+  const payload = JSON.stringify({ linkId: link.id, userId: link.user_id });
+  const blob = new Blob([payload], { type: "application/json" });
+  if (!navigator.sendBeacon?.("/api/click", blob)) {
+    fetch("/api/click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    }).catch(() => null);
+  }
+}
+
+function PinnedLinkIcon({ link, compact }: { link: Link; compact: boolean }) {
+  const iconName = link.icone || link.icon;
+  const sizeClass = compact ? "size-8" : "size-11";
+  const imageSize = compact ? 16 : 22;
+
+  return (
+    <a
+      href={link.url}
+      target="_blank"
+      rel="noreferrer"
+      onClick={() => trackPinnedClick(link)}
+      title={link.title}
+      aria-label={link.title}
+      className={`${sizeClass} group inline-flex items-center justify-center rounded-full border border-white/50 bg-white/20 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-white/35`}
+      style={{
+        boxShadow:
+          "0 8px 24px rgba(0,0,0,0.12), 0 0 18px var(--ut-link-glow, rgba(56,189,248,0.18))",
+      }}
+    >
+      {link.is_custom_icon && link.icon_blob ? (
+        <CustomLinkIcon
+          src={link.icon_blob}
+          alt=""
+          className={`${compact ? "size-7" : "size-10"} border-0 bg-transparent shadow-none`}
+        />
+      ) : iconName && iconName !== "link" ? (
+        <Image
+          src={`/imgs/icons/links/${iconName}.png`}
+          alt=""
+          width={imageSize}
+          height={imageSize}
+          className="object-contain transition-transform duration-300 group-hover:scale-110"
+          unoptimized
+        />
+      ) : (
+        <Link2 size={compact ? 14 : 18} />
+      )}
+    </a>
+  );
+}
+
 export function PublicProfileView({
   user,
   links,
@@ -29,6 +85,7 @@ export function PublicProfileView({
   const isPreview = mode === "preview";
   const isGalaxy = theme.theme_id === "galaxy_led";
   const visibleLinks = links.slice(0, isPreview ? 4 : undefined);
+  const pinnedLinks = links.filter((link) => link.pinned).slice(0, 5);
 
   const linksContent =
     visibleLinks.length > 0 ? (
@@ -89,17 +146,17 @@ export function PublicProfileView({
               isPreview ? "rounded-[1.75rem] p-2.5" : "rounded-[2rem] p-3 sm:p-4"
             }`}
             style={{
-              background: "var(--ut-card-glass-bg, var(--ut-card-bg))",
+              background:
+                "color-mix(in srgb, var(--ut-card-glass-bg, rgba(255,255,255,0.08)) 72%, transparent)",
               backdropFilter:
                 "blur(min(var(--ut-card-blur, 14px), 18px)) saturate(165%)",
               WebkitBackdropFilter:
                 "blur(min(var(--ut-card-blur, 14px), 18px)) saturate(165%)",
-              borderColor:
-                "var(--ut-card-glass-border, rgba(255,255,255,0.45))",
+              borderColor: "rgba(255,255,255,0.16)",
               boxShadow:
                 isGalaxy && theme.enable_led_glow
-                  ? `0 24px 70px rgba(0,0,0,0.42), 0 0 34px ${theme.link_glow_color}28`
-                  : "var(--ut-card-glass-shadow, 0 24px 70px rgba(15,80,110,0.2))",
+                  ? `0 24px 70px rgba(0,0,0,0.34), 0 0 30px ${theme.link_glow_color}22`
+                  : "0 24px 70px rgba(0,0,0,0.18)",
             }}
           >
             {/* Banner */}
@@ -154,11 +211,23 @@ export function PublicProfileView({
                   {bio}
                 </p>
               )}
+
+              {pinnedLinks.length > 0 && (
+                <div
+                  className={`flex flex-wrap items-center justify-center ${
+                    isPreview ? "mt-2 gap-1.5" : "mt-4 gap-2.5"
+                  } ${isPreview ? "pointer-events-none" : ""}`}
+                >
+                  {pinnedLinks.map((link) => (
+                    <PinnedLinkIcon key={link.id} link={link} compact={isPreview} />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Gradient divider */}
             <div
-              className={`${isPreview ? "mx-2 my-3" : "mx-3 my-4"} h-px`}
+              className={`${isPreview ? "mx-2 my-3" : "mx-4 my-5"} h-px`}
               style={{
                 background:
                   "linear-gradient(90deg, transparent, var(--ut-card-glass-border, rgba(255,255,255,0.4)), transparent)",
@@ -170,7 +239,7 @@ export function PublicProfileView({
               className={`${
                 isPreview
                   ? "space-y-2 px-1 pb-1"
-                  : "space-y-2.5 px-2 pb-2"
+                  : "space-y-3 px-2 pb-2 sm:px-3"
               } ${isPreview ? "pointer-events-none" : ""}`}
             >
               {isPreview ? (

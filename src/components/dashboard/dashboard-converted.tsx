@@ -986,7 +986,7 @@ export default function DashboardConverted({ user, links: initialLinks, totalCli
               <img src="/brand/icon.png" alt="LinkWave" className="w-5 h-5 opacity-60" />
               <span className="font-bold">LinkWave</span>
             </div>
-            <div className="text-xs">Dashboard v1.0</div>
+            <div className="text-xs">Dashboard v2.0</div>
           </div>
         </footer>
 

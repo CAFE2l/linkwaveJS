@@ -17,11 +17,13 @@ export default function FullDashboard({
   initialLinks,
   initialClicks,
   initialIcons,
+  initialBio,
 }: {
   initialUser: AppUser;
   initialLinks: DbLink[];
   initialClicks?: number;
   initialIcons: string[];
+  initialBio?: string;
 }) {
   const [user, setUser] = useState<AppUser>(initialUser);
   const [links, setLinks] = useState<DbLink[]>(initialLinks ?? []);
@@ -39,7 +41,7 @@ export default function FullDashboard({
         title: p.title || "Untitled",
         url: p.url || "#",
         icon: p.icon || null,
-        is_custom_icon: p.is_custom_icon ? 1 : 0,
+        is_custom_icon: Boolean(p.is_custom_icon),
         icon_blob: p.icon_blob || null,
       };
       if (links.some((l) => String(l.url).toLowerCase() === String(payload.url).toLowerCase())) {
@@ -104,6 +106,37 @@ export default function FullDashboard({
     }
   }
 
+  async function handleTogglePinned(id: string, pinned: boolean): Promise<boolean> {
+    if (pinned && links.filter((link) => link.pinned && link.id !== id).length >= 5) {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Você pode fixar no máximo 5 links." });
+      return false;
+    }
+
+    try {
+      const res = await fetch("/api/links", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, pinned }),
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao atualizar pin" });
+        return false;
+      }
+
+      setLinks((s) => s.map((link) => (String(link.id) === id ? { ...link, pinned } : link)));
+      pushToast({
+        id: String(Date.now()),
+        type: "success",
+        msg: pinned ? "Link fixado" : "Link desfixado",
+      });
+      return true;
+    } catch {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao atualizar pin" });
+      return false;
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -159,6 +192,8 @@ export default function FullDashboard({
               setUser={setUser}
               linksCount={links.length}
               clicks={initialClicks ?? 0}
+              bio={initialBio ?? ""}
+              pinnedCount={links.filter((link) => link.pinned).length}
               pushToast={pushToast}
             />
           </aside>
@@ -176,6 +211,7 @@ export default function FullDashboard({
               onReorder={setLinks}
               onDelete={handleDelete}
               onEdit={handleEditLink}
+              onTogglePinned={handleTogglePinned}
             />
           </main>
 

@@ -11,12 +11,16 @@ export default function ProfileCard({
   setUser,
   linksCount,
   clicks,
+  bio,
+  pinnedCount,
   pushToast,
 }: {
   user: AppUser | null;
   setUser: React.Dispatch<React.SetStateAction<AppUser>>;
   linksCount: number;
   clicks: number;
+  bio: string;
+  pinnedCount: number;
   pushToast: (t: { id: string; type: "success" | "error"; msg: string }) => void;
 }) {
   const avatarRef = useRef<HTMLInputElement | null>(null);
@@ -45,7 +49,14 @@ export default function ProfileCard({
     pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
   }
 
-  const satisfaction = linksCount > 0 ? Math.min(100, Math.round((clicks / (linksCount || 1)) * 10)) : 0;
+  void clicks;
+
+  const profileCompletion =
+    (user?.avatar_url ? 20 : 0) +
+    (user?.banner_url ? 20 : 0) +
+    (bio.trim().length >= 10 ? 20 : 0) +
+    (linksCount > 0 ? 20 : 0) +
+    (pinnedCount > 0 ? 20 : 0);
 
   return (
     <div className="glass-card-strong overflow-hidden">
@@ -94,8 +105,8 @@ export default function ProfileCard({
             <p className="text-xs text-muted mt-0.5">Links</p>
           </div>
           <div className="glass-stat !p-3">
-            <p className="text-xl font-black text-ocean">{satisfaction}%</p>
-            <p className="text-xs text-muted mt-0.5">Satisfação</p>
+            <p className="text-xl font-black text-ocean">{profileCompletion}%</p>
+            <p className="text-xs text-muted mt-0.5">Perfil completo</p>
           </div>
         </div>
 

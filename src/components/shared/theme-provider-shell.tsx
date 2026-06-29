@@ -139,6 +139,9 @@ function generateKeyframes(t: UserThemeConfig): string {
       0%, 100% { box-shadow: 0 0 14px ${t.avatar_led_color}, 0 0 28px ${t.avatar_led_color}80; transform: scale(1); }
       50%      { box-shadow: 0 0 22px ${t.avatar_led_color}, 0 0 42px ${t.avatar_led_color}; transform: scale(1.03); }
     }
+    @keyframes ut-avatarSpin {
+      to { transform: rotate(360deg); }
+    }
     @keyframes ut-nebulaMove {
       0%, 100% { transform: translate(-10%, -10%) rotate(0deg); }
       33%      { transform: translate(5%, 5%) rotate(4deg); }

@@ -41,6 +41,7 @@ export default function PreviewCard({
   const previewLinks: Partial<DbLink>[] = preview?.title || preview?.url
     ? [preview, ...links]
     : links;
+  const pinnedLinks = links.filter((link) => link.pinned).slice(0, 5);
 
   return (
     <div className="glass-card p-5 flex flex-col">
@@ -79,6 +80,20 @@ export default function PreviewCard({
             <p className="text-[10px] text-slate-500 -mt-1">
               @{user?.username || "username"}
             </p>
+
+            {pinnedLinks.length > 0 && (
+              <div className="mt-1 flex max-w-full flex-wrap items-center justify-center gap-1.5">
+                {pinnedLinks.map((link) => (
+                  <div
+                    key={link.id}
+                    className="flex size-6 items-center justify-center rounded-full border border-white/70 bg-white/70 shadow-sm"
+                    title={link.title}
+                  >
+                    <PreviewLinkIcon link={link} />
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Links */}
             <div className="w-full space-y-1 mt-1">

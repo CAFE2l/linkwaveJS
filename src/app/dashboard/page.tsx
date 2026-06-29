@@ -17,12 +17,16 @@ export default async function DashboardPage() {
     (await prisma.user.findUnique({ where: { id: authUser.uid } })) ??
     (await ensureUserRecord(authUser.uid, authUser.email ?? ""));
 
-  const [profile, rawLinks, totalClicks, iconsData] = await Promise.all([
-    prisma.profile.findFirst({ where: { userId: authUser.uid }, select: { bio: true } }),
-    prisma.link.findMany({ where: { userId: authUser.uid }, orderBy: { orderPosition: "asc" } }),
-    prisma.click.count({ where: { userId: authUser.uid } }),
-    listIconsAction(),
-  ]);
+  const profile = await prisma.profile.findFirst({
+    where: { userId: authUser.uid },
+    select: { bio: true },
+  });
+  const rawLinks = await prisma.link.findMany({
+    where: { userId: authUser.uid },
+    orderBy: { orderPosition: "asc" },
+  });
+  const totalClicks = await prisma.click.count({ where: { userId: authUser.uid } });
+  const iconsData = await listIconsAction();
 
   const allIcons = iconsData.map((i) => i.name);
 

@@ -7,7 +7,7 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id
   email     String
   username  String
   name      String   @default("")
@@ -27,7 +27,7 @@ model User {
 
 model Profile {
   id           String   @id @default(uuid()) @db.Uuid
-  userId       String   @unique @map("user_id") @db.Uuid
+  userId       String   @unique @map("user_id")
   name         String
   username     String
   email        String
@@ -46,7 +46,7 @@ model Profile {
 
 model Link {
   id            String   @id @default(uuid()) @db.Uuid
-  userId        String   @map("user_id") @db.Uuid
+  userId        String   @map("user_id")
   title         String
   url           String
   icon          String?
@@ -65,7 +65,7 @@ model Link {
 model Click {
   id        String   @id @default(uuid()) @db.Uuid
   linkId    String   @map("link_id") @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
+  userId    String   @map("user_id")
   ipAddress String?  @map("ip_address")
   country   String?
   city      String?

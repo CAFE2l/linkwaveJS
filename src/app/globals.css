@@ -1354,8 +1354,8 @@ button, a, input, textarea {
 /* ── Phone Mockup ── */
 .phone-container-sm {
   position: relative;
-  width: 231px;
-  height: 433px;
+  width: 245px;
+  height: 460px;
   margin: 0 auto;
 }
 
@@ -1416,8 +1416,8 @@ button, a, input, textarea {
 /* ── Desktop Monitor Mockup ── */
 .monitor-container {
   position: relative;
-  width: 370px;
-  height: 307px;
+  width: 376px;
+  height: 315px;
   margin: 0 auto;
 }
 
@@ -1484,9 +1484,9 @@ button, a, input, textarea {
 }
 
 .cosmic-desktop-scale-content {
-  width: 315px;
+  width: 319px;
   flex-shrink: 0;
-  transform: scale(0.578);
+  transform: scale(0.591);
   transform-origin: center center;
 }
 

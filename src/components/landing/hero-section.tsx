@@ -85,7 +85,7 @@ export function HeroSection({
           <div className="mt-16 flex flex-wrap justify-center gap-4">
             {[
               { label: "Usuários", value: formatNumber(stats.totalUsers) },
-              { label: "Cliques", value: formatNumber(stats.totalClicks) },
+              { label: "Grátis", value: "100%" },
               { label: "Personalizável", value: "100%" },
             ].map((s) => (
               <div key={s.label} className="glass-stat">

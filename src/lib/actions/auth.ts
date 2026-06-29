@@ -163,27 +163,23 @@ export async function registerUserAction(
   const userId = userRecord.uid;
 
   try {
-    await prisma.profile.upsert({
-      where: { userId },
-      create: {
-        userId,
-        name,
-        username,
-        email,
-        active: true,
-        bio: "Minha onda de links.",
-        theme: "wave",
-        customColors: {},
-      },
-      update: {
-        name,
-        username,
-        email,
-        active: true,
-        bio: "Minha onda de links.",
-        theme: "wave",
-        customColors: {},
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.user.create({
+        data: { id: userId, email, username, name },
+      });
+
+      await tx.profile.create({
+        data: {
+          userId,
+          name,
+          username,
+          email,
+          active: true,
+          bio: "Minha onda de links.",
+          theme: "wave",
+          customColors: {},
+        },
+      });
     });
   } catch {
     await getAdminAuth().deleteUser(userId);

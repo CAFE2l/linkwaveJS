@@ -18,12 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "pkygkaddkpicavdpdqvd.supabase.co",
-      },
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/**",
+        hostname: "res.cloudinary.com",
       },
     ],
   },

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Monitor, Smartphone } from "lucide-react";
+import { Monitor, Smartphone, Folder } from "lucide-react";
 
 interface LinkItem {
   title: string;
@@ -38,8 +38,8 @@ function CosmicProfileDesktop() {
         <Image
           src="/imgs/banners/linkwave.png"
           alt="Banner"
-          width={315}
-          height={45}
+          width={480}
+          height={70}
           className="w-full h-full object-cover"
         />
         <div className="banner-overlay" />
@@ -49,8 +49,8 @@ function CosmicProfileDesktop() {
         <Image
           src="/imgs/essentials/profile.jpg"
           alt="Avatar"
-          width={36}
-          height={36}
+          width={50}
+          height={50}
           className="cosmic-avatar-img"
         />
       </div>
@@ -61,13 +61,13 @@ function CosmicProfileDesktop() {
       <div className="cosmic-preview-pinned">
         {pinnedSocials.map((s) => (
           <div key={s.name} className="cosmic-preview-pinned-item">
-            <Image src={s.icon} alt={s.name} width={12} height={12} />
+            <Image src={s.icon} alt={s.name} width={16} height={16} />
           </div>
         ))}
       </div>
 
       <div className="cosmic-preview-links">
-        {profileLinks.slice(0, 3).map((link) => (
+        {profileLinks.slice(0, 4).map((link) => (
           <a
             key={link.title}
             href={link.url}
@@ -75,7 +75,13 @@ function CosmicProfileDesktop() {
             rel="noopener noreferrer"
             className="quantum-link-item"
           >
-            <Image src={link.icon} alt="" width={14} height={14} className="link-icon" />
+            {link.title === "Portfólio" ? (
+              <span className="link-icon-folder">
+                <Folder size={16} className="text-white/80" />
+              </span>
+            ) : (
+              <Image src={link.icon} alt="" width={18} height={18} className="link-icon" />
+            )}
             <span>{link.title}</span>
           </a>
         ))}
@@ -94,8 +100,8 @@ function CosmicProfileMobile() {
         <Image
           src="/imgs/banners/linkwave.png"
           alt="Banner"
-          width={165}
-          height={48}
+          width={240}
+          height={55}
           className="w-full h-full object-cover"
         />
         <div className="banner-overlay" />
@@ -105,8 +111,8 @@ function CosmicProfileMobile() {
         <Image
           src="/imgs/essentials/profile.jpg"
           alt="Avatar"
-          width={30}
-          height={30}
+          width={36}
+          height={36}
           className="cosmic-avatar-img"
         />
       </div>
@@ -117,21 +123,27 @@ function CosmicProfileMobile() {
       <div className="cosmic-mobile-pinned">
         {pinnedSocials.map((s) => (
           <div key={s.name} className="cosmic-mobile-pinned-item">
-            <Image src={s.icon} alt={s.name} width={10} height={10} />
+            <Image src={s.icon} alt={s.name} width={12} height={12} />
           </div>
         ))}
       </div>
 
       <div className="cosmic-mobile-links">
-        {profileLinks.slice(0, 5).map((link) => (
+        {profileLinks.slice(0, 4).map((link) => (
           <a
             key={link.title}
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="quantum-link-item-mobile"
+            className="quantum-link-item"
           >
-            <Image src={link.icon} alt="" width={12} height={12} className="link-icon" />
+            {link.title === "Portfólio" ? (
+              <span className="link-icon-folder">
+                <Folder size={16} className="text-white/80" />
+              </span>
+            ) : (
+              <Image src={link.icon} alt="" width={18} height={18} className="link-icon" />
+            )}
             <span>{link.title}</span>
           </a>
         ))}
@@ -174,8 +186,8 @@ export function Showcase() {
                     <Image
                       src="/imgs/essentials/monitor.png"
                       alt="Monitor"
-                      width={370}
-                      height={310}
+                      width={480}
+                      height={400}
                       className="monitor-frame"
                     />
                   </div>
@@ -203,8 +215,8 @@ export function Showcase() {
                     <Image
                       src="/imgs/essentials/frame.png"
                       alt="Phone"
-                      width={231}
-                      height={496}
+                      width={240}
+                      height={500}
                       className="phone-frame-sm"
                     />
                   </div>

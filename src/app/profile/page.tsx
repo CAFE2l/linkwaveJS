@@ -10,8 +10,21 @@ export default async function ProfilePage() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: authUser.uid } });
-  if (!user) redirect("/register");
+  const record = await prisma.user.findUnique({ where: { id: authUser.uid } });
+  if (!record) redirect("/register");
+
+  const user = {
+    id: record.id,
+    email: record.email,
+    username: record.username,
+    name: record.name,
+    avatar_url: record.avatarUrl,
+    banner_url: record.bannerUrl,
+    theme_json: record.themeJson,
+    role: record.role,
+    active: record.active,
+    created_at: record.createdAt.toISOString(),
+  };
 
   const profile = await prisma.profile.findFirst({
     where: { userId: authUser.uid },
@@ -23,4 +36,5 @@ export default async function ProfilePage() {
       <ProfileEditor user={user} initialBio={profile?.bio ?? ""} />
     </DashboardShell>
   );
+
 }

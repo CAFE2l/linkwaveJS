@@ -5,13 +5,16 @@ import {
   Check,
   CheckCircle2,
   ExternalLink,
-  Image as ImageIcon,
   Layers3,
   LayoutTemplate,
   Loader2,
+  Palette,
   Save,
+  Sparkle,
   Sparkles,
+  Square,
   TriangleAlert,
+  Type,
   UserRound,
   WandSparkles,
 } from "lucide-react";
@@ -40,6 +43,13 @@ type ProfileDraft = {
 type SaveMessage = {
   ok: boolean;
   text: string;
+};
+
+const galaxyBg: Record<string, string> = {
+  milkyway: "#1e1b4b",
+  andromeda: "#7c2d12",
+  nebula: "#134e4a",
+  blackhole: "#000000",
 };
 
 function SectionHeader({
@@ -125,6 +135,100 @@ function SettingSwitch({
   );
 }
 
+function Toggle({
+  selected,
+  label,
+  onClick,
+}: {
+  selected: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+        selected
+          ? "bg-white/50 text-ocean shadow-sm border border-white/70 backdrop-blur-sm"
+          : "bg-white/20 text-ocean/60 hover:text-ocean border border-transparent hover:bg-white/30"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function Slider({
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  suffix = "",
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <label className="space-y-1.5">
+      <span className="flex justify-between text-xs font-bold text-ocean/60">
+        <span>{label}</span>
+        <span>{value}{suffix}</span>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-cyan-500"
+      />
+    </label>
+  );
+}
+
+function ColorPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="space-y-1.5">
+      <span className="text-xs font-bold text-ocean/60">{label}</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-9 cursor-pointer rounded-lg border border-white/50 bg-white/30 p-0.5"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v);
+          }}
+          className="h-9 flex-1 rounded-lg border border-white/50 bg-white/30 px-2 text-xs font-bold text-ocean backdrop-blur-sm"
+          maxLength={7}
+        />
+      </div>
+    </label>
+  );
+}
+
 export function CustomizePanel({
   user,
   links,
@@ -195,7 +299,7 @@ export function CustomizePanel({
             Customizar página
           </h1>
           <p className="mt-2 max-w-2xl text-sm font-semibold text-ocean/60 sm:text-base">
-            Ajuste o essencial e acompanhe o resultado real antes de publicar.
+            Personalize cada detalhe da sua página — aparência, cards, botões, tipografia e muito mais.
           </p>
         </div>
         <a
@@ -211,6 +315,7 @@ export function CustomizePanel({
 
       <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1fr)_390px]">
         <div className="space-y-6">
+          {/* ─── 1. Profile ─── */}
           <section className="glass-card-strong animate-fade-in-up p-5 sm:p-7">
             <SectionHeader
               icon={UserRound}
@@ -307,186 +412,300 @@ export function CustomizePanel({
             </div>
           </section>
 
+          {/* ─── 2. Appearance ─── */}
           <section
             className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
             style={{ animationDelay: "80ms" }}
           >
             <SectionHeader
-              icon={ImageIcon}
+              icon={Palette}
               title="2. Aparência"
-              description="Escolha um ponto de partida e ajuste o gradiente."
+              description="Fundo, gradiente, efeitos e atmosfera da sua página."
             />
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {THEME_PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  aria-pressed={theme.theme_id === preset.id}
-                  onClick={() => updateTheme(preset.values)}
-                  className={`group relative overflow-hidden rounded-2xl border p-2 text-left transition-all duration-300 ${
-                    theme.theme_id === preset.id
-                      ? "border-white bg-white/65 shadow-xl ring-2 ring-cyan-200/70"
-                      : "border-white/55 bg-white/25 hover:-translate-y-1 hover:bg-white/45"
-                  }`}
-                >
-                  <span
-                    className="block h-20 rounded-xl border border-white/70 shadow-inner transition-transform duration-300 group-hover:scale-[1.02]"
-                    style={{ background: preset.gradient }}
-                  />
-                  <span className="block px-2 pb-1 pt-2 text-sm font-black text-ocean">
-                    {preset.label}
-                  </span>
-                  <span className="block px-2 pb-1 text-xs font-semibold text-ocean/55">
-                    {preset.description}
-                  </span>
-                  {theme.theme_id === preset.id && (
-                    <span className="absolute right-4 top-4 flex size-6 items-center justify-center rounded-full bg-white text-cyan-600 shadow-lg">
-                      <Check size={14} strokeWidth={3} />
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-black text-ocean">Estilo do fundo</p>
+                <div className="flex gap-2">
+                  <Toggle selected={theme.background_type === "gradient"} label="Gradiente" onClick={() => updateTheme({ background_type: "gradient" })} />
+                  <Toggle selected={theme.background_type === "solid"} label="Sólido" onClick={() => updateTheme({ background_type: "solid" })} />
+                  <Toggle selected={theme.background_type === "galaxy"} label="Galáxia" onClick={() => updateTheme({ background_type: "galaxy" })} />
+                </div>
+              </div>
 
-            <div className="mt-5 grid gap-4 rounded-2xl border border-white/55 bg-white/20 p-4 sm:grid-cols-2">
-              <label className="flex items-center justify-between gap-3">
-                <span className="text-sm font-black text-ocean">Cor inicial</span>
-                <input
-                  type="color"
-                  value={theme.background_gradient_start}
-                  onChange={(event) =>
-                    updateTheme({
-                      theme_id: "default_aero",
-                      background_gradient_start: event.target.value,
-                    })
-                  }
-                  className="h-10 w-16 cursor-pointer rounded-xl border border-white/80 bg-white/50 p-1"
-                />
-              </label>
-              <label className="flex items-center justify-between gap-3">
-                <span className="text-sm font-black text-ocean">Cor final</span>
-                <input
-                  type="color"
-                  value={theme.background_gradient_end}
-                  onChange={(event) =>
-                    updateTheme({
-                      theme_id: "default_aero",
-                      background_gradient_end: event.target.value,
-                    })
-                  }
-                  className="h-10 w-16 cursor-pointer rounded-xl border border-white/80 bg-white/50 p-1"
-                />
-              </label>
-            </div>
+              {theme.background_type === "galaxy" && (
+                <div>
+                  <p className="mb-2 text-xs font-bold text-ocean/60">Tema da galáxia</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {Object.keys(galaxyBg).map((g) => (
+                      <Toggle key={g} selected={theme.galaxy_theme === g} label={g} onClick={() => updateTheme({ galaxy_theme: g as UserThemeConfig["galaxy_theme"] })} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            <h3 className="mb-3 mt-6 text-sm font-black text-ocean">Card do perfil</h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["light", "Glass claro", "Translúcido e luminoso"],
-                ["dark", "Glass escuro", "Contraste elegante"],
-                ["aero", "Aero premium", "Vidro com profundidade"],
-                ["neon", "Neon soft", "Brilho sutil nas bordas"],
-              ].map(([id, label, description]) => (
-                <ChoiceButton
-                  key={id}
-                  selected={theme.profile_card_style === id}
-                  label={label}
-                  description={description}
-                  onClick={() =>
-                    updateTheme({
-                      profile_card_style: id as UserThemeConfig["profile_card_style"],
-                      card_glass_style:
-                        id === "aero"
-                          ? "frosted"
-                          : (id as UserThemeConfig["card_glass_style"]),
-                    })
-                  }
+              {theme.background_type === "gradient" && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <ColorPicker label="Início" value={theme.background_gradient_start} onChange={(v) => updateTheme({ theme_id: "default_aero", background_gradient_start: v })} />
+                  <ColorPicker label="Meio" value={theme.background_color} onChange={(v) => updateTheme({ theme_id: "default_aero", background_color: v })} />
+                  <ColorPicker label="Fim" value={theme.background_gradient_end} onChange={(v) => updateTheme({ theme_id: "default_aero", background_gradient_end: v })} />
+                </div>
+              )}
+
+              {theme.background_type === "solid" && (
+                <ColorPicker label="Cor de fundo" value={theme.background_color} onChange={(v) => updateTheme({ background_color: v })} />
+              )}
+
+              <div>
+                <p className="mb-2 text-xs font-bold text-ocean/60">Efeito de fundo</p>
+                <div className="flex gap-2 flex-wrap">
+                  <Toggle selected={theme.background_effect === "none"} label="Nenhum" onClick={() => updateTheme({ background_effect: "none" })} />
+                  <Toggle selected={theme.background_effect === "pulse"} label="Pulse" onClick={() => updateTheme({ background_effect: "pulse" })} />
+                  <Toggle selected={theme.background_effect === "shimmer"} label="Shimmer" onClick={() => updateTheme({ background_effect: "shimmer" })} />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={theme.enable_stars}
+                  onChange={(e) => updateTheme({ enable_stars: e.target.checked })}
+                  className="size-4 accent-cyan-500"
                 />
-              ))}
+                <span className="text-sm font-bold text-ocean">Estrelas animadas</span>
+              </label>
             </div>
           </section>
 
+          {/* ─── 3. Cards ─── */}
+          <section
+            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
+            style={{ animationDelay: "120ms" }}
+          >
+            <SectionHeader
+              icon={Square}
+              title="3. Cards"
+              description="Estilo, cor e efeitos dos cards de perfil e links."
+            />
+
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-black text-ocean">Estilo do vidro</p>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { id: "light", label: "Claro" },
+                    { id: "dark", label: "Escuro" },
+                    { id: "frosted", label: "Fosco" },
+                    { id: "neon", label: "Neon" },
+                  ].map(({ id, label }) => (
+                    <Toggle
+                      key={id}
+                      selected={theme.card_glass_style === id}
+                      label={label}
+                      onClick={() => updateTheme({ card_glass_style: id as UserThemeConfig["card_glass_style"] })}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <ColorPicker label="Cor do card" value={theme.card_color} onChange={(v) => updateTheme({ card_color: v })} />
+
+              <div className="space-y-3">
+                <Slider label="Opacidade" value={theme.card_opacity} min={5} max={100} suffix="%" onChange={(v) => updateTheme({ card_opacity: v })} />
+                <Slider label="Desfoque" value={theme.card_blur} min={0} max={40} suffix="px" onChange={(v) => updateTheme({ card_blur: v })} />
+                <Slider label="Bordas arredondadas" value={theme.card_border_radius} min={0} max={48} suffix="px" onChange={(v) => updateTheme({ card_border_radius: v })} />
+              </div>
+
+              <ColorPicker label="Cor da borda" value={theme.border_color} onChange={(v) => updateTheme({ border_color: v })} />
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={theme.card_shadow}
+                  onChange={(e) => updateTheme({ card_shadow: e.target.checked })}
+                  className="size-4 accent-cyan-500"
+                />
+                <span className="text-sm font-bold text-ocean">Sombra extra nos cards</span>
+              </label>
+            </div>
+          </section>
+
+          {/* ─── 4. Buttons ─── */}
           <section
             className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
             style={{ animationDelay: "160ms" }}
           >
             <SectionHeader
               icon={LayoutTemplate}
-              title="3. Estilo dos links"
-              description="Formato, interação e efeitos dos seus botões."
+              title="4. Botões"
+              description="Formato, cor e interação dos links da página."
             />
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["rounded", "Rounded", "Card moderno com cantos suaves"],
-                ["pill", "Pill", "Formato cápsula minimalista"],
-                ["glass", "Glass", "Vidro translúcido LinkWave"],
-                ["led", "LED Glow", "Contorno com iluminação colorida"],
-              ].map(([id, label, description]) => (
-                <ChoiceButton
-                  key={id}
-                  selected={theme.link_style === id}
-                  label={label}
-                  description={description}
-                  onClick={() =>
-                    updateTheme({
-                      link_style: id as UserThemeConfig["link_style"],
-                      button_glow: id === "led" ? true : theme.button_glow,
-                      enable_led_glow: id === "led" ? true : theme.enable_led_glow,
-                    })
-                  }
-                />
-              ))}
-            </div>
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-black text-ocean">Formato dos links</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    ["rounded", "Rounded", "Card moderno com cantos suaves"],
+                    ["pill", "Pill", "Formato cápsula minimalista"],
+                    ["glass", "Glass", "Vidro translúcido LinkWave"],
+                    ["led", "LED Glow", "Contorno com iluminação colorida"],
+                  ].map(([id, label, description]) => (
+                    <ChoiceButton
+                      key={id}
+                      selected={theme.link_style === id}
+                      label={label}
+                      description={description}
+                      onClick={() =>
+                        updateTheme({
+                          link_style: id as UserThemeConfig["link_style"],
+                          button_glow: id === "led" ? true : theme.button_glow,
+                          enable_led_glow: id === "led" ? true : theme.enable_led_glow,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <SettingSwitch
-                checked={theme.enable_animations}
-                label="Animação fade in"
-                description="Entrada suave do conteúdo"
-                onChange={(checked) =>
-                  updateTheme({
-                    enable_animations: checked,
-                    transition_effect: checked ? "fade" : "none",
-                  })
-                }
-              />
-              <SettingSwitch
-                checked={theme.link_hover_effect === "lift"}
-                label="Hover lift"
-                description="Eleva o link ao passar o mouse"
-                onChange={(checked) =>
-                  updateTheme({ link_hover_effect: checked ? "lift" : "none" })
-                }
-              />
-              <SettingSwitch
-                checked={theme.enable_led_glow}
-                label="LED glow"
-                description="Brilho suave nos cards de link"
-                onChange={(checked) =>
-                  updateTheme({ button_glow: checked, enable_led_glow: checked })
-                }
-              />
-              <SettingSwitch
-                checked={theme.enable_background_bubbles}
-                label="Background bubbles"
-                description="Bolhas de luz no plano de fundo"
-                onChange={(checked) =>
-                  updateTheme({ enable_background_bubbles: checked })
-                }
-              />
-              <SettingSwitch
-                checked={theme.enable_particles}
-                label="Partículas"
-                description="Estrelas sutis no plano de fundo"
-                onChange={(checked) =>
-                  updateTheme({ enable_particles: checked, enable_stars: checked })
-                }
-              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ColorPicker label="Cor do botão" value={theme.button_color} onChange={(v) => updateTheme({ button_color: v })} />
+                <ColorPicker label="Glow dos links" value={theme.link_glow_color} onChange={(v) => updateTheme({ link_glow_color: v })} />
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-bold text-ocean/60">Efeito hover</p>
+                <div className="flex gap-2 flex-wrap">
+                  {["lift", "glow", "scale", "shake", "none"].map((e) => (
+                    <Toggle key={e} selected={theme.link_hover_effect === e} label={e} onClick={() => updateTheme({ link_hover_effect: e as UserThemeConfig["link_hover_effect"] })} />
+                  ))}
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={theme.button_glow}
+                  onChange={(e) => updateTheme({ button_glow: e.target.checked })}
+                  className="size-4 accent-cyan-500"
+                />
+                <span className="text-sm font-bold text-ocean">Glow nos botões</span>
+              </label>
             </div>
           </section>
 
+          {/* ─── 5. Typography ─── */}
+          <section
+            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
+            style={{ animationDelay: "200ms" }}
+          >
+            <SectionHeader
+              icon={Type}
+              title="5. Tipografia"
+              description="Fonte e cores dos textos da sua página."
+            />
+
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-black text-ocean">Fonte</p>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { id: "space", label: "Space Grotesk" },
+                    { id: "nunito", label: "Nunito" },
+                    { id: "mono", label: "Mono" },
+                    { id: "serif", label: "Serif" },
+                  ].map(({ id, label }) => (
+                    <Toggle key={id} selected={theme.font_style === id} label={label} onClick={() => updateTheme({ font_style: id as UserThemeConfig["font_style"] })} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ColorPicker label="Texto principal" value={theme.text_color_primary} onChange={(v) => updateTheme({ text_color_primary: v })} />
+                <ColorPicker label="Texto secundário" value={theme.text_color_secondary} onChange={(v) => updateTheme({ text_color_secondary: v })} />
+              </div>
+            </div>
+          </section>
+
+          {/* ─── 6. Avatar ─── */}
+          <section
+            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
+            style={{ animationDelay: "240ms" }}
+          >
+            <SectionHeader
+              icon={UserRound}
+              title="6. Avatar"
+              description="Anel decorativo e brilho ao redor da sua foto."
+            />
+
+            <div className="space-y-4">
+              <div>
+                <p className="mb-2 text-xs font-bold text-ocean/60">Anel do avatar</p>
+                <div className="flex gap-2">
+                  <Toggle selected={theme.avatar_ring_style === "gradient"} label="Gradiente" onClick={() => updateTheme({ avatar_ring_style: "gradient" })} />
+                  <Toggle selected={theme.avatar_ring_style === "solid"} label="Sólido" onClick={() => updateTheme({ avatar_ring_style: "solid" })} />
+                  <Toggle selected={theme.avatar_ring_style === "none"} label="Nenhum" onClick={() => updateTheme({ avatar_ring_style: "none" })} />
+                </div>
+              </div>
+              <ColorPicker label="Cor do LED do avatar" value={theme.avatar_led_color} onChange={(v) => updateTheme({ avatar_led_color: v })} />
+              <ColorPicker label="Cor do LED do banner" value={theme.banner_led_color} onChange={(v) => updateTheme({ banner_led_color: v })} />
+            </div>
+          </section>
+
+          {/* ─── 7. Animations ─── */}
+          <section
+            className="glass-card-strong animate-fade-in-up p-5 sm:p-7"
+            style={{ animationDelay: "280ms" }}
+          >
+            <SectionHeader
+              icon={Sparkle}
+              title="7. Animações"
+              description="Movimento, transições e efeitos visuais."
+            />
+
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-xs font-bold text-ocean/60">Transição dos links</p>
+                <div className="flex gap-2 flex-wrap">
+                  {["none", "fade", "slide", "zoom", "float"].map((t) => (
+                    <Toggle key={t} selected={theme.transition_effect === t} label={t} onClick={() => updateTheme({ transition_effect: t as UserThemeConfig["transition_effect"] })} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SettingSwitch
+                  checked={theme.enable_animations}
+                  label="Animação fade in"
+                  description="Entrada suave do conteúdo"
+                  onChange={(checked) =>
+                    updateTheme({
+                      enable_animations: checked,
+                      transition_effect: checked ? "fade" : "none",
+                    })
+                  }
+                />
+                <SettingSwitch
+                  checked={theme.enable_background_bubbles}
+                  label="Background bubbles"
+                  description="Bolhas de luz no plano de fundo"
+                  onChange={(checked) =>
+                    updateTheme({ enable_background_bubbles: checked })
+                  }
+                />
+                <SettingSwitch
+                  checked={theme.enable_particles}
+                  label="Partículas"
+                  description="Estrelas sutis no plano de fundo"
+                  onChange={(checked) =>
+                    updateTheme({ enable_particles: checked, enable_stars: checked })
+                  }
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ─── Save ─── */}
           <div className="sticky bottom-4 z-20 rounded-3xl border border-white/80 bg-white/55 p-3 shadow-2xl shadow-cyan-950/15 backdrop-blur-2xl">
             <button
               type="button"
@@ -520,7 +739,7 @@ export function CustomizePanel({
               <div>
                 <div className="flex items-center gap-2 text-sm font-black text-ocean">
                   <Sparkles size={15} />
-                  4. Preview ao vivo
+                  8. Preview ao vivo
                 </div>
                 <p className="mt-0.5 text-xs font-semibold text-ocean/55">
                   Mesma experiência da página pública

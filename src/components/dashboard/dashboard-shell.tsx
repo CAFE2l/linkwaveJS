@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, LayoutDashboard, LogOut, Palette, ShieldCheck, Sliders, User } from "lucide-react";
+import { ExternalLink, LayoutDashboard, LogOut, ShieldCheck, Sliders, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import { ToastProvider } from "@/components/dashboard/toast";
 import { BlobBackground } from "@/components/landing/blob-background";
@@ -15,7 +15,6 @@ const navItems = [
   { href: "/dashboard", label: "Links", icon: LayoutDashboard },
   { href: "/dashboard/customize", label: "Customizar", icon: Sliders },
   { href: "/profile", label: "Perfil", icon: User },
-  { href: "/theme", label: "Tema", icon: Palette },
 ];
 
 export function DashboardShell({

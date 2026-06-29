@@ -34,7 +34,6 @@ export async function updateThemeAction(
     return { ok: false, message: "Não foi possível salvar o tema." };
   }
 
-  revalidatePath("/theme");
   revalidatePath("/dashboard/customize");
   revalidatePath("/u/*");
   return { ok: true, message: "Tema salvo." };

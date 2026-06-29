@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/profile", "/theme", "/admin", "/onboarding", "/settings"];
+const protectedRoutes = ["/dashboard", "/profile", "/admin", "/onboarding", "/settings"];
 const authRoutes = ["/login", "/register"];
 
 function withSecurityHeaders(response: NextResponse) {

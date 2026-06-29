@@ -11,24 +11,49 @@ type Props = {
 };
 
 async function getPublicProfile(username: string) {
-  const user = await prisma.user.findFirst({
+  const record = await prisma.user.findFirst({
     where: { username, active: true },
   });
 
-  if (!user) return null;
+  if (!record) return null;
+
+  const user = {
+    id: record.id,
+    email: record.email,
+    username: record.username,
+    name: record.name,
+    avatar_url: record.avatarUrl,
+    banner_url: record.bannerUrl,
+    theme_json: record.themeJson,
+    role: record.role,
+    active: record.active,
+    created_at: record.createdAt.toISOString(),
+  };
 
   const profile = await prisma.profile.findFirst({
-    where: { userId: user.id },
+    where: { userId: record.id },
     select: { bio: true },
   });
 
-  const links = await prisma.link.findMany({
-    where: { userId: user.id },
+  const rawLinks = await prisma.link.findMany({
+    where: { userId: record.id },
     orderBy: { orderPosition: "asc" },
-    select: { id: true, title: true, url: true, icon: true, icone: true, iconBlob: true, isCustomIcon: true, orderPosition: true, userId: true, createdAt: true },
   });
 
-  const theme = (user.themeJson ?? null) as Partial<UserThemeConfig> | null;
+  const links = rawLinks.map((l) => ({
+    id: l.id,
+    user_id: l.userId,
+    title: l.title,
+    url: l.url,
+    icon: l.icon,
+    icone: l.icone,
+    icon_blob: l.iconBlob,
+    is_custom_icon: l.isCustomIcon,
+    order_position: l.orderPosition,
+    created_at: l.createdAt.toISOString(),
+  }));
+
+  const theme = (record.themeJson ?? null) as Partial<UserThemeConfig> | null;
   const mergedTheme = mergeUserTheme(theme);
 
   return { user, profile, links, theme: mergedTheme };
@@ -44,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `@${data.user.username}`;
   const description = data.profile?.bio || "Minha página LinkWave.";
-  const image = data.user.avatarUrl || "/brand/banner.png";
+  const image = data.user.avatar_url || "/brand/banner.png";
 
   return {
     title,

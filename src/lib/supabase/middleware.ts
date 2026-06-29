@@ -1,8 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import type { Database } from "@/types/database";
 
-const protectedRoutes = ["/dashboard", "/profile", "/theme", "/admin", "/onboarding", "/settings"];
+const protectedRoutes = ["/dashboard", "/profile", "/admin", "/onboarding", "/settings"];
 const authRoutes = ["/login", "/register"];
 
 function withSecurityHeaders(response: NextResponse) {
@@ -15,7 +14,6 @@ function withSecurityHeaders(response: NextResponse) {
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -23,7 +21,7 @@ export async function updateSession(request: NextRequest) {
     return withSecurityHeaders(response);
   }
 
-  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

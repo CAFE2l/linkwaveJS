@@ -1,9 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let adminClient: ReturnType<typeof createClient<Database>> | null = null;
+let adminClient: SupabaseClient | null = null;
 
-export function createAdminClient() {
+export function createAdminClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -11,7 +10,7 @@ export function createAdminClient() {
     throw new Error("Configure NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.");
   }
 
-  adminClient ??= createClient<Database>(url, serviceRoleKey, {
+  adminClient ??= createClient(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

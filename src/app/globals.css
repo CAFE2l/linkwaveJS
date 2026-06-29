@@ -1061,13 +1061,6 @@ button, a, input, textarea {
 }
 
 /* ─── Cosmic Preview (Showcase) ─── */
-.cosmic-preview-wrapper {
-  border-radius: 16px;
-  overflow: hidden;
-  position: relative;
-  height: 440px;
-}
-
 .cosmic-preview-desktop {
   height: 100%;
   position: relative;
@@ -1145,7 +1138,7 @@ button, a, input, textarea {
 
 .dimensional-banner {
   width: 100%;
-  height: 160px;
+  height: 45px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -1160,15 +1153,15 @@ button, a, input, textarea {
 }
 
 .cosmic-avatar-border {
-  width: 80px;
-  height: 80px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  padding: 3px;
-  margin-top: -32px;
+  padding: 2px;
+  margin-top: -14px;
   position: relative;
   z-index: 3;
   background: linear-gradient(135deg, #38bdf8, #818cf8, #a78bfa);
-  box-shadow: 0 0 25px rgba(56,189,248,0.35);
+  box-shadow: 0 0 15px rgba(56,189,248,0.3);
   flex-shrink: 0;
 }
 
@@ -1181,32 +1174,33 @@ button, a, input, textarea {
 }
 
 .cosmic-preview-name {
-  font-size: 16px;
+  font-size: 11px;
   font-weight: 900;
   color: white;
-  margin-top: 8px;
+  margin-top: 4px;
   position: relative;
   z-index: 2;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 20px rgba(56,189,248,0.3);
+  text-shadow: 0 0 10px rgba(56,189,248,0.2);
 }
 
 .cosmic-preview-bio {
-  font-size: 10px;
-  color: rgba(148, 163, 184, 0.8);
+  font-size: 7px;
+  color: rgba(148, 163, 184, 0.7);
   font-weight: 600;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 1px;
   position: relative;
   z-index: 2;
-  padding: 0 20px;
+  padding: 0 12px;
+  line-height: 1.2;
 }
 
 .cosmic-preview-links {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 12px 20px 0;
+  gap: 3px;
+  padding: 4px 20px 0;
   width: 100%;
   position: relative;
   z-index: 2;
@@ -1217,14 +1211,14 @@ button, a, input, textarea {
 .quantum-link-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(96, 165, 250, 0.18);
-  backdrop-filter: blur(8px);
-  color: rgba(255,255,255,0.9);
-  font-size: 11px;
+  backdrop-filter: blur(4px);
+  color: rgba(255,255,255,0.85);
+  font-size: 8px;
   font-weight: 700;
   transition: all 0.25s ease;
   position: relative;
@@ -1247,24 +1241,14 @@ button, a, input, textarea {
 }
 
 .quantum-link-item .link-icon {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }
 
-.cosmic-preview-footer {
-  margin-top: auto;
-  padding: 8px 16px;
-  text-align: center;
-  font-size: 9px;
-  color: rgba(148,163,184,0.6);
-  font-weight: 600;
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
+
 
 @keyframes cosmic-drift {
   0% { transform: translate(0, 0); }
@@ -1281,22 +1265,22 @@ button, a, input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 4px;
+  margin-top: 3px;
   position: relative;
   z-index: 2;
   flex-shrink: 0;
 }
 
 .cosmic-preview-pinned-item {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(96,165,250,0.18);
+  border: 1px solid rgba(96,165,250,0.16);
   backdrop-filter: blur(4px);
   transition: all 0.2s ease;
   cursor: default;
@@ -1305,15 +1289,15 @@ button, a, input, textarea {
 .cosmic-preview-pinned-item:hover {
   background: rgba(255,255,255,0.12);
   border-color: rgba(56,189,248,0.4);
-  box-shadow: 0 0 16px rgba(56,189,248,0.2);
-  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(56,189,248,0.2);
+  transform: translateY(-1px);
 }
 
 .cosmic-preview-pinned-item img {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   object-fit: contain;
-  filter: drop-shadow(0 0 4px rgba(80,150,255,0.25));
+  filter: drop-shadow(0 0 3px rgba(80,150,255,0.2));
 }
 
 .cosmic-mobile-pinned {
@@ -1360,8 +1344,8 @@ button, a, input, textarea {
 /* ── Phone Mockup ── */
 .phone-container-sm {
   position: relative;
-  width: 200px;
-  height: 380px;
+  width: 231px;
+  height: 496px;
   margin: 0 auto;
 }
 
@@ -1423,8 +1407,8 @@ button, a, input, textarea {
 /* ── Desktop Monitor Mockup ── */
 .monitor-container {
   position: relative;
-  width: 280px;
-  height: 232px;
+  width: 370px;
+  height: 310px;
   margin: 0 auto;
 }
 
@@ -1485,7 +1469,7 @@ button, a, input, textarea {
 /* ─── Cosmic Preview Mobile (inside phone) ─── */
 .cosmic-mobile-banner {
   width: 100%;
-  height: 70px;
+  height: 48px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -1500,43 +1484,44 @@ button, a, input, textarea {
 }
 
 .cosmic-mobile-avatar-border {
-  width: 44px;
-  height: 44px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   padding: 2px;
-  margin-top: -18px;
+  margin-top: -12px;
   position: relative;
   z-index: 3;
   background: linear-gradient(135deg, #38bdf8, #818cf8, #a78bfa);
-  box-shadow: 0 0 15px rgba(56,189,248,0.3);
+  box-shadow: 0 0 10px rgba(56,189,248,0.25);
   flex-shrink: 0;
 }
 
 .cosmic-mobile-name {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 900;
   color: white;
-  margin-top: 4px;
+  margin-top: 2px;
   position: relative;
   z-index: 2;
   letter-spacing: -0.01em;
-  text-shadow: 0 0 10px rgba(56,189,248,0.2);
+  text-shadow: 0 0 8px rgba(56,189,248,0.15);
 }
 
 .cosmic-mobile-bio {
-  font-size: 7px;
-  color: rgba(148,163,184,0.7);
+  font-size: 6px;
+  color: rgba(148,163,184,0.6);
   font-weight: 600;
   text-align: center;
   position: relative;
   z-index: 2;
+  line-height: 1.2;
 }
 
 .cosmic-mobile-links {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 12px 0;
+  gap: 3px;
+  padding: 6px 10px 0;
   width: 100%;
   position: relative;
   z-index: 2;
@@ -1547,20 +1532,20 @@ button, a, input, textarea {
 .quantum-link-item-mobile {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 8px;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(96,165,250,0.15);
+  border: 1px solid rgba(96,165,250,0.12);
   backdrop-filter: blur(4px);
   color: rgba(255,255,255,0.85);
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
 }
 
 .quantum-link-item-mobile .link-icon {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -1568,9 +1553,9 @@ button, a, input, textarea {
 
 .cosmic-mobile-footer {
   margin-top: auto;
-  padding: 4px 12px 6px;
+  padding: 3px 10px 5px;
   text-align: center;
-  font-size: 7px;
+  font-size: 6px;
   color: rgba(148,163,184,0.5);
   font-weight: 600;
   position: relative;
@@ -1579,46 +1564,12 @@ button, a, input, textarea {
 }
 
 @media (min-width: 768px) {
-  .phone-container-sm {
-    width: 230px;
-    height: 438px;
-  }
-  .monitor-container {
-    width: 340px;
-    height: 282px;
-  }
-  .cosmic-preview-wrapper {
-    height: 480px;
-  }
-  .dimensional-banner {
-    height: 180px;
-  }
-  .cosmic-preview-bio {
-    font-size: 11px;
-  }
-  .cosmic-preview-pinned {
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .cosmic-preview-pinned-item {
-    width: 34px;
-    height: 34px;
-  }
-  .cosmic-preview-pinned-item img {
-    width: 18px;
-    height: 18px;
-  }
   .cosmic-preview-desktop {
     border-radius: 2px;
   }
 }
 
-@media (min-width: 1024px) {
-  .monitor-container {
-    width: 358px;
-    height: 296px;
-  }
-}
+
 
 .animate-glow-pulse {
   animation: glow-pulse 4s ease-in-out infinite;

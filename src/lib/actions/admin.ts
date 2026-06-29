@@ -317,7 +317,6 @@ export async function resetUserThemeAction(userId: string): Promise<ActionState>
 export async function getAdminThemes() {
   await requireAdmin();
   const users = await prisma.user.findMany({
-    where: { themeJson: { not: null } },
     select: { id: true, username: true, email: true, themeJson: true, createdAt: true },
     orderBy: { createdAt: "desc" },
     take: 100,

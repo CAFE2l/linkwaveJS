@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const [user, links, totalClicks, iconsData] = await Promise.all([
+  const [record, rawLinks, totalClicks, iconsData] = await Promise.all([
     prisma.user.findUnique({ where: { id: authUser.uid } }),
     prisma.link.findMany({ where: { userId: authUser.uid }, orderBy: { orderPosition: "asc" } }),
     prisma.click.count({ where: { userId: authUser.uid } }),
@@ -21,7 +21,33 @@ export default async function DashboardPage() {
 
   const allIcons = iconsData.map((i) => i.name);
 
-  if (!user) redirect("/register");
+  if (!record) redirect("/register");
+
+  const user = {
+    id: record.id,
+    email: record.email,
+    username: record.username,
+    name: record.name,
+    avatar_url: record.avatarUrl,
+    banner_url: record.bannerUrl,
+    theme_json: record.themeJson,
+    role: record.role,
+    active: record.active,
+    created_at: record.createdAt.toISOString(),
+  };
+
+  const links = rawLinks.map((l) => ({
+    id: l.id,
+    user_id: l.userId,
+    title: l.title,
+    url: l.url,
+    icon: l.icon,
+    icone: l.icone,
+    icon_blob: l.iconBlob,
+    is_custom_icon: l.isCustomIcon,
+    order_position: l.orderPosition,
+    created_at: l.createdAt.toISOString(),
+  }));
 
   return (
     <ThemeProvider>

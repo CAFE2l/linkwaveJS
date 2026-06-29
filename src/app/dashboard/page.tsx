@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { ensureUserRecord } from "@/lib/db/upsert-user";
 import { ThemeProvider } from "@/components/landing/theme-provider";
 import { BlobBackground } from "@/components/landing/blob-background";
-import { listIconsAction } from "@/lib/actions/icons";
+import { listIconsAction, type IconInfo } from "@/lib/actions/icons";
 
 export const metadata = { title: "Dashboard | LinkWave" };
 
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     orderBy: { orderPosition: "asc" },
   });
   const totalClicks = await prisma.click.count({ where: { userId: authUser.uid } });
-  const iconsData = await listIconsAction();
+  const iconsData: IconInfo[] = await listIconsAction();
 
   const allIcons = iconsData.map((i) => i.name);
 

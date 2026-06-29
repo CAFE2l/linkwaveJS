@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getCurrentUser } from '@/lib/firebase/auth-server';
 import { prisma } from '@/lib/db/prisma';
 import { normalizeUrl } from '@/lib/utils/url';
+
+const updateLinkSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1).max(60).optional(),
+  url: z.string().min(1).max(400).optional(),
+  icon: z.string().max(80).nullable().optional(),
+  is_custom_icon: z.boolean().optional(),
+  icon_blob: z.string().nullable().optional(),
+  pinned: z.boolean().optional(),
+});
 
 export async function GET() {
   try {
@@ -61,15 +72,33 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const body = await req.json();
-    const { id, title, url, icon, is_custom_icon, icon_blob } = body;
+    const parsed = updateLinkSchema.safeParse(await req.json().catch(() => null));
 
-    if (!id) {
-      return NextResponse.json({ ok: false, message: 'ID é obrigatório' }, { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, message: parsed.error.issues[0]?.message ?? 'Dados inválidos' }, { status: 400 });
     }
 
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
+
+    const { id, title, url, icon, is_custom_icon, icon_blob, pinned } = parsed.data;
+
+    if (pinned === true) {
+      const pinnedCount = await prisma.link.count({
+        where: {
+          userId: user.uid,
+          pinned: true,
+          NOT: { id },
+        },
+      });
+
+      if (pinnedCount >= 5) {
+        return NextResponse.json(
+          { ok: false, message: 'Você pode fixar no máximo 5 links.' },
+          { status: 400 },
+        );
+      }
+    }
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
@@ -77,6 +106,7 @@ export async function PUT(req: Request) {
     if (icon !== undefined) updateData.icon = icon || null;
     if (is_custom_icon !== undefined) updateData.isCustomIcon = is_custom_icon;
     if (icon_blob !== undefined) updateData.iconBlob = icon_blob || null;
+    if (pinned !== undefined) updateData.pinned = pinned;
 
     const link = await prisma.link.updateMany({
       where: { id, userId: user.uid },

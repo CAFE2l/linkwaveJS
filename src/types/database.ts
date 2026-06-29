@@ -41,6 +41,7 @@ export type Link = {
   icone: string | null;
   icon_blob: string | null;
   is_custom_icon: boolean;
+  pinned: boolean;
   order_position: number;
   created_at: string;
 };

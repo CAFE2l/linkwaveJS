@@ -12,8 +12,9 @@ export default async function DashboardPage() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const [record, rawLinks, totalClicks, iconsData] = await Promise.all([
+  const [record, profile, rawLinks, totalClicks, iconsData] = await Promise.all([
     prisma.user.findUnique({ where: { id: authUser.uid } }),
+    prisma.profile.findFirst({ where: { userId: authUser.uid }, select: { bio: true } }),
     prisma.link.findMany({ where: { userId: authUser.uid }, orderBy: { orderPosition: "asc" } }),
     prisma.click.count({ where: { userId: authUser.uid } }),
     listIconsAction(),
@@ -45,6 +46,7 @@ export default async function DashboardPage() {
     icone: l.icone,
     icon_blob: l.iconBlob,
     is_custom_icon: l.isCustomIcon,
+    pinned: l.pinned,
     order_position: l.orderPosition,
     created_at: l.createdAt.toISOString(),
   }));
@@ -59,6 +61,7 @@ export default async function DashboardPage() {
             initialLinks={links}
             initialClicks={totalClicks}
             initialIcons={allIcons}
+            initialBio={profile?.bio ?? ""}
           />
         </div>
       </div>

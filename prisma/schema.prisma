@@ -53,6 +53,7 @@ model Link {
   icone         String?
   iconBlob      String?  @map("icon_blob")
   isCustomIcon  Boolean  @default(false) @map("is_custom_icon")
+  pinned        Boolean  @default(false)
   orderPosition Int      @default(0) @map("order_position")
   createdAt     DateTime @default(now()) @map("created_at")
 

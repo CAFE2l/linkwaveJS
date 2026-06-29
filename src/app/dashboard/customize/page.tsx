@@ -39,6 +39,7 @@ export default async function CustomizePage() {
     icone: l.icone,
     icon_blob: l.iconBlob,
     is_custom_icon: l.isCustomIcon,
+    pinned: l.pinned,
     order_position: l.orderPosition,
     created_at: l.createdAt.toISOString(),
   }));

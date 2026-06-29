@@ -15,7 +15,7 @@ function formatNumber(n: number): string {
 const phoneLinks = [
   { name: "Instagram", icon: "/imgs/icons/links/Instagram.png" },
   { name: "YouTube", icon: "/imgs/icons/links/Youtube.png" },
-  { name: "Meu Site", icon: "/imgs/icons/links/Google Chrome.png" },
+  { name: "Meu Site", icon: "/imgs/icons/links/ArtStation.png" },
   { name: "WhatsApp", icon: "/imgs/icons/links/Whatsapp.png" },
   { name: "Portfólio", icon: "/imgs/icons/links/Discord.png" },
 ];

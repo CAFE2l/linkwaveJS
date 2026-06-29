@@ -31,6 +31,7 @@ function mapLink(row: {
   icone: string | null;
   iconBlob: string | null;
   isCustomIcon: boolean;
+  pinned: boolean;
   orderPosition: number;
   createdAt: Date;
 }): Link {
@@ -43,6 +44,7 @@ function mapLink(row: {
     icone: row.icone ?? null,
     icon_blob: row.iconBlob ?? null,
     is_custom_icon: row.isCustomIcon,
+    pinned: row.pinned,
     order_position: row.orderPosition,
     created_at: row.createdAt.toISOString(),
   };

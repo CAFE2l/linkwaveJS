@@ -285,7 +285,23 @@ export async function deleteLinkAdminAction(linkId: string): Promise<ActionState
 export async function getAdminLinks() {
   await requireAdmin();
   const links = await prisma.link.findMany({
-    select: { id: true, title: true, url: true, icon: true, userId: true, createdAt: true },
+    select: {
+      id: true,
+      title: true,
+      url: true,
+      icon: true,
+      userId: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          email: true,
+          avatarUrl: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
     take: 250,
   });
@@ -297,6 +313,13 @@ export async function getAdminLinks() {
     icon: l.icon,
     user_id: l.userId,
     created_at: l.createdAt.toISOString(),
+    user: {
+      id: l.user.id,
+      username: l.user.username,
+      name: l.user.name,
+      email: l.user.email,
+      avatar_url: l.user.avatarUrl,
+    },
   }));
 }
 

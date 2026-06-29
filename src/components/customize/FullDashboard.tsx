@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { LogOut, ExternalLink, User } from "lucide-react";
+import { LogOut, ExternalLink, ShieldCheck, Sliders, User } from "lucide-react";
 import ProfileCard from "./ProfileCard";
 import NewLinkForm from "./NewLinkForm";
 import LinkList from "./LinkList";
@@ -150,14 +150,19 @@ export default function FullDashboard({
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-20 mt-4 w-[min(100%-2rem,1120px)] mx-auto glass-nav px-5 py-2.5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
               <img src="/brand/icon.png" alt="LinkWave" className="h-7 w-7" />
               <span className="text-base font-black text-ocean">LinkWave</span>
             </Link>
             <div className="h-4 w-px bg-white/40 hidden sm:block" />
-            <div className="hidden sm:flex items-center gap-2">
+            <Link
+              href={`/u/${user.username}`}
+              target="_blank"
+              className="hidden min-w-0 items-center gap-2 rounded-full border border-white/55 bg-white/25 px-2.5 py-1.5 backdrop-blur-md transition hover:bg-white/40 sm:flex"
+              title={`Abrir perfil de @${user.username}`}
+            >
               <div className="w-7 h-7 rounded-full overflow-hidden bg-white/30 border border-white/60 flex items-center justify-center flex-shrink-0">
                 {user.avatar_url ? (
                   <img src={user.avatar_url} className="w-full h-full object-cover" alt="" />
@@ -165,10 +170,27 @@ export default function FullDashboard({
                   <User size={14} className="text-ocean" />
                 )}
               </div>
-              <span className="text-sm text-ocean">@{user.username}</span>
-            </div>
+              <span className="max-w-[180px] truncate text-sm font-bold text-ocean">@{user.username}</span>
+            </Link>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Link
+              href="/dashboard/customize"
+              className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200/80 bg-gradient-to-b from-cyan-300/80 to-blue-500/85 px-3.5 py-2 text-xs font-black text-white shadow-lg shadow-cyan-300/30 backdrop-blur-md transition hover:-translate-y-0.5 hover:from-cyan-200 hover:to-blue-400 hover:shadow-xl hover:shadow-cyan-300/40 active:scale-[0.98]"
+              title="Personalizar página"
+            >
+              <Sliders size={13} />
+              <span className="hidden sm:inline">Personalizar</span>
+            </Link>
+            {user.role === "admin" && (
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/60 bg-amber-100/50 px-3 py-1.5 text-xs font-bold text-amber-700 backdrop-blur-sm transition hover:bg-amber-100/80 hover:shadow-sm"
+              >
+                <ShieldCheck size={13} />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
             <a
               href={`/u/${user.username}`}
               target="_blank"

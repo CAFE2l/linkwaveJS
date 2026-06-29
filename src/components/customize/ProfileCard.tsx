@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Camera, Check, ExternalLink, Loader2, Pencil, User, X } from "lucide-react";
 import type { AppUser } from "@/types/database";
-import { uploadAvatarAction, uploadBannerAction } from "@/lib/actions/dashboard";
-import { updateProfileAction } from "@/lib/actions/profile";
 
 export default function ProfileCard({
   user,
@@ -32,7 +30,7 @@ export default function ProfileCard({
   const [nameDraft, setNameDraft] = useState(user.name ?? "");
   const [usernameDraft, setUsernameDraft] = useState(user.username);
   const [bioDraft, setBioDraft] = useState(bio);
-  const [saving, startSaving] = useTransition();
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setNameDraft(user.name ?? "");
@@ -49,14 +47,24 @@ export default function ProfileCard({
     setUploading(true);
     const fd = new FormData();
     fd.append("file", f);
-    const result = await (field === "avatar_url" ? uploadAvatarAction(fd) : uploadBannerAction(fd));
-    setUploading(false);
-    if (!result.ok || !result.url) {
-      pushToast({ id: String(Date.now()), type: "error", msg: result.message || "Erro ao enviar imagem" });
-      return;
+    fd.append("kind", field === "avatar_url" ? "avatar" : "banner");
+    try {
+      const response = await fetch("/api/profile/image", {
+        method: "POST",
+        body: fd,
+      });
+      const result = await response.json().catch(() => null) as { ok?: boolean; message?: string; url?: string } | null;
+      if (!response.ok || !result?.ok || !result.url) {
+        pushToast({ id: String(Date.now()), type: "error", msg: result?.message || "Erro ao enviar imagem" });
+        return;
+      }
+      setUser((current) => ({ ...current, [field]: result.url }));
+      pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
+    } catch {
+      pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao enviar imagem" });
+    } finally {
+      setUploading(false);
     }
-    setUser((current) => ({ ...current, [field]: result.url }));
-    pushToast({ id: String(Date.now()), type: "success", msg: field === "avatar_url" ? "Avatar atualizado" : "Banner atualizado" });
   }
 
   function cancelEdit() {
@@ -67,32 +75,46 @@ export default function ProfileCard({
   }
 
   function saveProfile() {
-    startSaving(async () => {
-      const result = await updateProfileAction({
+    setSaving(true);
+    fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         username: usernameDraft,
         name: nameDraft,
         bio: bioDraft,
         avatarUrl: user.avatar_url ?? "",
         bannerUrl: user.banner_url ?? "",
         theme: "wave",
-      });
+      }),
+    })
+      .then(async (response) => {
+        const result = await response.json().catch(() => null) as {
+          ok?: boolean;
+          message?: string;
+          profile?: { name: string; username: string; bio: string; avatarUrl: string; bannerUrl: string };
+        } | null;
 
-      if (!result.ok || !result.profile) {
-        pushToast({ id: String(Date.now()), type: "error", msg: result.message });
-        return;
-      }
+        if (!response.ok || !result?.ok || !result.profile) {
+          pushToast({ id: String(Date.now()), type: "error", msg: result?.message || "Erro ao atualizar perfil" });
+          return;
+        }
 
-      setUser((current) => ({
-        ...current,
-        name: result.profile?.name ?? current.name,
-        username: result.profile?.username ?? current.username,
-        avatar_url: result.profile?.avatarUrl || current.avatar_url,
-        banner_url: result.profile?.bannerUrl || current.banner_url,
-      }));
-      setBio(result.profile.bio);
-      setEditing(false);
-      pushToast({ id: String(Date.now()), type: "success", msg: "Perfil atualizado" });
-    });
+        setUser((current) => ({
+          ...current,
+          name: result.profile?.name ?? current.name,
+          username: result.profile?.username ?? current.username,
+          avatar_url: result.profile?.avatarUrl || current.avatar_url,
+          banner_url: result.profile?.bannerUrl || current.banner_url,
+        }));
+        setBio(result.profile.bio);
+        setEditing(false);
+        pushToast({ id: String(Date.now()), type: "success", msg: "Perfil atualizado" });
+      })
+      .catch(() => {
+        pushToast({ id: String(Date.now()), type: "error", msg: "Erro ao atualizar perfil" });
+      })
+      .finally(() => setSaving(false));
   }
 
   void clicks;

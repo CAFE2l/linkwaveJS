@@ -38,12 +38,23 @@ export default function FullDashboard({
 
   async function handleAddLink(p: Partial<DbLink>) {
     try {
+      const shouldPin = Boolean(p.pinned);
+      if (shouldPin && links.filter((link) => link.pinned).length >= 5) {
+        pushToast({
+          id: String(Date.now()),
+          type: "error",
+          msg: "Você já tem 5 links fixados. Desafixe um para continuar.",
+        });
+        return;
+      }
+
       const payload = {
         title: p.title || "Untitled",
         url: p.url || "#",
         icon: p.icon || null,
         is_custom_icon: Boolean(p.is_custom_icon),
         icon_blob: p.icon_blob || null,
+        pinned: shouldPin,
       };
       if (links.some((l) => String(l.url).toLowerCase() === String(payload.url).toLowerCase())) {
         pushToast({ id: String(Date.now()), type: "error", msg: "URL já existe" });

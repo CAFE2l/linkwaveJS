@@ -14,6 +14,34 @@ const updateLinkSchema = z.object({
   pinned: z.boolean().optional(),
 });
 
+function mapLink(row: {
+  id: string;
+  userId: string;
+  title: string;
+  url: string;
+  icon: string | null;
+  icone: string | null;
+  iconBlob: string | null;
+  isCustomIcon: boolean;
+  pinned: boolean;
+  orderPosition: number;
+  createdAt: Date;
+}) {
+  return {
+    id: row.id,
+    user_id: row.userId,
+    title: row.title,
+    url: row.url,
+    icon: row.icon,
+    icone: row.icone,
+    icon_blob: row.iconBlob,
+    is_custom_icon: row.isCustomIcon,
+    pinned: row.pinned,
+    order_position: row.orderPosition,
+    created_at: row.createdAt.toISOString(),
+  };
+}
+
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -35,7 +63,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, url, icon, is_custom_icon, icon_blob } = body;
+    const { title, url, icon, is_custom_icon, icon_blob, pinned } = body;
 
     if (!title || !url) {
       return NextResponse.json({ ok: false, message: 'Título e URL são obrigatórios' }, { status: 400 });
@@ -43,6 +71,19 @@ export async function POST(req: Request) {
 
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
+
+    if (pinned === true) {
+      const pinnedCount = await prisma.link.count({
+        where: { userId: user.uid, pinned: true },
+      });
+
+      if (pinnedCount >= 5) {
+        return NextResponse.json(
+          { ok: false, message: 'Você já tem 5 links fixados. Desafixe um para continuar.' },
+          { status: 400 },
+        );
+      }
+    }
 
     // compute orderPosition
     const count = await prisma.link.count({ where: { userId: user.uid } });
@@ -56,6 +97,7 @@ export async function POST(req: Request) {
         icon: icon || null,
         isCustomIcon: is_custom_icon ?? false,
         iconBlob: icon_blob || null,
+        pinned: pinned === true,
         orderPosition,
       },
     });
@@ -63,7 +105,7 @@ export async function POST(req: Request) {
     // revalidate dashboard path
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
-    return NextResponse.json({ ok: true, message: 'Link criado', link });
+    return NextResponse.json({ ok: true, message: 'Link criado', link: mapLink(link) });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });
@@ -121,7 +163,7 @@ export async function PUT(req: Request) {
 
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
-    return NextResponse.json({ ok: true, message: 'Link atualizado', link: updated });
+    return NextResponse.json({ ok: true, message: 'Link atualizado', link: updated ? mapLink(updated) : null });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ ok: false, message: 'Erro interno' }, { status: 500 });

@@ -14,10 +14,10 @@ export default async function CustomizePage() {
     (await prisma.user.findUnique({ where: { id: authUser.uid } })) ??
     (await ensureUserRecord(authUser.uid, authUser.email ?? ""));
 
-  const [profile, rawLinks] = await Promise.all([
-    prisma.profile.findFirst({ where: { userId: authUser.uid }, select: { bio: true } }),
-    prisma.link.findMany({ where: { userId: authUser.uid }, orderBy: { orderPosition: "asc" } }),
-  ]);
+  const profile = await prisma.profile.findFirst({
+    where: { userId: authUser.uid },
+    select: { bio: true },
+  });
 
   const user = {
     id: record.id,
@@ -32,24 +32,9 @@ export default async function CustomizePage() {
     created_at: record.createdAt.toISOString(),
   };
 
-  const links = rawLinks.map((l) => ({
-    id: l.id,
-    user_id: l.userId,
-    title: l.title,
-    url: l.url,
-    icon: l.icon,
-    icone: l.icone,
-    icon_blob: l.iconBlob,
-    is_custom_icon: l.isCustomIcon,
-    pinned: l.pinned,
-    order_position: l.orderPosition,
-    created_at: l.createdAt.toISOString(),
-  }));
-
   return (
     <CustomizePanel
       user={user}
-      links={links}
       initialBio={profile?.bio ?? ""}
     />
   );

@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { Camera, ImageIcon, Loader2 } from "lucide-react";
-import { uploadBannerAction } from "@/lib/actions/dashboard";
 import type { AppUser } from "@/types/database";
 
 export function BannerUpload({
@@ -33,14 +32,25 @@ export function BannerUpload({
 
     const fd = new FormData();
     fd.append("file", file);
-    const res = await uploadBannerAction(fd);
-    setPending(false);
+    fd.append("kind", "banner");
 
-    if (res.ok && res.url) {
-      setPreview(null);
-      onUpdate(res.url);
-    } else {
-      setError(res.message);
+    try {
+      const response = await fetch("/api/profile/image", {
+        method: "POST",
+        body: fd,
+      });
+      const res = await response.json().catch(() => null) as { ok?: boolean; message?: string; url?: string } | null;
+
+      if (response.ok && res?.ok && res.url) {
+        setPreview(null);
+        onUpdate(res.url);
+      } else {
+        setError(res?.message ?? "Erro ao enviar imagem.");
+      }
+    } catch {
+      setError("Erro ao enviar imagem.");
+    } finally {
+      setPending(false);
     }
   }
 

@@ -6,16 +6,13 @@ import {
   Check,
   CheckCircle2,
   ExternalLink,
-  Layers3,
   LayoutTemplate,
   Loader2,
   Palette,
   Save,
   Sparkle,
-  Sparkles,
   Square,
   TriangleAlert,
-  Type,
   UserRound,
   WandSparkles,
 } from "lucide-react";
@@ -25,12 +22,10 @@ import { updateThemeAction } from "@/lib/actions/theme";
 import { mergeUserTheme } from "@/lib/profile-theme-presets";
 import {
   type AppUser,
-  type Link,
   type UserThemeConfig,
 } from "@/types/database";
 import { AvatarUpload } from "./avatar-upload";
 import { BannerUpload } from "./banner-upload";
-import { CustomizePreview } from "./preview";
 
 const inputClass =
   "h-12 w-full rounded-2xl border border-white/75 bg-white/45 px-4 text-sm font-bold text-ocean outline-none backdrop-blur-xl transition focus:border-cyan-200 focus:bg-white/65 focus:ring-4 focus:ring-cyan-200/25";
@@ -264,11 +259,9 @@ function ColorPicker({
 
 export function CustomizePanel({
   user,
-  links,
   initialBio,
 }: {
   user: AppUser;
-  links: Link[];
   initialBio: string;
 }) {
   const [currentUser, setCurrentUser] = useState(user);
@@ -346,7 +339,7 @@ export function CustomizePanel({
         </a>
       </div>
 
-      <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1fr)_390px]">
+      <div className="grid items-start gap-7 xl:grid-cols-1 max-w-2xl mx-auto">
         <div className="space-y-6">
           {/* ─── 1. Profile ─── */}
           <CollapsibleSection
@@ -608,35 +601,7 @@ export function CustomizePanel({
             </div>
           </CollapsibleSection>
 
-          {/* ─── 5. Typography ─── */}
-          <CollapsibleSection
-              icon={Type}
-              title="Tipografia"
-              description="Fonte e cores dos textos da sua página."
-              delay="200ms"
-            >
 
-            <div className="space-y-5">
-              <div>
-                <p className="mb-2 text-sm font-black text-ocean">Fonte</p>
-                <div className="flex gap-2 flex-wrap">
-                  {[
-                    { id: "space", label: "Space Grotesk" },
-                    { id: "nunito", label: "Nunito" },
-                    { id: "mono", label: "Mono" },
-                    { id: "serif", label: "Serif" },
-                  ].map(({ id, label }) => (
-                    <Toggle key={id} selected={theme.font_style === id} label={label} onClick={() => updateTheme({ font_style: id as UserThemeConfig["font_style"] })} />
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <ColorPicker label="Texto principal" value={theme.text_color_primary} onChange={(v) => updateTheme({ text_color_primary: v })} />
-                <ColorPicker label="Texto secundário" value={theme.text_color_secondary} onChange={(v) => updateTheme({ text_color_secondary: v })} />
-              </div>
-            </div>
-          </CollapsibleSection>
 
           {/* ─── 6. Avatar ─── */}
           <CollapsibleSection
@@ -735,38 +700,6 @@ export function CustomizePanel({
           </div>
         </div>
 
-        <aside className="order-last xl:sticky xl:top-24">
-          <div
-            className="animate-fade-in-up rounded-[2rem] border border-white/75 bg-white/30 p-3 shadow-2xl shadow-cyan-950/15 backdrop-blur-2xl"
-            style={{ animationDelay: "120ms" }}
-          >
-            <div className="mb-3 flex items-center justify-between px-2">
-              <div>
-                <div className="flex items-center gap-2 text-sm font-black text-ocean">
-                  <Sparkles size={15} />
-                  8. Preview ao vivo
-                </div>
-                <p className="mt-0.5 text-xs font-semibold text-ocean/55">
-                  Mesma experiência da página pública
-                </p>
-              </div>
-              <span className="flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-100/70 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
-                Ao vivo
-              </span>
-            </div>
-            <CustomizePreview
-              user={currentUser}
-              links={links}
-              theme={theme}
-              bio={profile.bio}
-            />
-            <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/55 bg-white/25 px-3 py-2 text-xs font-semibold text-ocean/55">
-              <Layers3 size={14} className="shrink-0" />
-              Alterações aparecem aqui antes de salvar.
-            </div>
-          </div>
-        </aside>
       </div>
     </DashboardShell>
   );

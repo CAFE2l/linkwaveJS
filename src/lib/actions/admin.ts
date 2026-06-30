@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getAdminAuth } from "@/lib/firebase/admin";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { usernameSchema } from "@/lib/validations/auth";
@@ -31,7 +31,7 @@ async function requireAdmin() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { id: authUser.uid },
     select: { role: true },
   });
@@ -50,7 +50,7 @@ function refreshAdmin() {
 
 export async function getAdminUsers() {
   await requireAdmin();
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     select: {
       id: true,
       username: true,
@@ -85,7 +85,7 @@ export async function createUserAdminAction(input: unknown): Promise<ActionState
   await requireAdmin();
   const { name, username, email, password, role, active } = parsed.data;
 
-  const duplicate = await prisma.user.findFirst({
+  const duplicate = await getPrisma().user.findFirst({
     where: { OR: [{ email }, { username }] },
     select: { id: true },
   });
@@ -107,7 +107,7 @@ export async function createUserAdminAction(input: unknown): Promise<ActionState
   const finalRole = email === PRIMARY_ADMIN_EMAIL ? "admin" : role;
 
   try {
-    await prisma.user.upsert({
+    await getPrisma().user.upsert({
       where: { id: userId },
       create: {
         id: userId,
@@ -126,7 +126,7 @@ export async function createUserAdminAction(input: unknown): Promise<ActionState
       },
     });
 
-    await prisma.profile.upsert({
+    await getPrisma().profile.upsert({
       where: { userId },
       create: {
         userId,
@@ -166,7 +166,7 @@ export async function updateUserAdminAction(
 
   await requireAdmin();
 
-  const current = await prisma.user.findFirst({
+  const current = await getPrisma().user.findFirst({
     where: { id: userId },
     select: { email: true },
   });
@@ -178,7 +178,7 @@ export async function updateUserAdminAction(
     return { ok: false, message: "O administrador principal deve permanecer ativo e com role admin." };
   }
 
-  const duplicate = await prisma.user.findFirst({
+  const duplicate = await getPrisma().user.findFirst({
     where: { OR: [{ email: values.email }, { username: values.username }], NOT: { id: userId } },
     select: { id: true },
   });
@@ -198,11 +198,11 @@ export async function updateUserAdminAction(
 
   try {
     await Promise.all([
-      prisma.user.update({
+      getPrisma().user.update({
         where: { id: userId },
         data: finalValues,
       }),
-      prisma.profile.update({
+      getPrisma().profile.update({
         where: { userId },
         data: {
           name: finalValues.name,
@@ -226,7 +226,7 @@ export async function deleteUserAdminAction(userId: string): Promise<ActionState
     return { ok: false, message: "Você não pode excluir a própria conta durante a sessão." };
   }
 
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { id: userId },
     select: { email: true },
   });
@@ -250,7 +250,7 @@ export async function updateUserRoleAction(
   role: "user" | "admin",
 ): Promise<ActionState> {
   await requireAdmin();
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { id: userId },
     select: { name: true, username: true, email: true, active: true },
   });
@@ -263,7 +263,7 @@ export async function toggleUserActiveAction(
   active: boolean,
 ): Promise<ActionState> {
   await requireAdmin();
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { id: userId },
     select: { name: true, username: true, email: true, role: true },
   });
@@ -274,7 +274,7 @@ export async function toggleUserActiveAction(
 export async function deleteLinkAdminAction(linkId: string): Promise<ActionState> {
   await requireAdmin();
   try {
-    await prisma.link.delete({ where: { id: linkId } });
+    await getPrisma().link.delete({ where: { id: linkId } });
   } catch {
     return { ok: false, message: "Erro ao excluir link." };
   }
@@ -284,7 +284,7 @@ export async function deleteLinkAdminAction(linkId: string): Promise<ActionState
 
 export async function getAdminLinks() {
   await requireAdmin();
-  const links = await prisma.link.findMany({
+  const links = await getPrisma().link.findMany({
     select: {
       id: true,
       title: true,
@@ -326,7 +326,7 @@ export async function getAdminLinks() {
 export async function resetUserThemeAction(userId: string): Promise<ActionState> {
   await requireAdmin();
   try {
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: userId },
       data: { themeJson: {} },
     });
@@ -339,7 +339,7 @@ export async function resetUserThemeAction(userId: string): Promise<ActionState>
 
 export async function getAdminThemes() {
   await requireAdmin();
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     select: { id: true, username: true, email: true, themeJson: true, createdAt: true },
     orderBy: { createdAt: "desc" },
     take: 100,

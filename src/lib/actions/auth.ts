@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { headers, cookies } from "next/headers";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getAdminAuth } from "@/lib/firebase/admin";
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
@@ -128,9 +128,9 @@ export async function registerUserAction(
 
   const [existingUsername, existingProfileUsername, existingEmail] =
     await Promise.all([
-      prisma.user.findFirst({ where: { username }, select: { id: true } }),
-      prisma.profile.findFirst({ where: { username }, select: { id: true } }),
-      prisma.user.findFirst({ where: { email }, select: { id: true } }),
+      getPrisma().user.findFirst({ where: { username }, select: { id: true } }),
+      getPrisma().profile.findFirst({ where: { username }, select: { id: true } }),
+      getPrisma().user.findFirst({ where: { email }, select: { id: true } }),
     ]);
 
   if (existingUsername || existingProfileUsername) {
@@ -163,7 +163,7 @@ export async function registerUserAction(
   const userId = userRecord.uid;
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await getPrisma().$transaction(async (tx) => {
       await tx.user.create({
         data: { id: userId, email, username, name },
       });
@@ -238,8 +238,8 @@ export async function checkUsernameAvailabilityAction(
   const username = normalizeUsername(parsed.data);
 
   const [user, profile] = await Promise.all([
-    prisma.user.findFirst({ where: { username }, select: { id: true } }),
-    prisma.profile.findFirst({ where: { username }, select: { id: true } }),
+    getPrisma().user.findFirst({ where: { username }, select: { id: true } }),
+    getPrisma().profile.findFirst({ where: { username }, select: { id: true } }),
   ]);
 
   if (user || profile) {

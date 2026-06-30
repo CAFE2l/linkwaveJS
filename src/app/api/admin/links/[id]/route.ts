@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { requireAdminApi } from "@/lib/admin/auth";
 import { normalizeUrl } from "@/lib/utils/url";
 
@@ -36,7 +36,7 @@ export async function PATCH(request: Request, { params }: Params) {
     );
   }
 
-  const current = await prisma.link.findUnique({
+  const current = await getPrisma().link.findUnique({
     where: { id },
     select: { userId: true },
   });
@@ -44,7 +44,7 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ ok: false, message: "Link não encontrado." }, { status: 404 });
   }
 
-  const updated = await prisma.link.update({
+  const updated = await getPrisma().link.update({
     where: { id },
     data: {
       title: parsed.data.title,
@@ -88,7 +88,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   }
 
   const { id } = await params;
-  const current = await prisma.link.findUnique({
+  const current = await getPrisma().link.findUnique({
     where: { id },
     select: { userId: true },
   });
@@ -96,7 +96,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     return NextResponse.json({ ok: false, message: "Link não encontrado." }, { status: 404 });
   }
 
-  await prisma.link.delete({ where: { id } });
+  await getPrisma().link.delete({ where: { id } });
   revalidateAdminLinks(current.userId);
 
   return NextResponse.json({ ok: true, message: "Link excluído." });

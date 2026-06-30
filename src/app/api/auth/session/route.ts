@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { getAdminAuth } = await import("@/lib/firebase/admin");
-    const { prisma } = await import("@/lib/db/prisma");
+    const { getPrisma } = await import("@/lib/db/prisma");
+    const prisma = getPrisma();
 
     const decoded = await getAdminAuth().verifyIdToken(idToken);
     const { uid, email, name: displayName } = decoded;

@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
@@ -43,18 +43,18 @@ export async function POST(request: Request) {
 
   try {
     if (kind === "avatar") {
-      await prisma.$transaction([
-        prisma.user.update({
+      await getPrisma().$transaction([
+        getPrisma().user.update({
           where: { id: authUser.uid },
           data: { avatarUrl: url },
         }),
-        prisma.profile.updateMany({
+        getPrisma().profile.updateMany({
           where: { userId: authUser.uid },
           data: { avatarUrl: url },
         }),
       ]);
     } else {
-      await prisma.user.update({
+      await getPrisma().user.update({
         where: { id: authUser.uid },
         data: { bannerUrl: url },
       });
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Erro ao salvar imagem." }, { status: 500 });
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: authUser.uid },
     select: { username: true },
   });

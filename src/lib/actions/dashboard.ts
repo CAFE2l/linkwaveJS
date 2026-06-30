@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { normalizeUrl } from "@/lib/utils/url";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -66,7 +66,7 @@ export async function upsertLinkAction(
 
   try {
     if (id) {
-      const updated = await prisma.link.update({
+      const updated = await getPrisma().link.update({
         where: { id },
         data: {
           title,
@@ -78,8 +78,8 @@ export async function upsertLinkAction(
       return { ok: true, message: "Link atualizado.", link: mapLink(updated) };
     }
 
-    const count = await prisma.link.count({ where: { userId } });
-    const created = await prisma.link.create({
+    const count = await getPrisma().link.count({ where: { userId } });
+    const created = await getPrisma().link.create({
       data: {
         userId,
         title,
@@ -99,7 +99,7 @@ export async function upsertLinkAction(
 export async function deleteLinkAction(id: string): Promise<ActionState> {
   const { userId } = await getCurrentUserId();
   try {
-    await prisma.link.deleteMany({
+    await getPrisma().link.deleteMany({
       where: { id, userId },
     });
   } catch {
@@ -123,7 +123,7 @@ export async function reorderLinksAction(
   try {
     await Promise.all(
       parsed.data.ids.map((id, index) =>
-        prisma.link.updateMany({
+        getPrisma().link.updateMany({
           where: { id, userId },
           data: { orderPosition: index },
         }),
@@ -156,12 +156,12 @@ export async function uploadAvatarAction(
   }
 
   try {
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: userId },
       data: { avatarUrl },
     });
 
-    await prisma.profile.update({
+    await getPrisma().profile.update({
       where: { userId },
       data: { avatarUrl },
     });
@@ -194,7 +194,7 @@ export async function uploadBannerAction(
   }
 
   try {
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: userId },
       data: { bannerUrl },
     });

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 
 const MAX_REGISTRATIONS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
@@ -13,7 +13,7 @@ export async function checkRegistrationRateLimit(ip: string) {
   const since = new Date(Date.now() - WINDOW_MS);
 
   try {
-    const count = await prisma.registrationRateLimit.count({
+    const count = await getPrisma().registrationRateLimit.count({
       where: {
         ipKey,
         createdAt: { gte: since },
@@ -27,7 +27,7 @@ export async function checkRegistrationRateLimit(ip: string) {
       };
     }
 
-    await prisma.registrationRateLimit.create({
+    await getPrisma().registrationRateLimit.create({
       data: { ipKey },
     });
 

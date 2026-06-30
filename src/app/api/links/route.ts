@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getCurrentUser } from '@/lib/firebase/auth-server';
-import { prisma } from '@/lib/db/prisma';
+import { getPrisma } from '@/lib/db/prisma';
 import { normalizeUrl } from '@/lib/utils/url';
 
 const updateLinkSchema = z.object({
@@ -47,7 +47,7 @@ export async function GET() {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
-    const links = await prisma.link.findMany({
+    const links = await getPrisma().link.findMany({
       where: { userId: user.uid },
       orderBy: { orderPosition: 'asc' },
       take: 200,
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
     if (pinned === true) {
-      const pinnedCount = await prisma.link.count({
+      const pinnedCount = await getPrisma().link.count({
         where: { userId: user.uid, pinned: true },
       });
 
@@ -86,10 +86,10 @@ export async function POST(req: Request) {
     }
 
     // compute orderPosition
-    const count = await prisma.link.count({ where: { userId: user.uid } });
+    const count = await getPrisma().link.count({ where: { userId: user.uid } });
     const orderPosition = count;
 
-    const link = await prisma.link.create({
+    const link = await getPrisma().link.create({
       data: {
         userId: user.uid,
         title,
@@ -126,7 +126,7 @@ export async function PUT(req: Request) {
     const { id, title, url, icon, is_custom_icon, icon_blob, pinned } = parsed.data;
 
     if (pinned === true) {
-      const pinnedCount = await prisma.link.count({
+      const pinnedCount = await getPrisma().link.count({
         where: {
           userId: user.uid,
           pinned: true,
@@ -150,7 +150,7 @@ export async function PUT(req: Request) {
     if (icon_blob !== undefined) updateData.iconBlob = icon_blob || null;
     if (pinned !== undefined) updateData.pinned = pinned;
 
-    const link = await prisma.link.updateMany({
+    const link = await getPrisma().link.updateMany({
       where: { id, userId: user.uid },
       data: updateData,
     });
@@ -159,7 +159,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ ok: false, message: 'Link não encontrado' }, { status: 404 });
     }
 
-    const updated = await prisma.link.findUnique({ where: { id } });
+    const updated = await getPrisma().link.findUnique({ where: { id } });
 
     try { await import('next/cache').then(mod=>mod.revalidatePath && mod.revalidatePath('/dashboard')); } catch {}
 
@@ -180,7 +180,7 @@ export async function DELETE(req: Request) {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ ok: false, message: 'Não autenticado' }, { status: 401 });
 
-    const result = await prisma.link.deleteMany({
+    const result = await getPrisma().link.deleteMany({
       where: { id, userId: user.uid },
     });
 

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import FullDashboard from "@/components/customize/FullDashboard";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { ensureUserRecord } from "@/lib/db/upsert-user";
 import { ThemeProvider } from "@/components/landing/theme-provider";
 import { BlobBackground } from "@/components/landing/blob-background";
@@ -15,18 +15,18 @@ export default async function DashboardPage() {
   if (!authUser) redirect("/login");
 
   const record =
-    (await prisma.user.findUnique({ where: { id: authUser.uid } })) ??
+    (await getPrisma().user.findUnique({ where: { id: authUser.uid } })) ??
     (await ensureUserRecord(authUser.uid, authUser.email ?? ""));
 
-  const profile = await prisma.profile.findFirst({
+  const profile = await getPrisma().profile.findFirst({
     where: { userId: authUser.uid },
     select: { bio: true },
   });
-  const rawLinks: Link[] = await prisma.link.findMany({
+  const rawLinks: Link[] = await getPrisma().link.findMany({
     where: { userId: authUser.uid },
     orderBy: { orderPosition: "asc" },
   });
-  const totalClicks = await prisma.click.count({ where: { userId: authUser.uid } });
+  const totalClicks = await getPrisma().click.count({ where: { userId: authUser.uid } });
   const iconsData: IconInfo[] = await listIconsAction();
 
   const allIcons = iconsData.map((icon: IconInfo) => icon.name);

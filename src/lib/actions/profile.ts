@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { profileSchema } from "@/lib/validations/profile";
 
@@ -34,7 +34,7 @@ export async function updateProfileAction(
 
   const { username, name, avatarUrl, bannerUrl, bio, theme } = parsed.data;
 
-  const existing = await prisma.user.findFirst({
+  const existing = await getPrisma().user.findFirst({
     where: { username, NOT: { id: authUser.uid } },
     select: { id: true },
   });
@@ -44,7 +44,7 @@ export async function updateProfileAction(
   }
 
   try {
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: authUser.uid },
       data: {
         username,
@@ -54,7 +54,7 @@ export async function updateProfileAction(
       },
     });
 
-    await prisma.profile.upsert({
+    await getPrisma().profile.upsert({
       where: { userId: authUser.uid },
       create: {
         userId: authUser.uid,

@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 
 export type DailyCount = { date: string; count: number };
@@ -32,7 +32,7 @@ async function requireAdmin() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { id: authUser.uid },
     select: { role: true },
   });
@@ -78,40 +78,40 @@ export async function getAnalyticsOverview(): Promise<AnalyticsData> {
     allUsers,
     allClickData,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { active: true } }),
-    prisma.user.count({ where: { active: false } }),
-    prisma.link.count(),
-    prisma.click.count(),
-    prisma.click.count({ where: { createdAt: { gte: todayStart } } }),
-    prisma.click.findMany({
+    getPrisma().user.count(),
+    getPrisma().user.count({ where: { active: true } }),
+    getPrisma().user.count({ where: { active: false } }),
+    getPrisma().link.count(),
+    getPrisma().click.count(),
+    getPrisma().click.count({ where: { createdAt: { gte: todayStart } } }),
+    getPrisma().click.findMany({
       where: { createdAt: { gte: thirtyDaysAgo } },
       select: { createdAt: true },
       orderBy: { createdAt: "asc" },
     }),
-    prisma.user.findMany({
+    getPrisma().user.findMany({
       where: { createdAt: { gte: thirtyDaysAgo } },
       select: { createdAt: true },
       orderBy: { createdAt: "asc" },
     }),
-    prisma.click.count({
+    getPrisma().click.count({
       where: {
         createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
       },
     }),
-    prisma.link.findMany({
+    getPrisma().link.findMany({
       select: { id: true, title: true, url: true, userId: true },
       take: 200,
     }),
-    prisma.user.findMany({ select: { id: true, username: true } }),
-    prisma.click.findMany({ select: { linkId: true, createdAt: true, country: true } }),
+    getPrisma().user.findMany({ select: { id: true, username: true } }),
+    getPrisma().click.findMany({ select: { linkId: true, createdAt: true, country: true } }),
   ]);
 
   const currCount = recentClicks.length;
   const diff = currCount - prevPeriodClicks;
   const totalClicksDelta = prevPeriodClicks > 0 ? Math.round((diff / prevPeriodClicks) * 100) : 0;
 
-  const prevUsers = await prisma.user.count({
+  const prevUsers = await getPrisma().user.count({
     where: {
       createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
     },

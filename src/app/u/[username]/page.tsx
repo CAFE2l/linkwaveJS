@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PublicProfileView } from "@/components/public-profile/public-profile-view";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getBaseUrl } from "@/lib/utils/url";
 import { mergeUserTheme } from "@/lib/profile-theme-presets";
 import type { UserThemeConfig } from "@/types/database";
@@ -11,7 +11,7 @@ type Props = {
 };
 
 async function getPublicProfile(username: string) {
-  const record = await prisma.user.findFirst({
+  const record = await getPrisma().user.findFirst({
     where: { username, active: true },
   });
 
@@ -30,12 +30,12 @@ async function getPublicProfile(username: string) {
     created_at: record.createdAt.toISOString(),
   };
 
-  const profile = await prisma.profile.findFirst({
+  const profile = await getPrisma().profile.findFirst({
     where: { userId: record.id },
     select: { bio: true },
   });
 
-  const rawLinks = await prisma.link.findMany({
+  const rawLinks = await getPrisma().link.findMany({
     where: { userId: record.id },
     orderBy: { orderPosition: "asc" },
   });

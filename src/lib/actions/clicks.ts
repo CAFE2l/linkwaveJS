@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 
 export async function recordClickAction(linkId: string, userId: string) {
   const headerStore = await headers();
@@ -10,7 +10,7 @@ export async function recordClickAction(linkId: string, userId: string) {
     headerStore.get("x-real-ip") ||
     null;
 
-  await prisma.click.create({
+  await getPrisma().click.create({
     data: {
       linkId,
       userId,

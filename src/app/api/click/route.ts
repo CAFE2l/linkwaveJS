@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 
 const schema = z.object({
   linkId: z.string().uuid(),
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   const headerStore = await headers();
   try {
-    await prisma.click.create({
+    await getPrisma().click.create({
       data: {
         linkId: parsed.data.linkId,
         userId: parsed.data.userId,

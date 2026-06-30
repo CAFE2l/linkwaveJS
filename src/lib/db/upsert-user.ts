@@ -1,5 +1,5 @@
 import type { User } from "@prisma/client";
-import { prisma } from "./prisma";
+import { getPrisma } from "./prisma";
 
 function generateUsername(uid: string): string {
   return `u_${uid.slice(0, 26)}`;
@@ -10,13 +10,13 @@ export async function ensureUserRecord(
   email: string,
   displayName?: string,
 ): Promise<User> {
-  const existing = await prisma.user.findUnique({ where: { id: uid } });
+  const existing = await getPrisma().user.findUnique({ where: { id: uid } });
   if (existing) return existing;
 
   const username = generateUsername(uid);
   const name = displayName ?? "";
 
-  await prisma.$transaction(async (tx) => {
+  await getPrisma().$transaction(async (tx) => {
     await tx.user.create({
       data: { id: uid, email, username, name },
     });
@@ -34,7 +34,7 @@ export async function ensureUserRecord(
     });
   });
 
-  const created = await prisma.user.findUnique({ where: { id: uid } });
+  const created = await getPrisma().user.findUnique({ where: { id: uid } });
   if (!created) throw new Error("Failed to create user record");
   return created;
 }

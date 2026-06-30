@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { ensureUserRecord } from "@/lib/db/upsert-user";
 import { CustomizePanel } from "@/components/customize/customize-panel";
 import type { Link as PrismaLink } from "@prisma/client";
@@ -12,14 +12,14 @@ export default async function CustomizePage() {
   if (!authUser) redirect("/login");
 
   const record =
-    (await prisma.user.findUnique({ where: { id: authUser.uid } })) ??
+    (await getPrisma().user.findUnique({ where: { id: authUser.uid } })) ??
     (await ensureUserRecord(authUser.uid, authUser.email ?? ""));
 
-  const profile = await prisma.profile.findFirst({
+  const profile = await getPrisma().profile.findFirst({
     where: { userId: authUser.uid },
     select: { bio: true },
   });
-  const rawLinks: PrismaLink[] = await prisma.link.findMany({
+  const rawLinks: PrismaLink[] = await getPrisma().link.findMany({
     where: { userId: authUser.uid },
     orderBy: { orderPosition: "asc" },
     take: 4,

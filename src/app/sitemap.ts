@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getBaseUrl } from "@/lib/utils/url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     where: { active: true },
     select: { username: true, createdAt: true },
   });

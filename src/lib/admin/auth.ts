@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 
 export async function requireAdminApi() {
@@ -7,7 +7,7 @@ export async function requireAdminApi() {
     return { ok: false as const, status: 401, message: "Não autenticado." };
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: authUser.uid },
     select: { id: true, role: true },
   });

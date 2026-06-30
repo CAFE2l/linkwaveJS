@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { AdminLayout } from "@/components/admin/admin-layout";
 
 export const metadata = { title: "Admin | LinkWave" };
@@ -13,7 +13,7 @@ export default async function AdminRootLayout({
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/login");
 
-  const record = await prisma.user.findUnique({ where: { id: authUser.uid } });
+  const record = await getPrisma().user.findUnique({ where: { id: authUser.uid } });
   if (!record || record.role !== "admin") redirect("/dashboard");
 
   const user = {

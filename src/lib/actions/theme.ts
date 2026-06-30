@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db/prisma";
+import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { userThemeSchema } from "@/lib/validations/profile";
 
@@ -26,7 +26,7 @@ export async function updateThemeAction(
   if (!authUser) redirect("/login");
 
   try {
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: authUser.uid },
       data: { themeJson: parsed.data as never },
     });

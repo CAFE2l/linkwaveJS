@@ -4,10 +4,10 @@ import { ThemeContext } from "@/hooks/use-theme-context";
 import type { UserThemeConfig } from "@/types/database";
 
 const glassStyles: Record<string, { bg: string; border: string; shadow: string }> = {
-  dark:    { bg: "rgba(4,12,30,0.5)",     border: "rgba(50,100,220,0.25)",  shadow: "0 8px 32px rgba(0,0,0,0.6)" },
+  dark:    { bg: "rgba(20,30,50,0.22)",    border: "rgba(255,255,255,0.12)", shadow: "0 8px 32px rgba(0,0,0,0.38)" },
   light:   { bg: "rgba(255,255,255,0.15)", border: "rgba(255,255,255,0.5)",  shadow: "0 8px 32px rgba(80,180,220,0.2)" },
   frosted: { bg: "rgba(200,230,255,0.12)", border: "rgba(150,200,255,0.35)", shadow: "0 8px 32px rgba(100,180,255,0.25)" },
-  neon:    { bg: "rgba(0,20,40,0.65)",     border: "rgba(0,245,212,0.5)",    shadow: "0 8px 32px rgba(0,180,216,0.4),0 0 20px rgba(0,245,212,0.2)" },
+  neon:    { bg: "rgba(0,20,40,0.25)",     border: "rgba(0,245,212,0.24)",   shadow: "0 8px 32px rgba(0,180,216,0.3),0 0 20px rgba(0,245,212,0.16)" },
 };
 
 const galaxyBg: Record<string, string> = {
@@ -49,7 +49,8 @@ export function ThemeProviderShell({
     backgroundStyle = t.background_color;
   }
 
-  const linkBg = `rgba(${cardRgb.r}, ${cardRgb.g}, ${cardRgb.b}, ${Math.min(t.card_opacity + 30, 95) / 100})`;
+  const linkOpacity = Math.min(Math.max(t.card_opacity, 5), 100) / 100;
+  const linkBg = `rgba(${cardRgb.r}, ${cardRgb.g}, ${cardRgb.b}, ${linkOpacity})`;
 
   const cssVars = {
     "--ut-bg": backgroundStyle,
@@ -61,6 +62,8 @@ export function ThemeProviderShell({
     "--ut-card-blur": `${t.card_blur}px`,
     "--ut-card-radius": `${t.card_border_radius}px`,
     "--ut-link-bg": linkBg,
+    "--ut-link-border": "rgba(255,255,255,0.12)",
+    "--ut-link-blur": `${Math.max(t.card_blur, 12)}px`,
     "--ut-link-glow": t.link_glow_color,
     "--ut-link-hover": t.link_hover_effect,
     "--ut-text-primary": t.text_color_primary,

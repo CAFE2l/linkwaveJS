@@ -48,10 +48,10 @@ function PinnedLinkIcon({ link, compact }: { link: Link; compact: boolean }) {
       onClick={() => trackPinnedClick(link)}
       title={link.title}
       aria-label={link.title}
-      className={`${sizeClass} group inline-flex items-center justify-center rounded-full border border-white/50 bg-white/20 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-white/35`}
+      className={`${sizeClass} group inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.08] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-white/15`}
       style={{
         boxShadow:
-          "0 8px 24px rgba(0,0,0,0.12), 0 0 18px var(--ut-link-glow, rgba(56,189,248,0.18))",
+          "0 6px 20px rgba(0,0,0,0.12), 0 0 12px rgba(80,150,255,0.2)",
       }}
     >
       {link.is_custom_icon && link.icon_blob ? (

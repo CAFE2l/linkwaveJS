@@ -26,7 +26,7 @@ export function PublicLinkButton({ link }: { link: Link }) {
 
   function renderIcon() {
     const iconClass =
-      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/10 backdrop-blur-md transition-all duration-200 group-hover:scale-105 group-hover:bg-white/15";
+      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.08] shadow-[0_0_12px_rgba(80,150,255,0.2)] backdrop-blur-md transition-all duration-200 group-hover:scale-105 group-hover:bg-white/15";
 
     if (link.is_custom_icon && link.icon_blob) {
       return (
@@ -77,18 +77,17 @@ export function PublicLinkButton({ link }: { link: Link }) {
       transition={{ duration: 0.2, ease: "easeOut" }}
       style={{
         color: "var(--ut-text-primary, #0b1829)",
-        borderColor: theme?.border_color ?? "rgba(255,255,255,.3)",
-        background:
-          theme?.link_style === "glass"
-            ? "var(--ut-link-bg, rgba(255,255,255,.16))"
-            : `color-mix(in srgb, ${theme?.button_color ?? "#0ea5e9"} 28%, transparent)`,
+        borderColor: "var(--ut-link-border, rgba(255,255,255,.12))",
+        background: "var(--ut-link-bg, rgba(20,30,50,.18))",
+        backdropFilter: "blur(var(--ut-link-blur, 14px)) saturate(160%)",
+        WebkitBackdropFilter: "blur(var(--ut-link-blur, 14px)) saturate(160%)",
       }}
     >
       <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-70" />
       {renderIcon()}
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[0.95rem] font-black leading-tight tracking-normal">
+        <span className="block truncate text-[0.95rem] font-black leading-tight tracking-normal [text-shadow:0_1px_3px_rgba(0,0,0,0.4)]">
           {link.title}
         </span>
         <span

@@ -120,7 +120,7 @@ export const DEFAULT_USER_THEME: UserThemeConfig = {
   galaxy_theme: "milkyway",
   enable_stars: true,
   card_color: "#ffffff",
-  card_opacity: 20,
+  card_opacity: 18,
   card_blur: 14,
   card_border_radius: 28,
   card_shadow: false,

@@ -85,6 +85,7 @@ export function PublicProfileView({
 }: PublicProfileViewProps) {
   const isPreview = mode === "preview";
   const isGalaxy = theme.theme_id === "galaxy_led";
+  const hasGradientBanner = theme.banner_style === "gradient";
   const visibleLinks = links.slice(0, isPreview ? 4 : undefined);
   const pinnedLinks = links.filter((link) => link.pinned).slice(0, 5);
 
@@ -177,7 +178,13 @@ export function PublicProfileView({
             {/* Avatar + Name + Bio – overlapping banner */}
             <div
               className={`relative text-center ${
-                isPreview ? "-mt-10 px-2" : "-mt-12 px-3"
+                hasGradientBanner
+                  ? isPreview
+                    ? "-mt-20 px-2"
+                    : "-mt-28 px-3"
+                  : isPreview
+                    ? "-mt-10 px-2"
+                    : "-mt-12 px-3"
               }`}
             >
               <ProfileAvatar
@@ -191,8 +198,13 @@ export function PublicProfileView({
                 className={`font-black leading-tight tracking-tight drop-shadow-sm ${
                   isPreview
                     ? "mt-2.5 text-xl"
-                    : "mt-3 text-2xl sm:text-[1.75rem]"
+                  : "mt-3 text-2xl sm:text-[1.75rem]"
                 }`}
+                style={{
+                  textShadow: hasGradientBanner
+                    ? "0 2px 12px rgba(0,0,0,0.72)"
+                    : undefined,
+                }}
               >
                 {user.name || user.username}
               </h1>
@@ -201,7 +213,12 @@ export function PublicProfileView({
                 className={`${
                   isPreview ? "mt-0.5 text-xs" : "mt-1 text-sm"
                 } font-bold`}
-                style={{ color: "var(--ut-text-secondary)" }}
+                style={{
+                  color: "var(--ut-text-secondary)",
+                  textShadow: hasGradientBanner
+                    ? "0 2px 10px rgba(0,0,0,0.7)"
+                    : undefined,
+                }}
               >
                 @{user.username}
               </p>
@@ -213,7 +230,12 @@ export function PublicProfileView({
                       ? "mt-2 line-clamp-2 text-xs"
                       : "mt-2.5 text-sm"
                   }`}
-                  style={{ color: "var(--ut-text-secondary)" }}
+                  style={{
+                    color: "var(--ut-text-secondary)",
+                    textShadow: hasGradientBanner
+                      ? "0 2px 10px rgba(0,0,0,0.7)"
+                      : undefined,
+                  }}
                 >
                   {bio}
                 </p>

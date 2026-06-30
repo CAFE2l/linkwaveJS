@@ -148,6 +148,50 @@ function ChoiceButton({
   );
 }
 
+function BannerStyleButton({
+  selected,
+  mode,
+  title,
+  description,
+  onClick,
+}: {
+  selected: boolean;
+  mode: "card" | "gradient";
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`rounded-2xl border p-3 text-left transition-all duration-200 ${
+        selected
+          ? "border-cyan-200 bg-white/70 shadow-lg ring-2 ring-cyan-200/70"
+          : "border-white/55 bg-white/25 hover:bg-white/45"
+      }`}
+    >
+      <span className="relative block h-20 overflow-hidden rounded-xl bg-gradient-to-br from-fuchsia-500 via-blue-500 to-slate-950">
+        {mode === "gradient" ? (
+          <span
+            className="absolute inset-0 bg-[linear-gradient(135deg,#c026d3,#2563eb_50%,#061426)]"
+            style={{
+              maskImage: "linear-gradient(to bottom, black 25%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 25%, transparent 100%)",
+            }}
+          />
+        ) : (
+          <span className="absolute inset-2 rounded-lg border border-white/60 bg-white/15" />
+        )}
+        <span className="absolute bottom-2 left-1/2 size-7 -translate-x-1/2 rounded-full border-2 border-white bg-cyan-200 shadow-md" />
+      </span>
+      <span className="mt-2 block text-sm font-black text-ocean">{title}</span>
+      <span className="mt-0.5 block text-xs font-semibold text-ocean/60">{description}</span>
+    </button>
+  );
+}
+
 function SettingSwitch({
   checked,
   label,
@@ -417,6 +461,72 @@ export function CustomizePanel({
                 }
               />
             </div>
+
+            <div className="mt-5">
+              <p className="mb-2 text-sm font-black text-ocean">Estilo do banner</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <BannerStyleButton
+                  selected={theme.banner_style !== "gradient"}
+                  mode="card"
+                  title="Card"
+                  description="Banner tradicional com bordas definidas."
+                  onClick={() => updateTheme({ banner_style: "glass" })}
+                />
+                <BannerStyleButton
+                  selected={theme.banner_style === "gradient"}
+                  mode="gradient"
+                  title="Degradê"
+                  description="A imagem se dissolve no fundo do perfil."
+                  onClick={() => updateTheme({ banner_style: "gradient" })}
+                />
+              </div>
+            </div>
+
+            {theme.banner_style === "gradient" && (
+              <div className="mt-4 space-y-4 rounded-2xl border border-white/60 bg-white/25 p-4">
+                <p className="text-xs font-black uppercase tracking-wider text-ocean/65">
+                  Ajustes do degradê
+                </p>
+                <Slider
+                  label="Altura do banner"
+                  value={theme.banner_height}
+                  min={200}
+                  max={500}
+                  suffix="px"
+                  onChange={(value) => updateTheme({ banner_height: value })}
+                />
+                <Slider
+                  label="Início do fade"
+                  value={theme.banner_fade_start}
+                  min={0}
+                  max={80}
+                  suffix="%"
+                  onChange={(value) => updateTheme({ banner_fade_start: value })}
+                />
+                <div>
+                  <p className="mb-2 text-xs font-bold text-ocean/60">Intensidade do fade</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      ["subtle", "Suave"],
+                      ["medium", "Médio"],
+                      ["strong", "Forte"],
+                    ].map(([value, label]) => (
+                      <Toggle
+                        key={value}
+                        selected={theme.banner_fade_intensity === value}
+                        label={label}
+                        onClick={() =>
+                          updateTheme({
+                            banner_fade_intensity:
+                              value as UserThemeConfig["banner_fade_intensity"],
+                          })
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-ocean/65">

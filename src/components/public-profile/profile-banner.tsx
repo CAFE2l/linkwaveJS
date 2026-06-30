@@ -15,6 +15,7 @@ export function ProfileBanner({
   const hasLed = theme.banner_style === "led" && theme.enable_led_glow;
   const isDimensional = theme.banner_style === "dimensional";
   const isMinimal = theme.banner_style === "minimal";
+  const isGradient = theme.banner_style === "gradient";
 
   const positionMap: Record<string, string> = {
     top: "center 15%",
@@ -22,19 +23,44 @@ export function ProfileBanner({
     bottom: "center 85%",
   };
   const objectPosition = positionMap[theme.banner_position] ?? "center center";
+  const renderedHeight = compact
+    ? Math.max(108, Math.round(theme.banner_height * 0.42))
+    : theme.banner_height;
+  // A stronger fade reaches full transparency sooner; every mode ends fully
+  // transparent so galaxy backgrounds never show a hard seam.
+  const fadeSpan = {
+    subtle: 60,
+    medium: 45,
+    strong: 25,
+  }[theme.banner_fade_intensity];
+  const fadeEnd = Math.min(theme.banner_fade_start + fadeSpan, 100);
+  const mask = `linear-gradient(to bottom, black 0%, black ${theme.banner_fade_start}%, transparent ${fadeEnd}%, transparent 100%)`;
 
   return (
     <div
-      className={`group relative isolate w-full overflow-hidden ${
-        compact ? "h-28 rounded-[1.4rem]" : "h-44 rounded-[1.75rem] sm:h-52"
+      className={`group relative isolate w-full overflow-hidden transition-[height] duration-200 ${
+        isGradient
+          ? compact
+            ? "-mx-2.5 -mt-2.5 w-[calc(100%+1.25rem)] rounded-none"
+            : "-mx-3 -mt-3 w-[calc(100%+1.5rem)] rounded-none sm:-mx-4 sm:-mt-4 sm:w-[calc(100%+2rem)]"
+          : compact
+            ? "h-28 rounded-[1.4rem]"
+            : "h-44 rounded-[1.75rem] sm:h-52"
       }`}
       style={{
-        border: hasLed
+        height: isGradient ? renderedHeight : undefined,
+        maskImage: isGradient ? mask : undefined,
+        WebkitMaskImage: isGradient ? mask : undefined,
+        border: isGradient
+          ? "none"
+          : hasLed
           ? `1px solid ${theme.banner_led_color}b3`
           : isMinimal
             ? "1px solid rgba(255,255,255,0.25)"
             : "1px solid rgba(255,255,255,0.55)",
-        boxShadow: hasLed
+        boxShadow: isGradient
+          ? "none"
+          : hasLed
           ? `0 0 32px ${theme.banner_led_color}66, 0 18px 48px rgba(0,0,0,0.28)`
           : isDimensional
             ? `0 20px 60px rgba(0,0,0,0.35), 0 0 30px ${theme.banner_led_color}40`
@@ -93,7 +119,11 @@ export function ProfileBanner({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-transparent" />
 
       {/* Dark scrim for text readability */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+      <div className={`pointer-events-none absolute inset-0 ${
+        isGradient
+          ? "bg-gradient-to-t from-black/55 via-black/10 to-transparent"
+          : "bg-gradient-to-t from-black/30 via-transparent to-transparent"
+      }`} />
 
       {/* Dimensional overlay – mix-blend depth */}
       {isDimensional && (
@@ -108,7 +138,7 @@ export function ProfileBanner({
       )}
 
       {/* Subtle blur veil for frosted effect */}
-      {!isMinimal && !compact && (
+      {!isGradient && !isMinimal && !compact && (
         <div className="pointer-events-none absolute inset-0 backdrop-blur-[1px]" />
       )}
 

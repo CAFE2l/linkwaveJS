@@ -87,7 +87,10 @@ export type UserThemeConfig = {
   card_border_radius: number;
   card_shadow: boolean;
   card_glass_style: "dark" | "light" | "frosted" | "neon";
-  banner_style: "glass" | "dimensional" | "minimal" | "led";
+  banner_style: "glass" | "dimensional" | "minimal" | "led" | "gradient";
+  banner_height: number;
+  banner_fade_start: number;
+  banner_fade_intensity: "subtle" | "medium" | "strong";
   profile_card_style: "light" | "dark" | "aero" | "neon";
   text_color_primary: string;
   text_color_secondary: string;
@@ -126,6 +129,9 @@ export const DEFAULT_USER_THEME: UserThemeConfig = {
   card_shadow: false,
   card_glass_style: "light",
   banner_style: "glass",
+  banner_height: 320,
+  banner_fade_start: 40,
+  banner_fade_intensity: "medium",
   profile_card_style: "aero",
   text_color_primary: "#0b4770",
   text_color_secondary: "#31769a",

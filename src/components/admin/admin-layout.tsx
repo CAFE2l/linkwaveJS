@@ -3,8 +3,8 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Activity,
   BarChart3,
   ChevronLeft,
   LayoutDashboard,
@@ -187,7 +187,17 @@ export function AdminLayout({
 
         {/* Page content */}
         <main className="relative z-10 p-4 sm:p-6 lg:p-8 admin-scrollbar">
-          {children}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

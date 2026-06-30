@@ -1,8 +1,15 @@
 "use client";
 
 import { memo, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Eye, Layers3, Sparkles, X } from "lucide-react";
+import Image from "next/image";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { Eye, Smartphone, Sparkles, X } from "lucide-react";
 import { CustomizePreview } from "./preview";
 import { useCustomizeStore } from "./customize-store";
 import type { AppUser, Link } from "@/types/database";
@@ -79,10 +86,35 @@ const PreviewFrame = memo(function PreviewFrame({
             {statusLabel}
           </span>
         </div>
-        <CustomizePreview user={user} links={previewLinks} theme={theme} bio={bio} />
-        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/55 bg-white/25 px-3 py-2 text-xs font-semibold text-ocean/65">
-          <Layers3 size={14} className="shrink-0" />
-          Use este mockup para validar fundo, cards, LEDs e transições em tempo real.
+        <div
+          className="relative mx-auto"
+          style={{
+            width: "min(100%, 350px, calc((100vh - 190px) * 0.533))",
+            aspectRatio: "500 / 938",
+          }}
+        >
+          <div className="absolute left-[14.2%] top-[13.96%] z-[1] h-[71.96%] w-[71.4%] overflow-hidden rounded-[18px] bg-slate-950">
+            <CustomizePreview
+              user={user}
+              links={previewLinks}
+              theme={theme}
+              bio={bio}
+              embedded
+            />
+          </div>
+          <Image
+            src="/imgs/essentials/frame.png"
+            alt="Preview do perfil em um celular"
+            fill
+            sizes="(min-width: 1024px) 350px, 90vw"
+            className="pointer-events-none z-10 object-contain drop-shadow-[0_28px_32px_rgba(8,47,73,0.28)]"
+            priority
+          />
+          <div className="pointer-events-none absolute inset-[8%] z-20 rounded-[2rem] bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50 mix-blend-screen" />
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-2 text-xs font-semibold text-ocean/65">
+          <Smartphone size={14} className="shrink-0" />
+          Visualização mobile em tempo real
         </div>
     </motion.div>
   );
@@ -90,12 +122,22 @@ const PreviewFrame = memo(function PreviewFrame({
 
 export function LivePreviewPanel(props: LivePreviewPanelProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const scrollOffset = useTransform(scrollY, [0, 1200], [0, 28]);
+  const smoothScrollOffset = useSpring(scrollOffset, {
+    stiffness: 90,
+    damping: 22,
+    mass: 0.5,
+  });
 
   return (
     <>
-      <aside className="sticky top-24 hidden lg:block">
+      <motion.aside
+        className="sticky top-24 hidden lg:block"
+        style={{ y: smoothScrollOffset }}
+      >
         <PreviewFrame {...props} />
-      </aside>
+      </motion.aside>
 
       <button
         type="button"

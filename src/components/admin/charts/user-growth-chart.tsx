@@ -23,8 +23,8 @@ export function UserGrowthChart({ data }: { data: DailyCount[] }) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="userGrowthGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.25} />
-                <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
+                <stop offset="0%" stopColor="#2aa8e0" stopOpacity={0.25} />
+                <stop offset="100%" stopColor="#2aa8e0" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" />
@@ -41,7 +41,7 @@ export function UserGrowthChart({ data }: { data: DailyCount[] }) {
                 boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
-            <Area type="monotone" dataKey="count" stroke="#38bdf8" strokeWidth={2} fill="url(#userGrowthGrad)" />
+            <Area type="monotone" dataKey="count" stroke="#2aa8e0" strokeWidth={2} fill="url(#userGrowthGrad)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

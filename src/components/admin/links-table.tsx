@@ -3,6 +3,7 @@
 import NextLink from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -21,6 +22,7 @@ export type AdminLinkRow = {
   title: string;
   url: string;
   icon: string | null;
+  is_custom_icon: boolean;
   user_id: string;
   created_at: string;
   user: {
@@ -113,8 +115,25 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
     });
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.03 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut" as const },
+    },
+  };
+
   return (
-    <div>
+    <motion.div variants={containerVariants} initial="hidden" animate="visible">
       <div className="flex flex-col gap-3 border-b border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block min-w-0 flex-1 sm:max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(10,22,38,0.5)]" size={16} />
@@ -158,7 +177,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
           </thead>
           <tbody>
             {pageRows.map((link) => (
-              <tr key={link.id}>
+              <motion.tr key={link.id} variants={itemVariants}>
                 <td>
                   <NextLink
                     href={`/admin/users/${link.user.id}/links`}
@@ -188,7 +207,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
                     <ExternalLink size={12} className="shrink-0" />
                   </a>
                 </td>
-                <td className="text-xs text-[rgba(10,22,38,0.5)]">{link.icon || "Padrão"}</td>
+                <td className="text-xs text-[rgba(10,22,38,0.5)]">{link.is_custom_icon ? "Personalizado" : link.icon || "Padrão"}</td>
                 <td className="text-xs text-[rgba(10,22,38,0.5)]">
                   {new Date(link.created_at).toLocaleDateString("pt-BR")}
                 </td>
@@ -213,7 +232,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
                     </button>
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
             {pageRows.length === 0 && (
               <tr>
@@ -270,7 +289,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
           onConfirm={() => confirmDelete(deleting)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

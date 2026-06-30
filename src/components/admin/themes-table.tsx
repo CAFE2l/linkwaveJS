@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { motion } from "framer-motion";
 import { RotateCcw } from "lucide-react";
 import { resetUserThemeAction } from "@/lib/actions/admin";
 
@@ -12,9 +13,26 @@ type ThemeRow = {
   created_at: string;
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" as const },
+  },
+};
+
 export function AdminThemesTable({ themes }: { themes: ThemeRow[] }) {
   return (
-    <div className="overflow-x-auto admin-scrollbar">
+    <motion.div className="overflow-x-auto admin-scrollbar" variants={containerVariants} initial="hidden" animate="visible">
       <table className="admin-table min-w-[600px]">
         <thead>
           <tr>
@@ -26,7 +44,9 @@ export function AdminThemesTable({ themes }: { themes: ThemeRow[] }) {
         </thead>
         <tbody>
           {themes.map((item) => (
-            <ThemeRow key={item.id} item={item} />
+            <motion.tr key={item.id} variants={itemVariants}>
+              <ThemeRowContent item={item} />
+            </motion.tr>
           ))}
           {themes.length === 0 && (
             <tr>
@@ -37,11 +57,11 @@ export function AdminThemesTable({ themes }: { themes: ThemeRow[] }) {
           )}
         </tbody>
       </table>
-    </div>
+    </motion.div>
   );
 }
 
-function ThemeRow({ item }: { item: ThemeRow }) {
+function ThemeRowContent({ item }: { item: ThemeRow }) {
   const [pending, startReset] = useTransition();
 
   function handleReset() {
@@ -54,7 +74,7 @@ function ThemeRow({ item }: { item: ThemeRow }) {
   const themeStr = JSON.stringify(item.theme_json, null, 1);
 
   return (
-    <tr>
+    <>
       <td>
         <span className="font-medium text-[#0a1626]">@{item.username}</span>
       </td>
@@ -79,6 +99,6 @@ function ThemeRow({ item }: { item: ThemeRow }) {
           Resetar
         </button>
       </td>
-    </tr>
+    </>
   );
 }

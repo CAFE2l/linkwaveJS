@@ -28,8 +28,8 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="hourlyGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.2} />
-                <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
+                <stop offset="0%" stopColor="#28b060" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#28b060" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" />
@@ -46,7 +46,7 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
                 boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
-            <Area type="monotone" dataKey="count" stroke="#a78bfa" strokeWidth={2} fill="url(#hourlyGrad)" />
+            <Area type="monotone" dataKey="count" stroke="#28b060" strokeWidth={2} fill="url(#hourlyGrad)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

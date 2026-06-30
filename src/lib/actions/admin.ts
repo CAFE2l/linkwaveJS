@@ -290,6 +290,7 @@ export async function getAdminLinks() {
       title: true,
       url: true,
       icon: true,
+      isCustomIcon: true,
       userId: true,
       createdAt: true,
       user: {
@@ -311,6 +312,7 @@ export async function getAdminLinks() {
     title: l.title,
     url: l.url,
     icon: l.icon,
+    is_custom_icon: l.isCustomIcon,
     user_id: l.userId,
     created_at: l.createdAt.toISOString(),
     user: {

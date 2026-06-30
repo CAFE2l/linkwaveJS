@@ -53,8 +53,8 @@ export function OverviewCards({
             className="admin-card admin-card-hover p-5 transition-all duration-200"
           >
             <div className="flex items-start justify-between">
-              <div className={`flex size-11 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} shadow-lg`}>
-                <Icon size={20} className="text-white" />
+              <div className={`flex size-11 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} shadow-lg ring-1 ring-white/30`}>
+                <Icon size={20} className="text-white drop-shadow-sm" />
               </div>
             </div>
             <div className="mt-4">

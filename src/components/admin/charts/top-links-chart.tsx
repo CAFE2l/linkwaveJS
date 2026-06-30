@@ -3,8 +3,6 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { TopLink } from "@/lib/actions/analytics";
 
-const CHART_HEIGHT = 220;
-
 export function TopLinksChart({ data }: { data: TopLink[] }) {
   if (data.length === 0) {
     return (
@@ -43,7 +41,7 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
                 boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
-            <Bar dataKey="clicks" fill="#a78bfa" radius={[0, 3, 3, 0]} opacity={0.8} />
+            <Bar dataKey="clicks" fill="#5bc8f5" radius={[0, 3, 3, 0]} opacity={0.8} />
           </BarChart>
         </ResponsiveContainer>
       </div>

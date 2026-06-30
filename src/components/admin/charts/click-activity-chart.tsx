@@ -36,7 +36,7 @@ export function ClickActivityChart({ data }: { data: DailyCount[] }) {
                 boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
-            <Bar dataKey="count" fill="#38bdf8" radius={[3, 3, 0, 0]} opacity={0.8} />
+            <Bar dataKey="count" fill="#2aa8e0" radius={[3, 3, 0, 0]} opacity={0.8} />
           </BarChart>
         </ResponsiveContainer>
       </div>

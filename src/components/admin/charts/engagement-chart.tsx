@@ -38,7 +38,7 @@ export function EngagementChart({ data }: { data: EngagementItem[] }) {
                 boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
-            <Bar dataKey="users" fill="#22d3ee" radius={[3, 3, 0, 0]} opacity={0.8} />
+            <Bar dataKey="users" fill="#5bc8f5" radius={[3, 3, 0, 0]} opacity={0.8} />
           </BarChart>
         </ResponsiveContainer>
       </div>

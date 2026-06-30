@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   CheckCircle2,
   Pencil,
@@ -11,15 +12,15 @@ import {
   Trash2,
   TriangleAlert,
   UserRound,
-  X,
 } from "lucide-react";
 import {
   createUserAdminAction,
   deleteUserAdminAction,
   updateUserAdminAction,
 } from "@/lib/actions/admin";
+import { UserEditDrawer } from "./user-edit-drawer";
 
-type UserRow = {
+export type UserRow = {
   id: string;
   username: string;
   name: string;
@@ -30,7 +31,7 @@ type UserRow = {
   created_at: string;
 };
 
-type UserDraft = {
+export type UserDraft = {
   name: string;
   username: string;
   email: string;
@@ -39,13 +40,21 @@ type UserDraft = {
   active: boolean;
 };
 
-const emptyDraft: UserDraft = {
-  name: "",
-  username: "",
-  email: "",
-  password: "",
-  role: "user",
-  active: true,
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" as const },
+  },
 };
 
 export function AdminUsersTable({ users }: { users: UserRow[] }) {
@@ -80,12 +89,11 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
   }
 
   function deleteUser(user: UserRow) {
-    if (!window.confirm(`Excluir permanentemente @${user.username} e todos os seus dados?`)) return;
     runAction(() => deleteUserAdminAction(user.id));
   }
 
   return (
-    <div>
+    <motion.div variants={containerVariants} initial="hidden" animate="visible">
       <div className="flex flex-col gap-3 border-b border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block min-w-0 flex-1 sm:max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(10,22,38,0.5)]" size={16} />
@@ -110,7 +118,8 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
       </div>
 
       {feedback && (
-        <div
+        <motion.div
+          variants={itemVariants}
           role="status"
           className={`mx-4 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium ${
             feedback.ok
@@ -120,7 +129,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
         >
           {feedback.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}
           {feedback.message}
-        </div>
+        </motion.div>
       )}
 
       <div className="overflow-x-auto admin-scrollbar">
@@ -139,7 +148,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
             {filteredUsers.map((user) => {
               const primaryAdmin = user.email.toLowerCase() === "gutiajs@gmail.com";
               return (
-                <tr key={user.id}>
+                <motion.tr key={user.id} variants={itemVariants}>
                   <td>
                     <div className="flex items-center gap-3">
                       <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/50 ring-1 ring-white/70">
@@ -203,7 +212,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
                       </button>
                     </div>
                   </td>
-                </tr>
+                </motion.tr>
               );
             })}
             {filteredUsers.length === 0 && (
@@ -218,7 +227,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
       </div>
 
       {(creating || editing) && (
-        <UserModal
+        <UserEditDrawer
           user={editing}
           pending={pending}
           feedback={feedback}
@@ -239,163 +248,9 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
               runAction(() => createUserAdminAction(draft));
             }
           }}
+          onDelete={(user) => deleteUser(user)}
         />
       )}
-    </div>
-  );
-}
-
-function UserModal({
-  user,
-  pending,
-  feedback,
-  onClose,
-  onSubmit,
-}: {
-  user: UserRow | null;
-  pending: boolean;
-  feedback: { ok: boolean; message: string } | null;
-  onClose: () => void;
-  onSubmit: (draft: UserDraft) => void;
-}) {
-  const [draft, setDraft] = useState<UserDraft>(
-    user
-      ? {
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          password: "",
-          role: user.role,
-          active: user.active,
-        }
-      : emptyDraft,
-  );
-  const primaryAdmin = user?.email.toLowerCase() === "gutiajs@gmail.com";
-
-  return (
-    <div className="admin-modal-overlay">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSubmit(draft);
-        }}
-        className="admin-modal admin-fade-in"
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.5)] transition hover:bg-white/50 hover:text-[#0a1626]"
-          aria-label="Fechar"
-        >
-          <X size={16} />
-        </button>
-
-        <h2 className="text-lg font-bold text-[#0a1626]">{user ? "Editar usuário" : "Novo usuário"}</h2>
-        <p className="mt-1 text-sm text-[rgba(10,22,38,0.6)]">
-          {user ? "Atualize os dados e permissões da conta." : "Crie uma conta confirmada no Supabase Auth."}
-        </p>
-
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <AdminField label="Nome">
-            <input
-              required
-              value={draft.name}
-              onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-              className="admin-input-dark"
-            />
-          </AdminField>
-          <AdminField label="Username">
-            <input
-              required
-              value={draft.username}
-              onChange={(event) => setDraft({ ...draft, username: event.target.value.toLowerCase() })}
-              className="admin-input-dark"
-            />
-          </AdminField>
-          <AdminField label="Email">
-            <input
-              required
-              type="email"
-              value={draft.email}
-              disabled={primaryAdmin}
-              onChange={(event) => setDraft({ ...draft, email: event.target.value })}
-              className="admin-input-dark disabled:opacity-50"
-            />
-          </AdminField>
-          {!user && (
-            <AdminField label="Senha inicial">
-              <input
-                required
-                type="password"
-                minLength={8}
-                value={draft.password}
-                onChange={(event) => setDraft({ ...draft, password: event.target.value })}
-                className="admin-input-dark"
-              />
-            </AdminField>
-          )}
-          <AdminField label="Permissão">
-            <select
-              value={draft.role}
-              disabled={primaryAdmin}
-              onChange={(event) => setDraft({ ...draft, role: event.target.value as "user" | "admin" })}
-              className="admin-input-dark disabled:opacity-50"
-            >
-              <option value="user">Usuário</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </AdminField>
-          <AdminField label="Status">
-            <select
-              value={draft.active ? "active" : "inactive"}
-              disabled={primaryAdmin}
-              onChange={(event) => setDraft({ ...draft, active: event.target.value === "active" })}
-              className="admin-input-dark disabled:opacity-50"
-            >
-              <option value="active">Ativo</option>
-              <option value="inactive">Inativo</option>
-            </select>
-          </AdminField>
-        </div>
-
-        {primaryAdmin && (
-          <p className="mt-4 rounded-lg border border-amber-500/15 bg-amber-500/8 px-4 py-3 text-xs font-medium text-amber-600">
-            O administrador principal não pode ser desativado, rebaixado ou excluído.
-          </p>
-        )}
-
-        {feedback && (
-          <p
-            role="status"
-            className={`mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-xs font-medium ${
-              feedback.ok
-                ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-600"
-                : "border-red-500/20 bg-red-500/8 text-red-600"
-            }`}
-          >
-            {feedback.ok ? <CheckCircle2 size={15} /> : <TriangleAlert size={15} />}
-            {feedback.message}
-          </p>
-        )}
-
-        <div className="mt-6 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="admin-btn admin-btn-ghost">
-            Cancelar
-          </button>
-          <button type="submit" disabled={pending} className="admin-btn admin-btn-primary disabled:opacity-50">
-            {pending ? "Salvando..." : user ? "Salvar alterações" : "Criar usuário"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function AdminField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[rgba(10,22,38,0.5)]">{label}</span>
-      {children}
-    </label>
+    </motion.div>
   );
 }

@@ -26,7 +26,7 @@ import {
 } from "@/types/database";
 import { AvatarUpload } from "./avatar-upload";
 import { BannerUpload } from "./banner-upload";
-import { LivePreviewPanel } from "./LivePreviewPanel";
+
 import { useCustomizeStore } from "./customize-store";
 import type { Link } from "@/types/database";
 
@@ -865,12 +865,6 @@ export function CustomizePanel({
             )}
           </div>
         </div>
-        <LivePreviewPanel
-          user={currentUser}
-          links={links}
-          bio={profile.bio}
-          status={saving ? "saving" : message ? (message.ok ? "saved" : "error") : "idle"}
-        />
       </div>
     </DashboardShell>
   );

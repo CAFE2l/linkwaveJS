@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { getAdminAuth } from "./admin";
 
 export async function getCurrentUser() {
   try {
@@ -7,6 +6,9 @@ export async function getCurrentUser() {
     const sessionCookie = cookieStore.get("__session")?.value;
     if (!sessionCookie) return null;
 
+    // Firebase Admin is intentionally loaded only when a session exists so an
+    // optional auth configuration cannot crash anonymous public routes.
+    const { getAdminAuth } = await import("./admin");
     const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     return decoded;
   } catch {

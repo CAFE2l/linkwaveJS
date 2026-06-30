@@ -1,19 +1,23 @@
-import { getPrisma } from "@/lib/db/prisma";
 import type { LandingStats } from "@/types/database";
 
 export async function getLandingStats(): Promise<LandingStats> {
   try {
+    // Keep database driver loading inside the guarded runtime path. If the
+    // deployment cannot load or configure Prisma, the public landing page
+    // still renders with fallback statistics instead of crashing at startup.
+    const { getPrisma } = await import("@/lib/db/prisma");
+    const prisma = getPrisma();
     const [totalUsers, totalClicks, activeUsers] = await Promise.all([
-      getPrisma().user.count({ where: { active: true } }),
-      getPrisma().click.count(),
-      getPrisma().user.findMany({ where: { active: true }, select: { id: true } }),
+      prisma.user.count({ where: { active: true } }),
+      prisma.click.count(),
+      prisma.user.findMany({ where: { active: true }, select: { id: true } }),
     ]);
 
     const activeIds = activeUsers.map((u) => u.id);
     let usersWithClicks = 0;
 
     if (activeIds.length > 0) {
-      const data = await getPrisma().click.findMany({
+      const data = await prisma.click.findMany({
         where: { userId: { in: activeIds } },
         select: { userId: true },
       });

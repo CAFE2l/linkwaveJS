@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth";
 import type { AppUser } from "@/types/database";
+import { BlobBackground } from "@/components/landing/blob-background";
 
 const navItems = [
   { href: "/admin/overview", label: "Visão geral", icon: BarChart3 },
@@ -42,7 +43,8 @@ export function AdminLayout({
   }
 
   return (
-    <div className="admin-bg min-h-screen text-[#0a1626] antialiased">
+    <div className="admin-bg relative min-h-screen text-[#0a1626] antialiased">
+      <BlobBackground />
       {/* Mobile menu overlay */}
       {mobileOpen && (
         <div
@@ -178,7 +180,7 @@ export function AdminLayout({
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8 admin-scrollbar">
+        <main className="relative z-10 p-4 sm:p-6 lg:p-8 admin-scrollbar">
           {children}
         </main>
       </div>

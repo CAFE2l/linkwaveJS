@@ -9,8 +9,8 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
   if (data.length === 0) {
     return (
       <div className="admin-card p-5">
-        <h2 className="text-base font-semibold text-white mb-1">Links mais clicados</h2>
-        <p className="text-xs text-slate-400">Nenhum dado de clique disponível.</p>
+        <h2 className="text-base font-semibold text-[#0a1626] mb-1">Links mais clicados</h2>
+        <p className="text-xs text-[rgba(10,22,38,0.6)]">Nenhum dado de clique disponível.</p>
       </div>
     );
   }
@@ -24,8 +24,8 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
 
   return (
     <div className="admin-card p-5">
-      <h2 className="text-base font-semibold text-white mb-1">Links mais clicados</h2>
-      <p className="text-xs text-slate-400 mb-4">Top 10 links com mais acessos</p>
+      <h2 className="text-base font-semibold text-[#0a1626] mb-1">Links mais clicados</h2>
+      <p className="text-xs text-[rgba(10,22,38,0.6)] mb-4">Top 10 links com mais acessos</p>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical" margin={{ left: 20 }}>
@@ -34,12 +34,13 @@ export function TopLinksChart({ data }: { data: TopLink[] }) {
             <YAxis dataKey="name" type="category" tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} width={150} />
             <Tooltip
               contentStyle={{
-                background: "#0f172a",
-                border: "1px solid rgba(148,163,184,0.15)",
-                borderRadius: "8px",
+                background: "rgba(255,255,255,0.85)",
+                backdropFilter: "blur(16px)",
+                border: "1px solid rgba(255,255,255,0.9)",
+                borderRadius: "12px",
                 fontSize: "13px",
-                color: "#e2e8f0",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                color: "#0a1626",
+                boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
             <Bar dataKey="clicks" fill="#a78bfa" radius={[0, 3, 3, 0]} opacity={0.8} />

@@ -115,9 +115,9 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 border-b border-slate-700/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block min-w-0 flex-1 sm:max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(10,22,38,0.5)]" size={16} />
           <input
             value={query}
             onChange={(event) => updateQuery(event.target.value)}
@@ -125,7 +125,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
             className="admin-input-dark pl-10"
           />
         </label>
-        <span className="text-xs font-semibold text-slate-500">
+        <span className="text-xs font-semibold text-[rgba(10,22,38,0.5)]">
           {filteredRows.length} resultado(s)
         </span>
       </div>
@@ -135,8 +135,8 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
           role="status"
           className={`mx-4 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium ${
             feedback.ok
-              ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-400"
-              : "border-red-500/20 bg-red-500/8 text-red-400"
+              ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-600"
+              : "border-red-500/20 bg-red-500/8 text-red-600"
           }`}
         >
           {feedback.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}
@@ -164,32 +164,32 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
                     href={`/admin/users/${link.user.id}/links`}
                     className="group inline-flex items-center gap-2"
                   >
-                    <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700">
+                    <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/50 ring-1 ring-white/70">
                       {link.user.avatar_url ? (
                         <img src={link.user.avatar_url} alt="" className="size-full object-cover" />
                       ) : (
-                        <UserRound size={12} className="text-slate-500" />
+                        <UserRound size={12} className="text-[rgba(10,22,38,0.5)]" />
                       )}
                     </span>
-                    <span className="font-medium text-slate-200 transition group-hover:text-cyan-400">
+                    <span className="font-medium text-[#0a1626] transition group-hover:text-[#2aa8e0]">
                       @{link.user.username}
                     </span>
                   </NextLink>
                 </td>
-                <td className="font-medium text-slate-200">{link.title}</td>
+                <td className="font-medium text-[#0a1626]">{link.title}</td>
                 <td>
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex max-w-sm items-center gap-1 text-sm text-slate-400 transition hover:text-cyan-400"
+                    className="inline-flex max-w-sm items-center gap-1 text-sm text-[rgba(10,22,38,0.6)] transition hover:text-[#2aa8e0]"
                   >
                     <span className="truncate">{link.url}</span>
                     <ExternalLink size={12} className="shrink-0" />
                   </a>
                 </td>
-                <td className="text-xs text-slate-500">{link.icon || "Padrão"}</td>
-                <td className="text-xs text-slate-500">
+                <td className="text-xs text-[rgba(10,22,38,0.5)]">{link.icon || "Padrão"}</td>
+                <td className="text-xs text-[rgba(10,22,38,0.5)]">
                   {new Date(link.created_at).toLocaleDateString("pt-BR")}
                 </td>
                 <td>
@@ -197,7 +197,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
                     <button
                       type="button"
                       onClick={() => setEditing(link)}
-                      className="flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
+                      className="flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.5)] transition hover:bg-white/50 hover:text-[#0a1626]"
                       aria-label={`Editar ${link.title}`}
                     >
                       <Pencil size={14} />
@@ -206,7 +206,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
                       type="button"
                       onClick={() => setDeleting(link)}
                       disabled={pending}
-                      className="flex size-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.4)] transition hover:bg-red-500/10 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={`Excluir ${link.title}`}
                     >
                       <Trash2 size={14} />
@@ -217,7 +217,7 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
             ))}
             {pageRows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-[rgba(10,22,38,0.5)]">
                   Nenhum link encontrado.
                 </td>
               </tr>
@@ -226,8 +226,8 @@ export function AdminLinksTable({ links }: { links: AdminLinkRow[] }) {
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-slate-700/30 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-xs font-medium text-slate-500">
+      <div className="flex flex-col gap-3 border-t border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs font-medium text-[rgba(10,22,38,0.5)]">
           Página {currentPage} de {totalPages}
         </span>
         <div className="flex items-center gap-2">
@@ -305,14 +305,14 @@ function EditLinkModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
+          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.5)] transition hover:bg-white/50 hover:text-[#0a1626]"
           aria-label="Fechar"
         >
           <X size={16} />
         </button>
 
-        <h2 className="text-lg font-bold text-white">Editar link</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <h2 className="text-lg font-bold text-[#0a1626]">Editar link</h2>
+        <p className="mt-1 text-sm text-[rgba(10,22,38,0.6)]">
           Atualize o link de @{link.user.username}.
         </p>
 
@@ -344,7 +344,7 @@ function EditLinkModal({
         </div>
 
         {feedback && !feedback.ok && (
-          <p role="status" className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-xs font-medium text-red-400">
+          <p role="status" className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-xs font-medium text-red-600">
             <TriangleAlert size={15} />
             {feedback.message}
           </p>
@@ -377,9 +377,9 @@ function DeleteLinkModal({
   return (
     <div className="admin-modal-overlay">
       <div className="admin-modal admin-fade-in">
-        <h2 className="text-lg font-bold text-white">Excluir link</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
-          Tem certeza que quer excluir <span className="font-semibold text-slate-200">{link.title}</span> de @{link.user.username}? Isso não pode ser desfeito.
+        <h2 className="text-lg font-bold text-[#0a1626]">Excluir link</h2>
+        <p className="mt-2 text-sm leading-relaxed text-[rgba(10,22,38,0.6)]">
+          Tem certeza que quer excluir <span className="font-semibold text-[#0a1626]">{link.title}</span> de @{link.user.username}? Isso não pode ser desfeito.
         </p>
         <div className="mt-6 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="admin-btn admin-btn-ghost">
@@ -397,7 +397,7 @@ function DeleteLinkModal({
 function AdminField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[rgba(10,22,38,0.5)]">{label}</span>
       {children}
     </label>
   );

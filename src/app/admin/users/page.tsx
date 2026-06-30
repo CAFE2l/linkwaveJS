@@ -9,8 +9,8 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-6 admin-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Usuários</h1>
-        <p className="mt-1 text-sm text-slate-400">{users.length} conta(s) registrada(s) no sistema.</p>
+        <h1 className="text-2xl font-bold text-[#0a1626] tracking-tight">Usuários</h1>
+        <p className="mt-1 text-sm text-[rgba(10,22,38,0.6)]">{users.length} conta(s) registrada(s) no sistema.</p>
       </div>
 
       <div className="admin-card overflow-hidden">

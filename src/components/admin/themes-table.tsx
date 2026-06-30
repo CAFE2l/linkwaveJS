@@ -30,9 +30,9 @@ export function AdminThemesTable({ themes }: { themes: ThemeRow[] }) {
           ))}
           {themes.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-500">
-                Nenhum tema personalizado encontrado.
-              </td>
+                <td colSpan={4} className="px-6 py-12 text-center text-sm text-[rgba(10,22,38,0.5)]">
+                  Nenhum tema personalizado encontrado.
+                </td>
             </tr>
           )}
         </tbody>
@@ -56,15 +56,15 @@ function ThemeRow({ item }: { item: ThemeRow }) {
   return (
     <tr>
       <td>
-        <span className="font-medium text-slate-200">@{item.username}</span>
+        <span className="font-medium text-[#0a1626]">@{item.username}</span>
       </td>
-      <td className="text-slate-400">{item.email}</td>
+      <td className="text-[rgba(10,22,38,0.6)]">{item.email}</td>
       <td>
         <details className="group">
-          <summary className="cursor-pointer text-xs font-medium text-slate-400 transition hover:text-slate-200">
-            Ver configuração
-          </summary>
-          <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-slate-800/50 p-2 text-[10px] text-slate-400 admin-scrollbar">
+        <summary className="cursor-pointer text-xs font-medium text-[rgba(10,22,38,0.5)] transition hover:text-[#0a1626]">
+          Ver configuração
+        </summary>
+        <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-white/40 p-2 text-[10px] text-[rgba(10,22,38,0.5)] admin-scrollbar">
             {themeStr}
           </pre>
         </details>

@@ -86,9 +86,9 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 border-b border-slate-700/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-white/50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block min-w-0 flex-1 sm:max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(10,22,38,0.5)]" size={16} />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -114,8 +114,8 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
           role="status"
           className={`mx-4 mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium ${
             feedback.ok
-              ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-400"
-              : "border-red-500/20 bg-red-500/8 text-red-400"
+              ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-600"
+              : "border-red-500/20 bg-red-500/8 text-red-600"
           }`}
         >
           {feedback.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}
@@ -142,41 +142,41 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
                 <tr key={user.id}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700">
+                      <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/50 ring-1 ring-white/70">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt="" className="size-full object-cover" />
                         ) : (
-                          <UserRound size={15} className="text-slate-500" />
+                          <UserRound size={15} className="text-[rgba(10,22,38,0.5)]" />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 text-sm font-medium text-slate-200">
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-[#0a1626]">
                           <span className="truncate">@{user.username}</span>
-                          {primaryAdmin && <ShieldCheck size={13} className="shrink-0 text-amber-400" />}
+                          {primaryAdmin && <ShieldCheck size={13} className="shrink-0 text-amber-500" />}
                         </div>
-                        <div className="max-w-48 truncate text-xs text-slate-500">{user.name}</div>
+                        <div className="max-w-48 truncate text-xs text-[rgba(10,22,38,0.5)]">{user.name}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="text-slate-400">{user.email}</td>
+                  <td className="text-[rgba(10,22,38,0.6)]">{user.email}</td>
                   <td>
                     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase ${
                       user.role === "admin"
-                        ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                        : "border-slate-600/30 bg-slate-700/30 text-slate-400"
+                        ? "border-amber-500/20 bg-amber-500/10 text-amber-600"
+                        : "border-white/50 bg-white/30 text-[rgba(10,22,38,0.5)]"
                     }`}>
                       {user.role}
                     </span>
                   </td>
                   <td>
                     <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${
-                      user.active ? "text-emerald-400" : "text-red-400"
+                      user.active ? "text-emerald-600" : "text-red-600"
                     }`}>
                       <span className={`size-1.5 rounded-full ${user.active ? "bg-emerald-500" : "bg-red-500"}`} />
                       {user.active ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="text-xs text-slate-500">
+                  <td className="text-xs text-[rgba(10,22,38,0.5)]">
                     {new Date(user.created_at).toLocaleDateString("pt-BR")}
                   </td>
                   <td>
@@ -185,10 +185,10 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
                         type="button"
                         onClick={() => {
                           setFeedback(null);
-                          setEditing(user);
-                        }}
-                        className="flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
-                        aria-label={`Editar ${user.username}`}
+                        setEditing(user);
+                      }}
+                      className="flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.5)] transition hover:bg-white/50 hover:text-[#0a1626]"
+                      aria-label={`Editar ${user.username}`}
                       >
                         <Pencil size={14} />
                       </button>
@@ -196,7 +196,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
                         type="button"
                         onClick={() => deleteUser(user)}
                         disabled={pending || primaryAdmin}
-                        className="flex size-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                        className="flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.4)] transition hover:bg-red-500/10 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
                         aria-label={`Excluir ${user.username}`}
                       >
                         <Trash2 size={14} />
@@ -208,7 +208,7 @@ export function AdminUsersTable({ users }: { users: UserRow[] }) {
             })}
             {filteredUsers.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-[rgba(10,22,38,0.5)]">
                   Nenhum usuário encontrado.
                 </td>
               </tr>
@@ -284,14 +284,14 @@ function UserModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-200"
+          className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-[rgba(10,22,38,0.5)] transition hover:bg-white/50 hover:text-[#0a1626]"
           aria-label="Fechar"
         >
           <X size={16} />
         </button>
 
-        <h2 className="text-lg font-bold text-white">{user ? "Editar usuário" : "Novo usuário"}</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <h2 className="text-lg font-bold text-[#0a1626]">{user ? "Editar usuário" : "Novo usuário"}</h2>
+        <p className="mt-1 text-sm text-[rgba(10,22,38,0.6)]">
           {user ? "Atualize os dados e permissões da conta." : "Crie uma conta confirmada no Supabase Auth."}
         </p>
 
@@ -359,7 +359,7 @@ function UserModal({
         </div>
 
         {primaryAdmin && (
-          <p className="mt-4 rounded-lg border border-amber-500/15 bg-amber-500/8 px-4 py-3 text-xs font-medium text-amber-400">
+          <p className="mt-4 rounded-lg border border-amber-500/15 bg-amber-500/8 px-4 py-3 text-xs font-medium text-amber-600">
             O administrador principal não pode ser desativado, rebaixado ou excluído.
           </p>
         )}
@@ -369,8 +369,8 @@ function UserModal({
             role="status"
             className={`mt-4 flex items-center gap-2 rounded-lg border px-4 py-3 text-xs font-medium ${
               feedback.ok
-                ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-400"
-                : "border-red-500/20 bg-red-500/8 text-red-400"
+                ? "border-emerald-500/20 bg-emerald-500/8 text-emerald-600"
+                : "border-red-500/20 bg-red-500/8 text-red-600"
             }`}
           >
             {feedback.ok ? <CheckCircle2 size={15} /> : <TriangleAlert size={15} />}
@@ -394,7 +394,7 @@ function UserModal({
 function AdminField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[rgba(10,22,38,0.5)]">{label}</span>
       {children}
     </label>
   );

@@ -8,8 +8,8 @@ function DeltaBadge({ value }: { value: number }) {
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
       isUp
-        ? "bg-emerald-500/10 text-emerald-400"
-        : "bg-red-500/10 text-red-400"
+        ? "bg-emerald-500/12 text-emerald-600"
+        : "bg-red-500/12 text-red-600"
     }`}>
       {isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
       {Math.abs(value)}%
@@ -58,11 +58,11 @@ export function OverviewCards({
               </div>
             </div>
             <div className="mt-4">
-              <div className="text-2xl font-bold text-white tracking-tight">
+              <div className="text-2xl font-bold text-[#0a1626] tracking-tight">
                 {stat.value.toLocaleString("pt-BR")}
               </div>
               <div className="mt-1 flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-400">{stat.label}</span>
+                <span className="text-sm font-medium text-[rgba(10,22,38,0.6)]">{stat.label}</span>
                 <DeltaBadge value={stat.delta} />
               </div>
             </div>

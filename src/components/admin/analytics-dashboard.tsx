@@ -13,8 +13,8 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   return (
     <div className="space-y-6 admin-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Visão geral</h1>
-        <p className="mt-1 text-sm text-slate-400">Acompanhe métricas, usuários e atividades da plataforma LinkWave.</p>
+        <h1 className="text-2xl font-bold text-[#0a1626] tracking-tight">Visão geral</h1>
+        <p className="mt-1 text-sm text-[rgba(10,22,38,0.6)]">Acompanhe métricas, usuários e atividades da plataforma LinkWave.</p>
       </div>
 
       <OverviewCards

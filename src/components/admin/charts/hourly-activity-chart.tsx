@@ -13,13 +13,13 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
     <div className="admin-card p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-base font-semibold text-white">Atividade por hora</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Distribuição de cliques ao longo do dia</p>
+          <h2 className="text-base font-semibold text-[#0a1626]">Atividade por hora</h2>
+          <p className="text-xs text-[rgba(10,22,38,0.6)] mt-0.5">Distribuição de cliques ao longo do dia</p>
         </div>
         {peak && (
           <div className="text-right">
-            <div className="text-xl font-bold text-white">{peak.count}</div>
-            <div className="text-[11px] font-medium text-slate-500">pico {peak.hour}h</div>
+            <div className="text-xl font-bold text-[#0a1626]">{peak.count}</div>
+            <div className="text-[11px] font-medium text-[rgba(10,22,38,0.5)]">pico {peak.hour}h</div>
           </div>
         )}
       </div>
@@ -37,12 +37,13 @@ export function HourlyActivityChart({ data }: { data: HourlyCount[] }) {
             <YAxis tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{
-                background: "#0f172a",
-                border: "1px solid rgba(148,163,184,0.15)",
-                borderRadius: "8px",
+                background: "rgba(255,255,255,0.85)",
+                backdropFilter: "blur(16px)",
+                border: "1px solid rgba(255,255,255,0.9)",
+                borderRadius: "12px",
                 fontSize: "13px",
-                color: "#e2e8f0",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                color: "#0a1626",
+                boxShadow: "0 8px 24px rgba(80,180,220,0.2)",
               }}
             />
             <Area type="monotone" dataKey="count" stroke="#a78bfa" strokeWidth={2} fill="url(#hourlyGrad)" />

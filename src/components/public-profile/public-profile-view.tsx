@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
+import { motion } from "framer-motion";
 import { Link2 } from "lucide-react";
 import { AnimatedLinks } from "@/components/public-profile/animated-links";
 import { BackgroundLayer } from "@/components/public-profile/background-layer";
@@ -141,10 +142,20 @@ export function PublicProfileView({
           }`}
         >
           {/* Premium card */}
-          <article
+          <motion.article
             className={`relative overflow-hidden border ${
               isPreview ? "rounded-[1.75rem] p-2.5" : "rounded-[2rem] p-3 sm:p-4"
             }`}
+            animate={{
+              borderRadius: theme.card_border_radius,
+              boxShadow:
+                theme.card_shadow
+                  ? `0 28px 80px rgba(0,0,0,0.3), 0 0 32px ${theme.link_glow_color}33`
+                  : isGalaxy && theme.enable_led_glow
+                    ? `0 24px 70px rgba(0,0,0,0.34), 0 0 30px ${theme.link_glow_color}22`
+                    : "0 18px 50px rgba(0,0,0,0.16)",
+            }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               background:
                 "color-mix(in srgb, var(--ut-card-glass-bg, rgba(255,255,255,0.08)) 72%, transparent)",
@@ -153,10 +164,6 @@ export function PublicProfileView({
               WebkitBackdropFilter:
                 "blur(min(var(--ut-card-blur, 14px), 18px)) saturate(165%)",
               borderColor: "rgba(255,255,255,0.16)",
-              boxShadow:
-                isGalaxy && theme.enable_led_glow
-                  ? `0 24px 70px rgba(0,0,0,0.34), 0 0 30px ${theme.link_glow_color}22`
-                  : "0 24px 70px rgba(0,0,0,0.18)",
             }}
           >
             {/* Banner */}
@@ -256,7 +263,7 @@ export function PublicProfileView({
                 </AnimatedLinks>
               )}
             </div>
-          </article>
+          </motion.article>
 
           {/* LinkWave badge */}
           <div

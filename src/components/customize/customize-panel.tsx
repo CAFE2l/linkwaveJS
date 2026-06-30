@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState, useTransition } from "react";
+import { type ReactNode, useEffect, useRef, useState, useTransition } from "react";
 import {
   ChevronDown,
   Check,
@@ -26,6 +26,9 @@ import {
 } from "@/types/database";
 import { AvatarUpload } from "./avatar-upload";
 import { BannerUpload } from "./banner-upload";
+import { LivePreviewPanel } from "./LivePreviewPanel";
+import { useCustomizeStore } from "./customize-store";
+import type { Link } from "@/types/database";
 
 const inputClass =
   "h-12 w-full rounded-2xl border border-white/75 bg-white/45 px-4 text-sm font-bold text-ocean outline-none backdrop-blur-xl transition focus:border-cyan-200 focus:bg-white/65 focus:ring-4 focus:ring-cyan-200/25";
@@ -106,11 +109,13 @@ function ChoiceButton({
   selected,
   label,
   description,
+  shape,
   onClick,
 }: {
   selected: boolean;
   label: string;
   description?: string;
+  shape?: "rounded" | "pill" | "glass" | "led";
   onClick: () => void;
 }) {
   return (
@@ -126,6 +131,14 @@ function ChoiceButton({
     >
       <span className="block pr-5 text-sm font-black">{label}</span>
       {description && <span className="mt-0.5 block text-xs font-semibold opacity-65">{description}</span>}
+      {shape && (
+        <span
+          aria-hidden="true"
+          className={`mt-3 block h-7 border border-cyan-300/70 bg-gradient-to-r from-white/65 to-cyan-100/55 transition-all duration-200 ${
+            shape === "pill" ? "rounded-full" : shape === "rounded" ? "rounded-lg" : "rounded-xl"
+          } ${shape === "led" ? "shadow-[0_0_14px_rgba(34,211,238,.7)]" : ""}`}
+        />
+      )}
       {selected && (
         <span className="absolute right-3 top-3 flex size-5 items-center justify-center rounded-full bg-cyan-500 text-white shadow-sm">
           <Check size={12} strokeWidth={3} />
@@ -204,20 +217,41 @@ function Slider({
   suffix?: string;
   onChange: (v: number) => void;
 }) {
+  const [draftValue, setDraftValue] = useState(value);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const progress = ((draftValue - min) / (max - min)) * 100;
+
+  useEffect(() => setDraftValue(value), [value]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    [],
+  );
+
+  function handleChange(nextValue: number) {
+    setDraftValue(nextValue);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => onChange(nextValue), 110);
+  }
+
   return (
     <label className="space-y-1.5">
       <span className="flex justify-between text-xs font-bold text-ocean/60">
         <span>{label}</span>
-        <span>{value}{suffix}</span>
+        <span>{draftValue}{suffix}</span>
       </span>
       <input
         type="range"
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-cyan-500"
+        value={draftValue}
+        onChange={(event) => handleChange(Number(event.target.value))}
+        className="h-2 w-full cursor-pointer appearance-none rounded-full accent-cyan-500"
+        style={{
+          background: `linear-gradient(90deg, #06b6d4 0%, #38bdf8 ${progress}%, rgba(255,255,255,.35) ${progress}%, rgba(255,255,255,.35) 100%)`,
+        }}
       />
     </label>
   );
@@ -232,6 +266,11 @@ function ColorPicker({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const [draftValue, setDraftValue] = useState(value);
+  const valid = /^#[0-9a-fA-F]{6}$/.test(draftValue);
+
+  useEffect(() => setDraftValue(value), [value]);
+
   return (
     <label className="space-y-1.5">
       <span className="text-xs font-bold text-ocean/60">{label}</span>
@@ -239,17 +278,25 @@ function ColorPicker({
         <input
           type="color"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-9 cursor-pointer rounded-lg border border-white/50 bg-white/30 p-0.5"
+          onChange={(event) => {
+            setDraftValue(event.target.value);
+            onChange(event.target.value);
+          }}
+          className="h-12 w-12 cursor-pointer rounded-xl border border-white/70 bg-white/30 p-1"
         />
         <input
           type="text"
-          value={value}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v);
+          value={draftValue}
+          aria-invalid={!valid}
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            if (!/^#[0-9a-fA-F]{0,6}$/.test(nextValue)) return;
+            setDraftValue(nextValue);
+            if (/^#[0-9a-fA-F]{6}$/.test(nextValue)) onChange(nextValue);
           }}
-          className="h-9 flex-1 rounded-lg border border-white/50 bg-white/30 px-2 text-xs font-bold text-ocean backdrop-blur-sm"
+          className={`h-12 flex-1 rounded-xl border bg-white/35 px-3 text-sm font-bold text-ocean outline-none backdrop-blur-sm ${
+            valid ? "border-white/60 focus:ring-4 focus:ring-cyan-200/30" : "border-red-400 focus:ring-4 focus:ring-red-200/30"
+          }`}
           maxLength={7}
         />
       </div>
@@ -259,9 +306,11 @@ function ColorPicker({
 
 export function CustomizePanel({
   user,
+  links,
   initialBio,
 }: {
   user: AppUser;
+  links: Link[];
   initialBio: string;
 }) {
   const [currentUser, setCurrentUser] = useState(user);
@@ -270,14 +319,20 @@ export function CustomizePanel({
     username: user.username,
     bio: initialBio,
   });
-  const [theme, setTheme] = useState<UserThemeConfig>(
-    mergeUserTheme(user.theme_json as Partial<UserThemeConfig> | null),
-  );
+  const theme = useCustomizeStore((state) => state.theme);
+  const patchTheme = useCustomizeStore((state) => state.patchTheme);
+  const initializeTheme = useCustomizeStore((state) => state.initialize);
   const [saving, startSaving] = useTransition();
   const [message, setMessage] = useState<SaveMessage | null>(null);
 
+  useEffect(() => {
+    initializeTheme(
+      mergeUserTheme(user.theme_json as Partial<UserThemeConfig> | null),
+    );
+  }, [initializeTheme, user.theme_json]);
+
   function updateTheme(partial: Partial<UserThemeConfig>) {
-    setTheme((current) => ({ ...current, ...partial }));
+    patchTheme(partial);
     setMessage(null);
   }
 
@@ -339,7 +394,7 @@ export function CustomizePanel({
         </a>
       </div>
 
-      <div className="grid items-start gap-7 xl:grid-cols-1 max-w-2xl mx-auto">
+      <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
         <div className="space-y-6">
           {/* ─── 1. Profile ─── */}
           <CollapsibleSection
@@ -566,6 +621,7 @@ export function CustomizePanel({
                       selected={theme.link_style === id}
                       label={label}
                       description={description}
+                      shape={id as "rounded" | "pill" | "glass" | "led"}
                       onClick={() =>
                         updateTheme({
                           link_style: id as UserThemeConfig["link_style"],
@@ -699,7 +755,12 @@ export function CustomizePanel({
             )}
           </div>
         </div>
-
+        <LivePreviewPanel
+          user={currentUser}
+          links={links}
+          bio={profile.bio}
+          status={saving ? "saving" : message ? (message.ok ? "saved" : "error") : "idle"}
+        />
       </div>
     </DashboardShell>
   );

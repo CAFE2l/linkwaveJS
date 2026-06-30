@@ -2,10 +2,13 @@
 
 import { ArrowUpRight, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
+import { useThemeContext } from "@/hooks/use-theme-context";
 import type { Link } from "@/types/database";
 
 export function PublicLinkButton({ link }: { link: Link }) {
+  const theme = useThemeContext();
   function trackClick() {
     const payload = JSON.stringify({ linkId: link.id, userId: link.user_id });
     const blob = new Blob([payload], { type: "application/json" });
@@ -58,14 +61,27 @@ export function PublicLinkButton({ link }: { link: Link }) {
   }
 
   return (
-    <a
+    <motion.a
       href={link.url}
       target="_blank"
       rel="noreferrer"
       onClick={trackClick}
-      className="group relative flex min-h-[4.25rem] items-center gap-3 overflow-hidden rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-3 text-left shadow-[0_4px_18px_rgba(0,0,0,0.12)] backdrop-blur-lg transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.11] hover:shadow-[0_8px_32px_rgba(0,0,0,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+      className="group relative flex min-h-[4.25rem] items-center gap-3 overflow-hidden border px-4 py-3 text-left backdrop-blur-lg transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+      animate={{
+        borderRadius: theme?.link_style === "pill" ? 999 : theme?.link_style === "rounded" ? 14 : 20,
+        boxShadow:
+          theme?.button_glow || theme?.link_style === "led"
+            ? `0 8px 28px ${theme?.link_glow_color ?? "#22d3ee"}66`
+            : "0 4px 18px rgba(0,0,0,0.12)",
+      }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       style={{
         color: "var(--ut-text-primary, #0b1829)",
+        borderColor: theme?.border_color ?? "rgba(255,255,255,.3)",
+        background:
+          theme?.link_style === "glass"
+            ? "var(--ut-link-bg, rgba(255,255,255,.16))"
+            : `color-mix(in srgb, ${theme?.button_color ?? "#0ea5e9"} 28%, transparent)`,
       }}
     >
       <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-70" />
@@ -99,6 +115,6 @@ export function PublicLinkButton({ link }: { link: Link }) {
           color: "var(--ut-btn-bg, #0ea5e9)",
         }}
       />
-    </a>
+    </motion.a>
   );
 }

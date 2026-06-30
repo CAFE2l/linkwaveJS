@@ -61,8 +61,14 @@ export function AdminLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-white/50 px-5">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20">
-            <Image src="/brand/icon.png" alt="" width={22} height={22} />
+          <div className="flex size-12 shrink-0 items-center justify-center">
+            <Image
+              src="/brand/icon.png"
+              alt="LinkWave"
+              width={42}
+              height={42}
+              className="size-[42px] object-contain"
+            />
           </div>
           <div>
             <div className="text-sm font-bold text-[#0a1626]">LinkWave</div>

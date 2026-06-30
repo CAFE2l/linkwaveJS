@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   const totalClicks = await prisma.click.count({ where: { userId: authUser.uid } });
   const iconsData: IconInfo[] = await listIconsAction();
 
-  const allIcons = iconsData.map((i) => i.name);
+  const allIcons = iconsData.map((icon: IconInfo) => icon.name);
 
   const user = {
     id: record.id,

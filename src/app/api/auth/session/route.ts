@@ -4,6 +4,19 @@ function generateUsername(uid: string): string {
   return `u_${uid.slice(0, 26)}`;
 }
 
+function readTokenProject(idToken: string): string | null {
+  try {
+    const payload = idToken.split(".")[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(
+      Buffer.from(payload, "base64url").toString("utf8"),
+    ) as { aud?: unknown };
+    return typeof decoded.aud === "string" ? decoded.aud : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   let idToken: string;
 
@@ -26,6 +39,24 @@ export async function POST(request: NextRequest) {
   let decoded;
   let sessionCookie: string;
   try {
+    const tokenProject = readTokenProject(idToken);
+    const adminProject = process.env.FIREBASE_ADMIN_PROJECT_ID
+      ?.trim()
+      .replace(/^"|"$/g, "");
+
+    if (tokenProject && adminProject && tokenProject !== adminProject) {
+      console.error(
+        `Firebase project mismatch: token=${tokenProject} admin=${adminProject}`,
+      );
+      return NextResponse.json(
+        {
+          error: "Firebase projects do not match",
+          code: "FIREBASE_PROJECT_MISMATCH",
+        },
+        { status: 401 },
+      );
+    }
+
     const { getAdminAuth } = await import("@/lib/firebase/admin");
     const adminAuth = getAdminAuth();
     decoded = await adminAuth.verifyIdToken(idToken);
@@ -38,9 +69,13 @@ export async function POST(request: NextRequest) {
       typeof error === "object" && error && "code" in error
         ? String(error.code)
         : "unknown";
-    console.error("Firebase session verification failed", { code: firebaseCode });
+    console.error(`Firebase session verification failed: ${firebaseCode}`);
+    const safeCode = `FIREBASE_${firebaseCode
+      .replace(/^auth\//, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .toUpperCase()}`;
     return NextResponse.json(
-      { error: "Firebase token validation failed", code: "FIREBASE_TOKEN_REJECTED" },
+      { error: "Firebase token validation failed", code: safeCode },
       { status: 401 },
     );
   }

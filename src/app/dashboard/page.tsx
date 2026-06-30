@@ -6,6 +6,7 @@ import { ensureUserRecord } from "@/lib/db/upsert-user";
 import { ThemeProvider } from "@/components/landing/theme-provider";
 import { BlobBackground } from "@/components/landing/blob-background";
 import { listIconsAction, type IconInfo } from "@/lib/actions/icons";
+import type { Link } from "@prisma/client";
 
 export const metadata = { title: "Dashboard | LinkWave" };
 
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
     where: { userId: authUser.uid },
     select: { bio: true },
   });
-  const rawLinks = await prisma.link.findMany({
+  const rawLinks: Link[] = await prisma.link.findMany({
     where: { userId: authUser.uid },
     orderBy: { orderPosition: "asc" },
   });
@@ -43,18 +44,18 @@ export default async function DashboardPage() {
     created_at: record.createdAt.toISOString(),
   };
 
-  const links = rawLinks.map((l) => ({
-    id: l.id,
-    user_id: l.userId,
-    title: l.title,
-    url: l.url,
-    icon: l.icon,
-    icone: l.icone,
-    icon_blob: l.iconBlob,
-    is_custom_icon: l.isCustomIcon,
-    pinned: l.pinned,
-    order_position: l.orderPosition,
-    created_at: l.createdAt.toISOString(),
+  const links = rawLinks.map((link: Link) => ({
+    id: link.id,
+    user_id: link.userId,
+    title: link.title,
+    url: link.url,
+    icon: link.icon,
+    icone: link.icone,
+    icon_blob: link.iconBlob,
+    is_custom_icon: link.isCustomIcon,
+    pinned: link.pinned,
+    order_position: link.orderPosition,
+    created_at: link.createdAt.toISOString(),
   }));
 
   return (

@@ -78,19 +78,19 @@ export default function FullDashboard({
     }
   }
 
-  async function handleEditLink(id: string, title: string, url: string): Promise<boolean> {
+  async function handleEditLink(id: string, title: string, url: string, icon: string): Promise<boolean> {
     try {
       const res = await fetch("/api/links", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, title, url }),
+        body: JSON.stringify({ id, title, url, icon }),
       });
       const data = await res.json();
       if (!data.ok) {
         pushToast({ id: String(Date.now()), type: "error", msg: data.message || "Erro ao atualizar" });
         return false;
       }
-      setLinks((s) => s.map((l) => (String(l.id) === id ? { ...l, title, url } : l)));
+      setLinks((s) => s.map((l) => (String(l.id) === id ? { ...l, title, url, icon } : l)));
       pushToast({ id: String(Date.now()), type: "success", msg: "Link atualizado!" });
       return true;
     } catch {

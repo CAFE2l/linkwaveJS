@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { GripVertical, Link2, Pencil, Trash2, Check, X, Loader2, Pin } from "lucide-react";
 import { Reorder, motion } from "framer-motion";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
+import { IconPicker } from "@/components/dashboard/icon-picker";
 import type { Link as DbLink } from "@/types/database";
 
 function LinkIcon({ link }: { link: DbLink }) {
@@ -37,12 +38,13 @@ function EditForm({
   saving,
 }: {
   link: DbLink;
-  onSave: (id: string, title: string, url: string) => void;
+  onSave: (id: string, title: string, url: string, icon: string) => void;
   onCancel: () => void;
   saving: boolean;
 }) {
   const [title, setTitle] = useState(link.title);
   const [url, setUrl] = useState(link.url);
+  const [icon, setIcon] = useState(link.icon ?? link.icone ?? "link");
 
   return (
     <div className="p-3 rounded-xl bg-white/30 backdrop-blur-sm border border-white/60 space-y-3">
@@ -59,9 +61,10 @@ function EditForm({
         className="w-full rounded-lg px-3 py-2 border border-white/60 bg-white/40 text-ocean placeholder:text-ocean/40 text-sm focus:outline-none focus:ring-2 focus:ring-white/60"
         placeholder="https://..."
       />
+      <IconPicker value={icon} onChange={setIcon} />
       <div className="flex gap-2">
         <button
-          onClick={() => onSave(link.id, title, url)}
+          onClick={() => onSave(link.id, title, url, icon)}
           disabled={saving || !title.trim() || !url.trim()}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg glass-button text-xs"
         >
@@ -90,7 +93,7 @@ export default function LinkList({
   links: DbLink[];
   onReorder: (n: DbLink[]) => void;
   onDelete: (id: string | number) => void;
-  onEdit?: (id: string, title: string, url: string) => Promise<boolean>;
+  onEdit?: (id: string, title: string, url: string, icon: string) => Promise<boolean>;
   onTogglePinned?: (id: string, pinned: boolean) => Promise<boolean>;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -102,10 +105,10 @@ export default function LinkList({
   );
   const pinnedCount = orderedLinks.filter((link) => link.pinned).length;
 
-  const handleSave = useCallback(async (id: string, title: string, url: string) => {
+  const handleSave = useCallback(async (id: string, title: string, url: string, icon: string) => {
     if (!onEdit) return;
     setSavingId(id);
-    const success = await onEdit(id, title, url);
+    const success = await onEdit(id, title, url, icon);
     setSavingId(null);
     if (success) setEditingId(null);
   }, [onEdit]);

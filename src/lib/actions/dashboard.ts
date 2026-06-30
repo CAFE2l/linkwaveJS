@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getPrisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/firebase/auth-server";
 import { normalizeUrl } from "@/lib/utils/url";
+import { resolveLinkIcon } from "@/lib/utils/url-to-icon";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { linkSchema, reorderLinksSchema } from "@/lib/validations/profile";
 import type { Link } from "@/types/database";
@@ -71,7 +72,7 @@ export async function upsertLinkAction(
         data: {
           title,
           url: normalizeUrl(url),
-          icon: icon || "link",
+          icon: resolveLinkIcon(url, icon),
         },
       });
       revalidatePath("/dashboard");
@@ -84,7 +85,7 @@ export async function upsertLinkAction(
         userId,
         title,
         url: normalizeUrl(url),
-        icon: icon || "link",
+        icon: resolveLinkIcon(url, icon),
         orderPosition: count,
       },
     });

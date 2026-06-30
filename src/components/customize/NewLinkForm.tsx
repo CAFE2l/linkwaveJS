@@ -73,6 +73,8 @@ export default function NewLinkForm({
       pinned,
     });
     setTitle(""); setUrl(""); setSelectedIcon(""); setCustomDataUrl(null); setPinned(false);
+    setIconMode("predefined");
+    userSetIcon.current = false;
   }
 
   const iconSrc = iconMode === "custom" && customDataUrl

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import { useThemeContext } from "@/hooks/use-theme-context";
+import { getIconFromUrl } from "@/lib/utils/url-to-icon";
 import type { Link } from "@/types/database";
 
 export function PublicLinkButton({ link }: { link: Link }) {
@@ -22,7 +23,11 @@ export function PublicLinkButton({ link }: { link: Link }) {
     }
   }
 
-  const iconName = link.icone || link.icon;
+  const storedIcon = link.icone || link.icon;
+  const iconName =
+    storedIcon && storedIcon !== "link"
+      ? storedIcon
+      : getIconFromUrl(link.url);
 
   function renderIcon() {
     const iconClass =

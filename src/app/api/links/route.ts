@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getCurrentUser } from '@/lib/firebase/auth-server';
 import { getPrisma } from '@/lib/db/prisma';
 import { normalizeUrl } from '@/lib/utils/url';
+import { resolveLinkIcon } from '@/lib/utils/url-to-icon';
 
 const updateLinkSchema = z.object({
   id: z.string().uuid(),
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
         userId: user.uid,
         title,
         url: normalizeUrl(url),
-        icon: icon || null,
+        icon: resolveLinkIcon(url, icon),
         isCustomIcon: is_custom_icon ?? false,
         iconBlob: icon_blob || null,
         pinned: pinned === true,
@@ -145,7 +146,7 @@ export async function PUT(req: Request) {
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
     if (url !== undefined) updateData.url = normalizeUrl(url);
-    if (icon !== undefined) updateData.icon = icon || null;
+    if (icon !== undefined) updateData.icon = resolveLinkIcon(url ?? "", icon);
     if (is_custom_icon !== undefined) updateData.isCustomIcon = is_custom_icon;
     if (icon_blob !== undefined) updateData.iconBlob = icon_blob || null;
     if (pinned !== undefined) updateData.pinned = pinned;

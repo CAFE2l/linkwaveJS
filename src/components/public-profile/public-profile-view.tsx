@@ -12,6 +12,7 @@ import { ProfileLinkButton } from "@/components/public-profile/profile-link-butt
 import { StarCanvas } from "@/components/public-profile/star-canvas";
 import { CustomLinkIcon } from "@/components/shared/custom-link-icon";
 import { ThemeProviderShell } from "@/components/shared/theme-provider-shell";
+import { getIconFromUrl } from "@/lib/utils/url-to-icon";
 import type { AppUser, Link, UserThemeConfig } from "@/types/database";
 
 type PublicProfileViewProps = {
@@ -36,7 +37,11 @@ function trackPinnedClick(link: Link) {
 }
 
 function PinnedLinkIcon({ link, compact }: { link: Link; compact: boolean }) {
-  const iconName = link.icone || link.icon;
+  const storedIcon = link.icone || link.icon;
+  const iconName =
+    storedIcon && storedIcon !== "link"
+      ? storedIcon
+      : getIconFromUrl(link.url);
   const sizeClass = compact ? "size-8" : "size-11";
   const imageSize = compact ? 16 : 22;
 

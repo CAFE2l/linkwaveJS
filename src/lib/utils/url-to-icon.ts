@@ -331,6 +331,13 @@ export function getIconFromUrl(url: string): string | null {
 
     if (domainToIcon[hostname]) return domainToIcon[hostname];
 
+    // Match regional and nested subdomains such as br.pinterest.com,
+    // uk.linkedin.com and music.youtube.com without accepting lookalike hosts.
+    const parentDomain = Object.keys(domainToIcon).find((domain) =>
+      hostname.endsWith(`.${domain}`),
+    );
+    if (parentDomain) return domainToIcon[parentDomain];
+
     const parts = hostname.split(".");
     const baseDomain = parts[0];
 
@@ -357,4 +364,13 @@ export function getIconFromUrl(url: string): string | null {
   } catch {
     return null;
   }
+}
+
+export function resolveLinkIcon(
+  url: string,
+  requestedIcon?: string | null,
+): string {
+  const normalizedIcon = requestedIcon?.trim();
+  if (normalizedIcon && normalizedIcon !== "link") return normalizedIcon;
+  return getIconFromUrl(url) ?? "link";
 }

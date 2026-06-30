@@ -5,26 +5,51 @@ function generateUsername(uid: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  let idToken: string;
+
   try {
-    const { idToken } = await request.json();
-    if (!idToken) {
-      return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
+    const body = (await request.json()) as { idToken?: unknown };
+    if (typeof body.idToken !== "string" || body.idToken.length === 0) {
+      return NextResponse.json(
+        { error: "Missing idToken", code: "MISSING_ID_TOKEN" },
+        { status: 400 },
+      );
     }
+    idToken = body.idToken;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body", code: "INVALID_REQUEST_BODY" },
+      { status: 400 },
+    );
+  }
 
+  let decoded;
+  let sessionCookie: string;
+  try {
     const { getAdminAuth } = await import("@/lib/firebase/admin");
-    const { getPrisma } = await import("@/lib/db/prisma");
-    const prisma = getPrisma();
-
-    const decoded = await getAdminAuth().verifyIdToken(idToken);
-    const { uid, email, name: displayName } = decoded;
-    const userEmail = email ?? "";
-
+    const adminAuth = getAdminAuth();
+    decoded = await adminAuth.verifyIdToken(idToken);
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-
-    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+    sessionCookie = await adminAuth.createSessionCookie(idToken, {
       expiresIn,
     });
+  } catch (error: unknown) {
+    const firebaseCode =
+      typeof error === "object" && error && "code" in error
+        ? String(error.code)
+        : "unknown";
+    console.error("Firebase session verification failed", { code: firebaseCode });
+    return NextResponse.json(
+      { error: "Firebase token validation failed", code: "FIREBASE_TOKEN_REJECTED" },
+      { status: 401 },
+    );
+  }
 
+  try {
+    const { getPrisma } = await import("@/lib/db/prisma");
+    const prisma = getPrisma();
+    const { uid, email, name: displayName } = decoded;
+    const userEmail = email ?? "";
     await prisma.user.upsert({
       where: { id: uid },
       create: {
@@ -50,21 +75,28 @@ export async function POST(request: NextRequest) {
       },
       update: {},
     });
-
-    const response = NextResponse.json({ success: true });
-    response.cookies.set("__session", sessionCookie, {
-      maxAge: expiresIn / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Session creation error:", error);
-    return NextResponse.json({ error: "Failed to create session" }, { status: 401 });
+  } catch (error: unknown) {
+    const databaseCode =
+      typeof error === "object" && error && "code" in error
+        ? String(error.code)
+        : "unknown";
+    console.error("Firebase user database sync failed", { code: databaseCode });
+    return NextResponse.json(
+      { error: "User database sync failed", code: "USER_SYNC_FAILED" },
+      { status: 500 },
+    );
   }
+
+  const expiresIn = 60 * 60 * 24 * 5 * 1000;
+  const response = NextResponse.json({ success: true });
+  response.cookies.set("__session", sessionCookie, {
+    maxAge: expiresIn / 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+  return response;
 }
 
 export async function DELETE() {
